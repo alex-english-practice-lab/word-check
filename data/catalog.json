@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "defaultLibraryId": "lib:ielts",
+  "libraries": [
+    { "id": "lib:ielts", "version": "1.0.0", "url": "ielts.v1.json" }
+  ]
+}

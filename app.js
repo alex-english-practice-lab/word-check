@@ -1,4 +1,6 @@
-const $=id=>document.getElementById(id),C=window.WordCore;
+const $=id=>document.getElementById(id),C=window.WordCore,V=window.WordVocabulary;
+const libraries=V.createRegistry();let catalogReady=null,activeLibrary=null;
+function ensureCatalog(){return catalogReady||(catalogReady=libraries.loadManifest('data/catalog.json').catch(e=>{catalogReady=null;throw e}))}
 let words=[],queue=[],answers=[],index=0,hints=0,graded=false,mode='full',scope='',currentSense='',isDemo=false,active=false,loadVersion=0;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function show(id){for(const x of ['setup','quiz','results'])$(x).hidden=x!==id;window.scrollTo(0,0)}
@@ -11,7 +13,12 @@ function renderPreview(){let lists=[...new Set(words.map(w=>w.list))].sort((a,b)
 $('range').addEventListener('input',()=>{renderListCounts();updateSelection()});$('count').addEventListener('input',updateSelection);$('sampling').addEventListener('change',updateSelection);$('listCounts').addEventListener('input',e=>{if(e.target.dataset.countList){listCounts.set(+e.target.dataset.countList,e.target.value);updateSelection()}});
 function useWordList(text,name,isDefault=false,encoding='UTF-8'){
  const parsed=C.parse(text);if(!parsed.words.length)throw Error('没有识别到词条，请检查词表格式。');
- words=parsed.words;listCounts.clear();const lists=[...new Set(words.map(w=>w.list))].sort((a,b)=>a-b);
+ return useLibrary(V.fromLegacy(parsed,{name}),isDefault,encoding);
+}
+function useLibrary(library,isDefault=false,encoding='UTF-8'){
+ const nextWords=V.toPracticeWords(library);if(!nextWords.length)throw Error('没有识别到词条，请检查词表格式。');
+ const name=library.name,parsed={warnings:library.importDiagnostics||[]};
+ activeLibrary=library;words=nextWords;listCounts.clear();const lists=[...new Set(words.map(w=>w.list))].sort((a,b)=>a-b);
  if(!isDefault)$('range').value=lists.join(',');else{try{C.range($('range').value,lists)}catch{$('range').value=String(lists[0])}}
  $('sourceBadge').textContent=name;$('defaultNotice').hidden=!isDefault;$('restoreDefault').hidden=isDefault;$('loadError').hidden=true;
  $('importNotice').className='';$('importNotice').innerHTML=`<p class="small">${isDefault?'默认词库已就绪':'已临时导入'} · ${words.length.toLocaleString()} 个词条 · ${lists.length} 个 List${isDefault?'':' · '+encoding}</p>`;
@@ -19,9 +26,12 @@ function useWordList(text,name,isDefault=false,encoding='UTF-8'){
  if(parsed.warnings.length||noIPA){const d=document.createElement('details');d.className='source-notes';d.innerHTML=`<summary>词表核对说明${parsed.warnings.length?' · '+parsed.warnings.length+' 处格式或重复记录':''}</summary>${parsed.warnings.length?'<pre>'+parsed.warnings.map(w=>'第 '+w.line+' 行 · '+esc(w.reason)+'\n'+esc(w.text)).join('\n\n')+'</pre>':''}${noIPA?'<p class="small">'+noIPA+' 个词条原文未提供音标，以短语为主；检查时显示释义。</p>':''}`;$('importNotice').append(d)}
  renderPreview();
 }
-async function loadDefault(){const version=++loadVersion;$('sourceBadge').textContent='正在加载默认词库…';$('start').disabled=true;$('loadError').hidden=true;
- try{const response=await fetch('ielts-word-list.txt',{cache:'no-cache'});if(!response.ok)throw Error('词库暂时无法加载');const text=await response.text();if(version!==loadVersion)return;useWordList(text,'IELTS 默认词库',true)}catch(e){if(version!==loadVersion)return;$('sourceBadge').textContent=words.length?'保留当前词表':'默认词库未加载';$('loadError').hidden=false;if(words.length)updateSelection()}
+async function loadLibrary(libraryId){if(active)throw Error('请先结束当前检查。');const version=++loadVersion;$('sourceBadge').textContent='正在加载默认词库…';$('start').disabled=true;$('loadError').hidden=true;
+ try{await ensureCatalog();const library=await libraries.load(libraryId||libraries.defaultId);if(version!==loadVersion)return;useLibrary(library,library.id===libraries.defaultId);return library.id}catch(e){if(version!==loadVersion)return;$('sourceBadge').textContent=words.length?'保留当前词表':'默认词库未加载';$('loadError').hidden=false;if(words.length)updateSelection()}
 }
+function loadDefault(){return loadLibrary()}
+// Lightweight integration/test entry point; no new selector or persistence UI.
+window.WordCheckLibraries={register:entry=>libraries.register(entry),switchLibrary:loadLibrary,list:()=>libraries.list().map(({id,version})=>({id,version})),get activeId(){return activeLibrary?.id||null}};
 $('retryLoad').onclick=loadDefault;$('restoreDefault').onclick=loadDefault;
 $('file').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;const version=++loadVersion;try{if(file.size>2*1024*1024)throw Error('文件超过 2 MB，请先精简词表。');const buf=await file.arrayBuffer();let text,encoding='UTF-8';try{text=new TextDecoder('utf-8',{fatal:true}).decode(buf)}catch{text=new TextDecoder('gb18030',{fatal:true}).decode(buf);encoding='GB18030'}if(version!==loadVersion)return;useWordList(text,file.name,false,encoding)}catch(err){$('importNotice').textContent=err.message;$('importNotice').className='error';updateSelection()}finally{e.target.value=''}});
 function begin(pool,chosenMode,chosenScope){if(!pool.length)throw Error('没有可用词条。');queue=C.shuffle(pool);answers=[];index=0;mode=chosenMode;scope=chosenScope;active=true;show('quiz');renderQuestion();return{questions:queue.length,mode,scope}}
