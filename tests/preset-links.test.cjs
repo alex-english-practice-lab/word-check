@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const P=require('../preset-links.js');
-const input={v:1,l:'lib:ielts',lv:'1.0.0',m:'full',s:'List 1–2 · 10 题',w:['lib:ielts/word/a','lib:ielts/word/b']};
+const input={v:2,l:'lib:ielts',lv:'1.0.0',m:'full',s:'List 1–2 · 10 题',w:['lib:ielts/word/a','lib:ielts/word/b'],t:20,h:false};
 
 test('preset token preserves the exact word set and assignment settings',async()=>{
  const token=await P.createToken(input),decoded=await P.readToken(token);
@@ -13,6 +13,13 @@ test('preset token rejects edits, duplicates and malformed relationships',async(
  await assert.rejects(()=>P.createToken({...input,w:[input.w[0],input.w[0]]}),/编号/);
  await assert.rejects(()=>P.createToken({...input,w:['lib:other/word/a']}),/编号/);
  await assert.rejects(()=>P.createToken({...input,w:Array.from({length:101},(_,i)=>'lib:ielts/word/'+i)}),/100 题/);
+ await assert.rejects(()=>P.createToken({...input,t:601}),/答题设置/);
+ await assert.rejects(()=>P.createToken({...input,h:'false'}),/答题设置/);
+});
+
+test('version 1 links remain readable with settings omitted',async()=>{
+ const legacy={v:1,l:input.l,lv:input.lv,m:input.m,s:input.s,w:input.w};
+ assert.deepEqual(await P.readToken(await P.createToken(legacy)),legacy);
 });
 
 test('preset URL uses a fragment and discards unrelated query parameters',async()=>{

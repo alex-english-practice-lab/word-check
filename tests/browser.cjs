@@ -25,6 +25,7 @@ async function scenario(browser,url,prefix){
  await page.addInitScript(()=>{let seed=42;Math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296)});
  await page.addInitScript(()=>{window.testTools={};Object.defineProperty(document,'modelContext',{value:{registerTool(tool){window.testTools[tool.name]=tool}}})});
  await page.goto(url);await ready(page);
+ assert.equal(await page.locator('#customImport').isHidden(),true);
  assert.equal(await page.evaluate(()=>testTools.read_vocabulary_summary.execute().words),3610);
  const desktop=await screenshot(page,prefix+'-desktop');
  assert.equal(await page.locator('#sourceBadge').innerText(),'IELTS 默认词库');
@@ -53,7 +54,7 @@ async function scenario(browser,url,prefix){
  await page.locator('#list-count-29').fill('0');await page.locator('#list-count-61').fill('1');await page.locator('#start').click();
  assert.equal(await page.locator('#questionList').innerText(),'LIST 61');
  await typeCorrect(page);await page.locator('#next').click();await page.locator('#restart').click();
- await page.locator('#restoreDefault').click();await ready(page);
+ await page.evaluate(()=>loadDefault());await ready(page);
  // Compare the original mobile setup and question layouts at the same deterministic state.
  await page.setViewportSize({width:390,height:844});const mobile=await screenshot(page,prefix+'-mobile');
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
@@ -78,7 +79,7 @@ async function main(){
   page.once('dialog',d=>d.accept());await page.locator('#exit').click();await page.locator('#restart').click();
   log('second library switch, independent lists, stable question IDs and active-session switch guard');
   await page.route('**/data/ielts.v1.json',route=>route.fulfill({status:503,body:'offline'}));
-  await page.locator('#restoreDefault').click();await page.locator('#loadError').waitFor({state:'visible'});
+  await page.evaluate(()=>loadDefault());await page.locator('#loadError').waitFor({state:'visible'});
   assert.equal(await page.locator('#preview tr').count(),3);assert.equal(await page.evaluate(()=>WordCheckLibraries.activeId),second.id);
   await page.unroute('**/data/ielts.v1.json');await page.locator('#retryLoad').click();await ready(page);log('failed loading retains current library; retry restores default');
   // A slow default load must never override a later user import.
@@ -103,11 +104,13 @@ async function main(){
   await failed.goto(origin+'/word-check/');await failed.locator('#loadError').waitFor({state:'visible'});assert.ok(await failed.locator('#start').isDisabled());
   await failed.unroute('**/data/catalog.json');await failed.locator('#retryLoad').click();await ready(failed);await failed.close();log('initial manifest failure recovers on retry');
   const teacher=await browser.newPage();await teacher.goto(origin+'/word-check/');await ready(teacher);
-  await teacher.locator('#range').fill('1-2');await teacher.locator('#sampling').selectOption('total');await teacher.locator('#count').fill('8');await teacher.locator('#createPreset').click();
+  await teacher.locator('#range').fill('1-2');await teacher.locator('#sampling').selectOption('total');await teacher.locator('#count').fill('8');await teacher.locator('#questionTime').fill('601');assert.ok(await teacher.locator('#createPreset').isDisabled());await teacher.locator('#questionTime').fill('3');await teacher.locator('#allowHints').uncheck();await teacher.locator('#createPreset').click();
   const presetUrl=await teacher.locator('#presetLink').inputValue(),payload=await teacher.evaluate(url=>WordPresetLinks.readHash(new URL(url).hash),presetUrl);
-  assert.equal(payload.w.length,8);assert.equal(new Set(payload.w).size,8);assert.equal(payload.l,'lib:ielts');await teacher.close();
-  const presetOrders=[];for(const seedValue of [7,19]){const student=await browser.newPage();await student.addInitScript(seed=>{let state=seed;Math.random=()=>((state=(state*1664525+1013904223)>>>0)/4294967296)},seedValue);await student.goto(presetUrl);await student.locator('#quiz').waitFor({state:'visible'});assert.equal(await student.locator('#setup').isHidden(),true);assert.equal(await student.locator('#progressText').innerText(),'1 / 8');assert.deepEqual(new Set(await student.evaluate(()=>queue.map(word=>word.id))),new Set(payload.w));presetOrders.push(await student.evaluate(()=>queue.map(word=>word.id)));await student.close()}
+  assert.equal(payload.w.length,8);assert.equal(new Set(payload.w).size,8);assert.equal(payload.l,'lib:ielts');assert.equal(payload.t,3);assert.equal(payload.h,false);
+  const presetOrders=[];for(const seedValue of [7,19]){const student=await browser.newPage();await student.addInitScript(seed=>{let state=seed;Math.random=()=>((state=(state*1664525+1013904223)>>>0)/4294967296)},seedValue);await student.goto(presetUrl);await student.locator('#quiz').waitFor({state:'visible'});assert.equal(await student.locator('#setup').isHidden(),true);assert.equal(await student.locator('#progressText').innerText(),'1 / 8');assert.equal(await student.locator('#timer').isVisible(),true);assert.equal(await student.locator('#hint').isHidden(),true);assert.deepEqual(new Set(await student.evaluate(()=>queue.map(word=>word.id))),new Set(payload.w));presetOrders.push(await student.evaluate(()=>queue.map(word=>word.id)));await student.close()}
   assert.notDeepEqual(presetOrders[0],presetOrders[1]);log('preset link fixes the word set, locks setup and reshuffles question order');
+  await teacher.locator('#count').fill('1');await teacher.locator('#questionTime').fill('1');await teacher.locator('#createPreset').click();const timeoutUrl=await teacher.locator('#presetLink').inputValue();await teacher.close();
+  const timed=await browser.newPage();await timed.goto(timeoutUrl);await timed.locator('#quiz').waitFor({state:'visible'});await timed.locator('#feedback').filter({hasText:'本题超时'}).waitFor({state:'visible',timeout:4000});assert.equal(await timed.locator('#answer').isDisabled(),true);assert.equal(await timed.locator('#next').isVisible(),true);assert.equal(await timed.locator('#timer').innerText(),'0 秒');assert.equal(await timed.evaluate(()=>answers[0].reason),'timeout');await timed.locator('#next').click();assert.match(await timed.locator('#review').innerText(),/超时/);await timed.close();log('timer expiry marks timeout, reveals the answer and waits for Next');
   const tampered=await browser.newPage(),last=presetUrl.at(-1)==='A'?'B':'A';await tampered.goto(presetUrl.slice(0,-1)+last);await tampered.locator('#presetError').waitFor({state:'visible'});assert.match(await tampered.locator('#presetErrorMessage').innerText(),/修改/);await tampered.close();log('tampered preset link fails closed');
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}
 }

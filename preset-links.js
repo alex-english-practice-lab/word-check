@@ -1,6 +1,6 @@
 (function(root){
 'use strict';
-const VERSION=1;
+const VERSION=2;
 const encoder=new TextEncoder(),decoder=new TextDecoder();
 const nonempty=value=>typeof value==='string'&&value.length>0;
 function encodeBytes(bytes){
@@ -17,10 +17,12 @@ async function fingerprint(text){
  return encodeBytes(new Uint8Array(await root.crypto.subtle.digest('SHA-256',encoder.encode(text))));
 }
 function validate(input){
- if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.lv)||!['full','single'].includes(input.m)||!nonempty(input.s)||!Array.isArray(input.w)||!input.w.length)throw Error('作业链接内容不完整。');
+ if(!input||![1,VERSION].includes(input.v)||!nonempty(input.l)||!nonempty(input.lv)||!['full','single'].includes(input.m)||!nonempty(input.s)||!Array.isArray(input.w)||!input.w.length)throw Error('作业链接内容不完整。');
  if(input.s.length>500||input.w.length>100)throw Error('学生链接最多支持 100 题，请减少题量。');
  const ids=new Set();for(const id of input.w){if(!nonempty(id)||!id.startsWith(input.l+'/word/')||ids.has(id))throw Error('作业链接中的单词编号无效。');ids.add(id)}
- return {v:VERSION,l:input.l,lv:input.lv,m:input.m,s:input.s,w:[...input.w]};
+ const payload={v:input.v,l:input.l,lv:input.lv,m:input.m,s:input.s,w:[...input.w]};
+ if(input.v===VERSION){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean')throw Error('作业链接中的答题设置无效。');payload.t=input.t;payload.h=input.h}
+ return payload;
 }
 async function createToken(input){
  const payload=validate(input),encoded=encodeBytes(encoder.encode(JSON.stringify(payload)));
