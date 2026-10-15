@@ -10,6 +10,7 @@ function validate(library){
  requireValue(nonempty(library.id)&&nonempty(library.name)&&nonempty(library.version),'library identity, name and version required');
  requireValue(!library.id.includes('/'),'library ID cannot contain a path separator');
  requireValue(library.description===undefined||typeof library.description==='string','invalid description');
+ requireValue(library.selectionMode===undefined||['numbered','named'].includes(library.selectionMode),'invalid selectionMode');
  requireValue(library.source&&['builtin','user','test'].includes(library.source.type),'invalid source type');
  requireValue(Array.isArray(library.lists)&&library.lists.length>0,'lists required');
  const ids=new Set(),numbers=new Set();
@@ -52,6 +53,33 @@ function fromLegacy(parsed,{id='lib:'+mintId(),name,version='1.0.0',source={type
  }
  return validate(library);
 }
+// One-time import of an explicit source document; retain its provenance and rich senses.
+// Persist this result. Do not rerun on every page load (that would regenerate UUIDs).
+function fromSource(document,{id='lib:'+mintId(),idFactory=mintId}={}){
+ requireValue(document&&document.schemaVersion==='1.0'&&document.source&&Array.isArray(document.lists),'invalid source document');
+ const metadata=document.source;
+ requireValue(nonempty(metadata.id)&&nonempty(metadata.title)&&nonempty(metadata.version),'source metadata required');
+ const library={schemaVersion:1,id,name:metadata.title,description:metadata.description||'',version:metadata.version,
+  selectionMode:'named',source:{type:'builtin',format:'source-json-v1',metadata:copy(metadata)},lists:[]};
+ const sourceIds=new Set(),listIds=new Set();
+ for(const input of document.lists){
+  requireValue(nonempty(input.id)&&!listIds.has(input.id)&&nonempty(input.title)&&Array.isArray(input.entries),'invalid source list');listIds.add(input.id);
+  requireValue(Number.isFinite(input.order)&&input.entryCount===input.entries.length,'source list count/order mismatch');
+  const list={id:id+'/list/'+idFactory(),libraryId:id,name:input.title,number:library.lists.length+1,order:input.order,sourceListId:input.id,words:[]};
+  for(const e of input.entries){
+   requireValue(nonempty(e.id)&&!sourceIds.has(e.id),'duplicate/missing source entry ID');sourceIds.add(e.id);
+   requireValue(nonempty(e.word)&&typeof e.phonetic==='string'&&typeof e.partOfSpeech==='string'&&typeof e.meaning==='string','invalid source entry');
+   requireValue(Array.isArray(e.definitions)&&e.definitions.length>0&&e.definitions.every(nonempty),'source definitions required');
+   requireValue(Array.isArray(e.senses)&&e.senses.every(s=>typeof s.partOfSpeech==='string'&&Array.isArray(s.definitions)&&s.definitions.every(nonempty)),'invalid source sense groups');
+   list.words.push({id:id+'/word/'+idFactory(),libraryId:id,listId:list.id,revision:1,order:list.words.length,
+    text:e.word,phonetic:e.phonetic,pos:e.partOfSpeech,senses:[...e.definitions],acceptedAnswers:[e.word],
+    sourceEntryId:e.id,sourceMeaning:e.meaning,senseGroups:copy(e.senses)});
+  }
+  library.lists.push(list);
+ }
+ requireValue(metadata.listCount===library.lists.length&&metadata.entryCount===sourceIds.size,'source total count mismatch');
+ return validate(library);
+}
 function createRegistry({fetcher=(...args)=>fetch(...args)}={}){
  const entries=new Map();let defaultId=null;
  function register(entry){
@@ -64,13 +92,13 @@ function createRegistry({fetcher=(...args)=>fetch(...args)}={}){
   const entry=entries.get(id);requireValue(entry,'unknown library: '+id);
   let library;
   if(entry.data)library=copy(entry.data);
-  else{const response=await fetcher(entry.url,{cache:'no-cache'});if(!response.ok)throw Error('词库暂时无法加载');library=await response.json()}
+  else{const response=await fetcher(entry.url,{cache:'no-cache'});if(!response.ok)throw Error('无法加载词库文件（HTTP '+response.status+'）：'+entry.url);library=await response.json()}
   validate(library);requireValue(library.id===id,'loaded identity mismatch');
   if(entry.version)requireValue(library.version===entry.version,'loaded version mismatch');
   return library;
  }
  async function loadManifest(url){
-  const response=await fetcher(url,{cache:'no-cache'});if(!response.ok)throw Error('词库目录暂时无法加载');
+  const response=await fetcher(url,{cache:'no-cache'});if(!response.ok)throw Error('无法加载词库目录（HTTP '+response.status+'）：'+url);
   const manifest=await response.json();requireValue(manifest.schemaVersion===1&&Array.isArray(manifest.libraries),'invalid manifest');
   // Validate atomically so a failed request cannot leave a half-registered catalog.
   const trial=createRegistry({fetcher});
@@ -82,6 +110,6 @@ function createRegistry({fetcher=(...args)=>fetch(...args)}={}){
  }
  return {register,load,loadManifest,list:()=>[...entries.values()].map(copy),get defaultId(){return defaultId}};
 }
-const api={validate,fromLegacy,toPracticeWords,createRegistry};
+const api={validate,fromLegacy,fromSource,toPracticeWords,createRegistry};
 if(typeof module!=='undefined')module.exports=api;else root.WordVocabulary=api;
 })(typeof window!=='undefined'?window:globalThis);
