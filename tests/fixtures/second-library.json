@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "lib:test-only",
+  "name": "TEST ONLY — 不作为正式词库",
+  "description": "三个词条验证跨词库同词、同库异义、非连续 List；不注册到生产目录。",
+  "version": "1.0.0",
+  "source": { "type": "test" },
+  "lists": [
+    {
+      "id": "lib:test-only/list/a", "libraryId": "lib:test-only", "name": "Test 3", "number": 3, "order": 10,
+      "words": [
+        { "id": "lib:test-only/word/a", "libraryId": "lib:test-only", "listId": "lib:test-only/list/a", "revision": 1, "order": 1, "text": "emperor", "phonetic": "/ˈempərə(r)/", "pos": "n.", "senses": ["皇帝"], "acceptedAnswers": ["emperor"] },
+        { "id": "lib:test-only/word/b", "libraryId": "lib:test-only", "listId": "lib:test-only/list/a", "revision": 1, "order": 2, "text": "bank", "phonetic": "", "pos": "n.", "senses": ["银行"], "acceptedAnswers": ["bank"] },
+        { "id": "lib:test-only/word/c", "libraryId": "lib:test-only", "listId": "lib:test-only/list/a", "revision": 1, "order": 3, "text": "bank", "phonetic": "", "pos": "n.", "senses": ["河岸"], "acceptedAnswers": ["bank"] }
+      ]
+    },
+    { "id": "lib:test-only/list/b", "libraryId": "lib:test-only", "name": "Test 61", "number": 61, "order": 20, "words": [] }
+  ]
+}
