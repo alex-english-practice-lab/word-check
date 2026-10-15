@@ -1,0 +1,8 @@
+/* Additions for the library picker; the original responsive stylesheet is unchanged. */
+#groupChoices{display:grid;gap:8px}
+.group-choice{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.group-choice:has(input:checked){border-color:#8093f2;background:#f4f6ff}
+#groupChoices input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;margin:0;accent-color:var(--blue)}
+.group-choice span{font-size:14px;font-weight:600}
+.group-choice small{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:4px}
+#loadErrorDetail{display:block;overflow-wrap:anywhere;margin-top:6px}
