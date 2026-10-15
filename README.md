@@ -20,10 +20,13 @@ The link also fixes the per-question time limit and whether hints are allowed.
 When a timer reaches zero, the answer is revealed and the question is recorded
 as timed out; the student advances manually. Preset links support built-in
 libraries, validate the library version and link fingerprint, and open directly
-in a locked assignment flow. Version 1 preset links remain compatible and use
-the legacy defaults: no timer and hints allowed. Because GitHub Pages is static
-hosting, this is UI locking and corruption detection rather than server-backed
-authorization.
+in a locked assignment flow. Version 3 links encode sorted, delta-compressed
+word positions within the exact library version, then resolve them back to
+stable Word IDs when opened. This keeps a typical 50-word link below 500
+characters without using a server. Version 1 and 2 preset links remain
+compatible; version 1 uses the legacy defaults of no timer and hints allowed.
+Because GitHub Pages is static hosting, this is UI locking and corruption
+detection rather than server-backed authorization.
 
 The temporary TXT-import controls are hidden from the setup page for now. The
 parser and import wiring remain in the code so the entry point can be restored
