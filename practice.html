@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Word Check 日常词汇 V3：Recognition 四选一与 Synonym 多选练习">
+  <title>日常词汇 V3 · Word Check</title>
+  <link rel="stylesheet" href="style.css?v=20261015d">
+  <link rel="stylesheet" href="practice.css?v=20261015e">
+</head>
+<body>
+  <header>
+    <a class="brand" href="./"><span class="logo">W</span> Word Check <span class="brand-cn">单词检查</span></a>
+    <nav class="practice-nav" aria-label="网站导航"><a href="./">拼写检查</a><a href="practice.html" aria-current="page">日常词汇 V3</a></nav>
+  </header>
+  <main>
+    <div class="page-heading">
+      <div><span class="eyebrow">DAILY VOCABULARY · PILOT</span><h1>日常词汇 V3</h1><p class="small">Recognition 四选一 · Synonym 多选 · 记录仅存当前浏览器</p></div>
+      <span class="small" id="loadStatus" role="status">正在加载 V3 题库…</span>
+    </div>
+    <section id="setup" class="workspace" aria-label="练习设置">
+      <aside class="panel setup-panel">
+        <div class="section-heading"><span class="step">01</span><h2>设置本次练习</h2></div>
+        <fieldset class="p-mode-set"><legend>练习类型</legend>
+          <label class="mode"><input type="radio" name="practiceMode" value="recognition" checked><span><strong>Recognition · 词义四选一</strong><small>看英文，选正确中文意思；迷惑项按语义分类预设</small></span></label>
+          <label class="mode"><input type="radio" name="practiceMode" value="synonym"><span><strong>Synonym · 同义词多选</strong><small>在指定词义和语境中选出全部合适的词</small></span></label>
+        </fieldset>
+        <div id="categoryWrap"><label class="field-label" for="category">选择分类</label><select id="category"><option value="">全部分类</option></select></div>
+        <label class="field-label p-spaced" for="questionCount">本次题量</label>
+        <select id="questionCount"><option value="10">10 题</option><option value="20" selected>20 题</option><option value="30">30 题</option><option value="0">全部题目</option></select>
+        <div class="p-review-choice"><label><input type="checkbox" id="reviewOnly"> 仅从本机错题集中抽题</label><p class="small" id="reviewCount">尚无错题记录</p></div>
+        <p class="small" id="selectionSummary"></p><p class="error" id="setupError" role="alert"></p>
+        <button type="button" class="primary wide" id="start" disabled>开始练习</button>
+        <p class="small p-note">记录仅保存在当前浏览器，不会自动同步 iPhone / iPad。答错的题需连续两次做对才暂时退出复习池。</p>
+      </aside>
+      <section class="panel preview-panel">
+        <div class="section-heading"><span class="step">02</span><h2>词库预览</h2><span id="entryCount" class="pill">—</span></div>
+        <div class="notice"><strong>日常常见词汇 V3</strong><p>主词库 1,172 个词条。Recognition 使用审核后的 309 道内部试用题；Synonyms 使用 46 道语境多选题。其他词条可在下方查阅，尚未全部制作成四选一题。</p></div>
+        <label class="field-label p-spaced" for="wordSearch">查找主词库单词 / 中文含义</label>
+        <input type="search" id="wordSearch" placeholder="例如 archery / 地理 / 海洋">
+        <div class="table-scroll p-vocab-scroll"><table><thead><tr><th>英文</th><th>释义</th><th>原分类</th></tr></thead><tbody id="wordRows"><tr><td colspan="3">加载中…</td></tr></tbody></table></div>
+        <p class="small">词库预览显示答案；进入练习时不会提前展示正确选项。</p>
+      </section>
+    </section>
+    <section id="quiz" hidden aria-label="练习题目">
+      <div class="quiz-top"><button type="button" class="text-button" id="exit">结束本轮</button><span id="quizMode" class="pill"></span><span id="progressText"></span></div>
+      <div class="progress"><div id="progressBar"></div></div>
+      <div class="question-card panel p-quiz">
+        <div class="question-meta"><span id="questionCategory"></span><span id="questionInstruction"></span></div>
+        <div class="question-content p-question"><h2 id="headword"></h2><p id="context" class="p-context"></p></div>
+        <div id="options" class="p-options" role="group" aria-label="答案选项"></div>
+        <div id="feedback" role="status" aria-live="polite"></div>
+        <div class="next-row"><button type="button" id="submit" class="primary" disabled>检查答案</button><button type="button" id="skip" class="text-button">不会 / 跳过</button><button type="button" id="next" class="primary" hidden>下一题</button></div>
+      </div>
+      <p class="quiz-footnote">同义词多选必须选出全部正确项才算完全正确 · 可随时结束并查看已答题目</p>
+    </section>
+    <section id="results" hidden class="panel results" aria-label="练习结果">
+      <span class="eyebrow">SESSION REVIEW</span><h1 id="resultTitle">本轮练习完成</h1><p class="muted" id="resultSummary"></p>
+      <div class="stats p-two-stats"><div><strong id="correctCount">0</strong><span>完全正确</span></div><div><strong id="wrongCount">0</strong><span>答错 / 跳过</span></div></div>
+      <div class="table-scroll"><table><thead><tr><th>题目</th><th>你的选择</th><th>结果</th><th>正确答案</th></tr></thead><tbody id="resultRows"></tbody></table></div>
+      <p class="small" id="storageMessage"></p>
+      <div class="result-actions"><button type="button" class="primary" id="restart">重新设置</button><button type="button" class="secondary" id="retryWrong">重练本轮错题</button></div>
+    </section>
+    <footer><span>WORD CHECK</span><span>V3 词义识别与同义词 · 教学试用版</span></footer>
+  </main>
+  <script src="practice-core.js?v=20261015e"></script>
+  <script src="practice.js?v=20261015e"></script>
+</body>
+</html>

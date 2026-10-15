@@ -24,7 +24,7 @@ function renderGroupChoices(){
 }
 $('librarySelect').addEventListener('change',()=>loadLibrary($('librarySelect').value));
 $('groupChoices').addEventListener('change',()=>{$('range').value=[...$('groupChoices').querySelectorAll('input:checked')].map(input=>input.dataset.group).join(',');renderListCounts();updateSelection()});
-function show(id){for(const x of ['setup','quiz','results','presetError'])$(x).hidden=x!==id;window.scrollTo(0,0)}
+function show(id){for(const x of ['setup','quiz','results','presetError'])$(x).hidden=x!==id;$('practiceEntry').hidden=id!=='setup';window.scrollTo(0,0)}
 function selection(){try{if(namedGroups()&&!$('range').value.trim())throw Error('请至少选择一个难度分组。');const r=C.range($('range').value,words.map(w=>w.list)),available=new Set(words.map(w=>w.list)),missing=r.filter(n=>!available.has(n));if(missing.length)throw Error('词表中没有 List '+missing.join('、')+'，请调整范围或导入完整词表。');return words.filter(w=>r.includes(w.list))}catch(e){throw e}}
 const listCounts=new Map();
 function listPlan(){return C.range($('range').value,words.map(w=>w.list)).map(list=>({list,count:listCounts.get(list)===''?NaN:Number(listCounts.get(list))}))}
