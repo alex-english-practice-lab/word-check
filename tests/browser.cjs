@@ -68,7 +68,8 @@ async function main(){
  try{
   const before=await scenario(browser,origin+'/baseline/','before'),after=await scenario(browser,origin+'/word-check/','after');
   assert.equal(after.results,before.results);log('original and refactored quiz results/text match exactly');
-  for(const key of ['desktop','resultImage','mobile','mobileQuiz']){assert.ok(after[key].equals(before[key]),key+' screenshot changed');log(key+' pixel-identical screenshot')}
+  for(const key of ['resultImage','mobileQuiz']){assert.ok(after[key].equals(before[key]),key+' screenshot changed');log(key+' pixel-identical screenshot')}
+  log('setup screenshots captured; expected preset-link controls are excluded from legacy pixel equality');
   const page=await browser.newPage();await page.goto(origin+'/word-check/');await ready(page);
   await page.evaluate(async library=>{WordCheckLibraries.register({id:library.id,data:library});await WordCheckLibraries.switchLibrary(library.id)},second);
   assert.equal(await page.locator('#preview tr').count(),3);assert.equal(await page.evaluate(()=>WordCheckLibraries.activeId),second.id);
@@ -101,6 +102,13 @@ async function main(){
   const failed=await browser.newPage();await failed.route('**/data/catalog.json',route=>route.fulfill({status:503,body:'offline'}));
   await failed.goto(origin+'/word-check/');await failed.locator('#loadError').waitFor({state:'visible'});assert.ok(await failed.locator('#start').isDisabled());
   await failed.unroute('**/data/catalog.json');await failed.locator('#retryLoad').click();await ready(failed);await failed.close();log('initial manifest failure recovers on retry');
+  const teacher=await browser.newPage();await teacher.goto(origin+'/word-check/');await ready(teacher);
+  await teacher.locator('#range').fill('1-2');await teacher.locator('#sampling').selectOption('total');await teacher.locator('#count').fill('8');await teacher.locator('#createPreset').click();
+  const presetUrl=await teacher.locator('#presetLink').inputValue(),payload=await teacher.evaluate(url=>WordPresetLinks.readHash(new URL(url).hash),presetUrl);
+  assert.equal(payload.w.length,8);assert.equal(new Set(payload.w).size,8);assert.equal(payload.l,'lib:ielts');await teacher.close();
+  const presetOrders=[];for(const seedValue of [7,19]){const student=await browser.newPage();await student.addInitScript(seed=>{let state=seed;Math.random=()=>((state=(state*1664525+1013904223)>>>0)/4294967296)},seedValue);await student.goto(presetUrl);await student.locator('#quiz').waitFor({state:'visible'});assert.equal(await student.locator('#setup').isHidden(),true);assert.equal(await student.locator('#progressText').innerText(),'1 / 8');assert.deepEqual(new Set(await student.evaluate(()=>queue.map(word=>word.id))),new Set(payload.w));presetOrders.push(await student.evaluate(()=>queue.map(word=>word.id)));await student.close()}
+  assert.notDeepEqual(presetOrders[0],presetOrders[1]);log('preset link fixes the word set, locks setup and reshuffles question order');
+  const tampered=await browser.newPage(),last=presetUrl.at(-1)==='A'?'B':'A';await tampered.goto(presetUrl.slice(0,-1)+last);await tampered.locator('#presetError').waitFor({state:'visible'});assert.match(await tampered.locator('#presetErrorMessage').innerText(),/修改/);await tampered.close();log('tampered preset link fails closed');
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}
 }
 main().catch(e=>{console.error(e);server.close();process.exitCode=1});

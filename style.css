@@ -3,3 +3,4 @@
 .count-row{display:grid;grid-template-columns:minmax(0,1fr) 90px 20px;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.count-row label{font-weight:600}.count-row small{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:4px}.count-row input{min-width:0}#totalSettings{margin-top:18px}#listCounts{max-height:340px;overflow-y:auto;padding-right:4px}
 
 .source-notes{margin:12px 0;line-height:1.7}.source-notes summary{font-size:14px}
+.preset-create{margin-top:10px}.preset-link-panel{margin-top:16px;padding:15px;border:1px solid #cfd8fa;border-radius:9px;background:#f7f9ff}.preset-link-panel input{font-size:12px}.preset-link-panel .small{margin:8px 0 12px}.preset-error{max-width:640px;margin:70px auto;padding:36px}.button-link{display:inline-block;border-radius:8px;padding:12px 18px;text-decoration:none;font-weight:600}.preset-mode .page-heading{display:none}

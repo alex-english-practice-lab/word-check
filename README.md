@@ -13,6 +13,14 @@ The root app loads `data/catalog.json` and the versioned default library through
 are preserved. `github-word-check/` is an untouched duplicate legacy upload,
 not the Phase 1 app.
 
+Teachers can generate a preset student link from the setup panel. It stores the
+exact stable Word IDs selected for that assignment, so every student receives
+the same word set while question order is reshuffled whenever the link opens.
+Preset links support built-in libraries, validate the library version and link
+fingerprint, and open directly in a locked assignment flow. Because GitHub
+Pages is static hosting, this is UI locking and corruption detection rather
+than server-backed authorization.
+
 - [Architecture, fields, IDs, migration, interfaces, and Phase 2 plan](docs/ARCHITECTURE.md)
 - [Audit of the actual upstream source](docs/AUDIT.md)
 - [Development and validation report](docs/PHASE1-REPORT.md)
