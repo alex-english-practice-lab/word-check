@@ -66,9 +66,12 @@
     const availableReview = eligible.filter(q => due.has(q.question_type + ':' + q.id));
     text('reviewCount', `当前模式${category?'及分类':''}待复习 ${availableReview.length} 题（仅本机）`);
     const count = $('reviewOnly').checked ? availableReview.length : eligible.length;
-    text('selectionSummary', `本次可抽取 ${count} 题 · 选项顺序随机`);
-    $('start').disabled = count === 0;
-    text('setupError', count ? '' : (state.entries.length ? '当前选择没有可用题目，请修改条件。' : '词库正在加载…'));
+    const raw = $('questionCount').value.trim(), requested = Number(raw);
+    const valid = raw !== '' && Number.isSafeInteger(requested) && requested >= 0;
+    const actual = valid ? (requested === 0 ? count : Math.min(requested, count)) : 0;
+    text('selectionSummary', `可用 ${count} 题 · 本轮 ${actual} 题 · 选项顺序随机`);
+    $('start').disabled = count === 0 || !valid;
+    text('setupError', !valid ? '请输入 0 或正整数题量。' : count ? '' : (state.entries.length ? '当前选择没有可用题目，请修改条件。' : '词库正在加载…'));
   }
   function begin(questions, label) {
     if (!questions.length) { text('setupError', '没有可用的题目'); return; }
@@ -80,6 +83,8 @@
   }
   function startFromSetup() {
     try {
+      updateSetup();
+      if ($('start').disabled) return;
       const category = state.mode === 'recognition' ? $('category').value : '';
       const due = $('reviewOnly').checked ? C.dueKeys(C.readStore(window.localStorage)) : null;
       const count = $('questionCount').value;
@@ -106,6 +111,7 @@
       b.addEventListener('click', () => select(option.id)); group.append(b);
     });
     $('feedback').replaceChildren(); $('feedback').className = '';
+    $('feedback').parentElement.scrollTop = 0;
     $('submit').disabled = true; $('submit').hidden = false;
     $('skip').hidden = false; $('next').hidden = true;
     const first = group.querySelector('button'); if (first) first.focus();
@@ -144,7 +150,7 @@
     if (q.explanation_zh) feedback.append(document.createElement('br'), el('small', '', q.explanation_zh));
     $('submit').hidden = true; $('skip').hidden = true;
     text('next', state.index === state.queue.length - 1 ? '查看本轮结果' : '下一题');
-    $('next').hidden = false; $('next').focus();
+    $('next').hidden = false; $('next').focus({ preventScroll: true });
   }
   function next() {
     if (!state.graded) return;
@@ -184,6 +190,7 @@
   }
   document.querySelectorAll('input[name=practiceMode]').forEach(x=>x.addEventListener('change',updateSetup));
   $('category').addEventListener('change',updateSetup);
+  $('questionCount').addEventListener('input',updateSetup);
   $('questionCount').addEventListener('change',updateSetup);
   $('reviewOnly').addEventListener('change',updateSetup);
   $('wordSearch').addEventListener('input',renderWords);
