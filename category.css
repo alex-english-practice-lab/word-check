@@ -21,7 +21,11 @@
 .home-setup #librarySettings>.small{margin:7px 0 14px}
 .home-setup #numberedLists>.small,.home-setup #namedLists>.small{margin:7px 0 0}
 .home-setup .mode{padding:10px;margin:7px 0}
+.home-setup .setup-mode .mode:first-of-type{margin-top:0}
 .home-setup .toggle-setting{margin-top:13px}
+.home-setup .time-setting{position:relative}
+.home-setup .time-setting input{padding-right:78px}
+.home-setup .time-setting>span{position:absolute;right:14px;top:50%;transform:translateY(-50%);padding-left:12px;border-left:1px solid var(--line);color:var(--muted);font-size:13px;pointer-events:none}
 .home-setup #questionTimeHelp{margin:7px 0 0}
 .home-setup #totalSettings{margin-top:14px}
 .home-setup #countHelp{margin:7px 0 0}
@@ -34,7 +38,6 @@
 .home-setup #v3SamplingSettings>.small{margin:7px 0 0}
 .v3-home .home-setup input:not([type=radio]):not([type=checkbox]),.v3-home .home-setup select{min-height:48px}
 .v3-home #v3ModeOptions .mode{min-height:82px;margin:8px 0}
-.v3-home #v3ModeOptions .mode:first-of-type{margin-top:0}
 .v3-home #v3AnswerSettings .v3-review-setting{min-height:58px;padding:10px 0;margin-top:10px}
 .setup-actions{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,220px) minmax(200px,250px);gap:12px 14px;align-items:center;border-top:1px solid var(--line);padding-top:14px}
 .setup-status{min-width:0}
