@@ -6,9 +6,9 @@
   <meta name="description" content="Word Check 日常词汇 V3：Recognition 四选一与 Synonym 多选练习">
   <title>日常词汇 V3 · Word Check</title>
   <link rel="stylesheet" href="style.css?v=20261015d">
-  <link rel="stylesheet" href="practice.css?v=20261016b">
+  <link rel="stylesheet" href="practice.css?v=20261016c">
 </head>
-<body>
+<body class="practice-page">
   <header>
     <a class="brand" href="./"><span class="logo">W</span> Word Check <span class="brand-cn">单词检查</span></a>
     <nav class="practice-nav" aria-label="网站导航"><a href="./">拼写检查</a><a href="practice.html" aria-current="page">日常词汇 V3</a></nav>
@@ -18,25 +18,32 @@
       <div><span class="eyebrow">DAILY VOCABULARY · PILOT</span><h1>日常词汇 V3</h1><p class="small">Recognition 四选一 · Synonym 多选 · 记录仅存当前浏览器</p></div>
       <span class="small" id="loadStatus" role="status">正在加载 V3 题库…</span>
     </div>
-    <section id="setup" class="workspace" aria-label="练习设置">
-      <aside class="panel setup-panel">
+    <section id="setup" class="p-setup" aria-label="练习设置">
+      <aside class="panel setup-panel p-setup-panel">
         <div class="section-heading"><span class="step">01</span><h2>设置本次练习</h2></div>
-        <fieldset class="p-mode-set"><legend>练习类型</legend>
-          <label class="mode"><input type="radio" name="practiceMode" value="recognition" checked><span><strong>Recognition · 词义四选一</strong><small>看英文，选正确中文意思；迷惑项按语义分类预设</small></span></label>
-          <label class="mode"><input type="radio" name="practiceMode" value="synonym"><span><strong>Synonym · 同义词多选</strong><small>在指定词义和语境中选出全部合适的词</small></span></label>
-        </fieldset>
-        <div id="categoryWrap"><label class="field-label" for="category">选择分类</label><select id="category"><option value="">全部分类</option></select></div>
-        <label class="field-label p-spaced" for="questionCount">本次题量</label>
-        <input id="questionCount" type="number" min="0" step="1" value="20" inputmode="numeric" aria-describedby="questionCountHelp">
-        <p id="questionCountHelp" class="small">输入题数，例如 15、25 或 50；填 0 练习全部。超过可用题数时，使用全部可用题目。</p>
-        <div class="p-review-choice"><label><input type="checkbox" id="reviewOnly"> 仅从本机错题集中抽题</label><p class="small" id="reviewCount">尚无错题记录</p></div>
-        <p class="small" id="selectionSummary"></p><p class="error" id="setupError" role="alert"></p>
-        <button type="button" class="primary wide" id="start" disabled>开始练习</button>
-        <p class="small p-note">记录仅保存在当前浏览器，不会自动同步 iPhone / iPad。答错的题需连续两次做对才暂时退出复习池。</p>
+        <div class="p-setup-grid">
+          <fieldset class="p-mode-set p-setup-block"><legend>练习类型</legend>
+            <label class="mode"><input type="radio" name="practiceMode" value="recognition" checked><span><strong>Recognition · 词义四选一</strong><small>看英文，选正确中文意思</small></span></label>
+            <label class="mode"><input type="radio" name="practiceMode" value="synonym"><span><strong>Synonym · 同义词多选</strong><small>按指定语境选出全部近义词</small></span></label>
+          </fieldset>
+          <div class="p-setup-block">
+            <div id="categoryWrap"><label class="field-label" for="category">选择分类</label><select id="category"><option value="">全部分类</option></select></div>
+            <label class="field-label p-spaced" for="questionCount">本次题量</label>
+            <input id="questionCount" type="number" min="0" step="1" value="20" inputmode="numeric" aria-describedby="questionCountHelp">
+            <p id="questionCountHelp" class="small">可输入任意题数；填 0 练习全部。</p>
+          </div>
+          <div class="p-setup-block p-start-block">
+            <div class="p-review-choice"><label><input type="checkbox" id="reviewOnly"> 仅从本机错题集中抽题</label><p class="small" id="reviewCount">尚无错题记录</p></div>
+            <p class="small" id="selectionSummary"></p>
+            <p class="error" id="setupError" role="alert"></p>
+            <button type="button" class="primary wide" id="start" disabled>开始练习</button>
+          </div>
+        </div>
+        <p class="small p-note">记录保存在当前浏览器。答错的题连续两次做对后退出复习池。</p>
       </aside>
-      <section class="panel preview-panel">
+      <section class="panel preview-panel p-preview-below">
         <div class="section-heading"><span class="step">02</span><h2>词库预览</h2><span id="entryCount" class="pill">—</span></div>
-        <div class="notice"><strong>日常常见词汇 V3</strong><p>主词库 1,172 个词条。Recognition 使用审核后的 309 道内部试用题；Synonyms 使用 46 道语境多选题。其他词条可在下方查阅，尚未全部制作成四选一题。</p></div>
+        <div class="notice"><strong>日常常见词汇 V3</strong><p>主词库 1,172 个词条。Recognition 使用审核后的 309 道内部试用题；Synonym 使用 46 道语境多选题。其他词条可在下方查阅，尚未全部制作成四选一题。</p></div>
         <label class="field-label p-spaced" for="wordSearch">查找主词库单词 / 中文含义</label>
         <input type="search" id="wordSearch" placeholder="例如 archery / 地理 / 海洋">
         <div class="table-scroll p-vocab-scroll"><table><thead><tr><th>英文</th><th>释义</th><th>原分类</th></tr></thead><tbody id="wordRows"><tr><td colspan="3">加载中…</td></tr></tbody></table></div>
