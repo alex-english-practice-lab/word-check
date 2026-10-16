@@ -16,8 +16,11 @@ and library-version mismatches fail closed.
 This is UI separation, NOT access control. The repository and word data are public.
 SHA-256 checksums detect corruption only; they are unkeyed and can be recomputed.
 No passwords, authentication, student identities, backend or submissions are added.
-V3 recognition/synonym remain available for free practice but, as before,
-do not yet support student links.
+DAILY_VERSION=5 supports Daily Vocabulary V3 Recognition and Synonym links.
+Fixed V3 links store compact question indexes; random V3 links store mode, category,
+and question count. Both shuffle question and option order. Local wrong-answer filtering
+cannot be shared and disables link generation. V3 currently has no spelling timer or
+letter-hint controls, so those settings are not part of V3 links.
 
 Validation: node --test tests/*.test.cjs
 tests/browser.cjs sharing scenarios start at /teacher/; public homepage is
