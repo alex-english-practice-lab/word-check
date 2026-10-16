@@ -67,3 +67,5 @@
   .setup-actions .setup-status,.setup-actions #createPreset,.setup-actions #start,.v3-home .setup-actions #start{grid-column:auto;grid-row:auto}
   .home-preview-below{margin-top:16px}
 }
+.home-setup #questionTime{-moz-appearance:textfield;appearance:textfield}
+.home-setup #questionTime::-webkit-inner-spin-button,.home-setup #questionTime::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
