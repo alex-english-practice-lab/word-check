@@ -5,3 +5,8 @@
 
 /* Reserve feedback space so revealing an answer never moves the action row. */
 .p-feedback-slot{height:160px;overflow:auto;margin-top:22px;overflow-wrap:anywhere;scrollbar-gutter:stable}.p-feedback-slot .feedback{margin-top:0}.p-quiz .next-row .primary{width:144px;min-height:48px}.p-quiz .next-row{min-height:48px}@media(max-width:700px){.p-feedback-slot{height:200px}}
+
+/* Compact setup: all controls stay together above the vocabulary preview. */
+.practice-page main{padding-top:24px}.practice-page .page-heading{margin-bottom:18px}.p-setup{display:block}.p-setup-panel{padding:22px 26px}.p-setup-panel>.section-heading{margin-bottom:18px}.p-setup-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px;align-items:stretch}.p-setup-block{min-width:0}.p-setup-panel fieldset{margin:0}.p-setup-panel .mode{margin:7px 0;padding:10px}.p-setup-panel .p-spaced{margin-top:16px}.p-setup-panel #questionCountHelp{margin:7px 0 0}.p-start-block{display:flex;flex-direction:column}.p-start-block .p-review-choice{margin-top:0}.p-start-block #selectionSummary{margin:14px 0 4px}.p-start-block #setupError{margin:4px 0}.p-start-block #start{margin-top:auto}.p-setup-panel>.p-note{margin:15px 0 0;padding-top:11px}.p-preview-below{margin-top:22px}
+@media(max-width:900px){.p-setup-grid{grid-template-columns:1fr 1fr}.p-start-block{grid-column:1/-1}.p-start-block #start{max-width:320px}}
+@media(max-width:680px){.practice-page main{padding-top:22px}.practice-page .page-heading{margin-bottom:16px}.p-setup-panel{padding:20px}.p-setup-grid{grid-template-columns:1fr;gap:20px}.p-start-block{grid-column:auto}.p-start-block #start{max-width:none}.p-preview-below{margin-top:16px}}
