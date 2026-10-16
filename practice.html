@@ -6,7 +6,7 @@
   <meta name="description" content="Word Check 日常词汇 V3：Recognition 四选一与 Synonym 多选练习">
   <title>日常词汇 V3 · Word Check</title>
   <link rel="stylesheet" href="style.css?v=20261015d">
-  <link rel="stylesheet" href="practice.css?v=20261015e">
+  <link rel="stylesheet" href="practice.css?v=20261016b">
 </head>
 <body>
   <header>
@@ -27,7 +27,8 @@
         </fieldset>
         <div id="categoryWrap"><label class="field-label" for="category">选择分类</label><select id="category"><option value="">全部分类</option></select></div>
         <label class="field-label p-spaced" for="questionCount">本次题量</label>
-        <select id="questionCount"><option value="10">10 题</option><option value="20" selected>20 题</option><option value="30">30 题</option><option value="0">全部题目</option></select>
+        <input id="questionCount" type="number" min="0" step="1" value="20" inputmode="numeric" aria-describedby="questionCountHelp">
+        <p id="questionCountHelp" class="small">输入题数，例如 15、25 或 50；填 0 练习全部。超过可用题数时，使用全部可用题目。</p>
         <div class="p-review-choice"><label><input type="checkbox" id="reviewOnly"> 仅从本机错题集中抽题</label><p class="small" id="reviewCount">尚无错题记录</p></div>
         <p class="small" id="selectionSummary"></p><p class="error" id="setupError" role="alert"></p>
         <button type="button" class="primary wide" id="start" disabled>开始练习</button>
@@ -49,7 +50,7 @@
         <div class="question-meta"><span id="questionCategory"></span><span id="questionInstruction"></span></div>
         <div class="question-content p-question"><h2 id="headword"></h2><p id="context" class="p-context"></p></div>
         <div id="options" class="p-options" role="group" aria-label="答案选项"></div>
-        <div id="feedback" role="status" aria-live="polite"></div>
+        <div class="p-feedback-slot" tabindex="0" role="region" aria-label="答案反馈"><div id="feedback" role="status" aria-live="polite"></div></div>
         <div class="next-row">
           <div><button type="button" id="skip" class="text-button">不会 / 跳过</button></div>
           <div><button type="button" id="submit" class="primary" disabled>检查答案</button><button type="button" id="next" class="primary" hidden>下一题</button></div>
@@ -67,6 +68,6 @@
     <footer><span>WORD CHECK</span><span>V3 词义识别与同义词 · 教学试用版</span></footer>
   </main>
   <script src="practice-core.js?v=20261015e"></script>
-  <script src="practice.js?v=20261015e"></script>
+  <script src="practice.js?v=20261016b"></script>
 </body>
 </html>
