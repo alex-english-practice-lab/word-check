@@ -112,6 +112,34 @@ async function main(){
   await teacher.locator('#count').fill('1');await teacher.locator('#questionTime').fill('1');await teacher.locator('#createPreset').click();const timeoutUrl=await teacher.locator('#presetLink').inputValue();await teacher.close();
   const timed=await browser.newPage();await timed.goto(timeoutUrl);await timed.locator('#quiz').waitFor({state:'visible'});await timed.locator('#feedback').filter({hasText:'本题超时'}).waitFor({state:'visible',timeout:4000});assert.equal(await timed.locator('#answer').isDisabled(),true);assert.equal(await timed.locator('#next').isVisible(),true);assert.equal(await timed.locator('#timer').innerText(),'0 秒');assert.equal(await timed.evaluate(()=>answers[0].reason),'timeout');await timed.locator('#next').click();assert.match(await timed.locator('#review').innerText(),/超时/);await timed.close();log('timer expiry marks timeout, reveals the answer and waits for Next');
   const tampered=await browser.newPage(),last=presetUrl.at(-1)==='A'?'B':'A';await tampered.goto(presetUrl.slice(0,-1)+last);await tampered.locator('#presetError').waitFor({state:'visible'});assert.match(await tampered.locator('#presetErrorMessage').innerText(),/修改/);await tampered.close();log('tampered preset link fails closed');
+  const v3Home=await browser.newPage();await v3Home.goto(origin+'/word-check/');await ready(v3Home);assert.equal(await v3Home.locator('.practice-entry').isVisible(),true);assert.equal(await v3Home.locator('.practice-entry-link').getAttribute('href'),'practice.html');await v3Home.close();log('home page exposes the Daily Vocabulary V3 category');
+  const v3=await browser.newPage({viewport:{width:1280,height:900}}),v3Errors=[];v3.on('pageerror',e=>v3Errors.push(e.message));await v3.goto(origin+'/word-check/practice.html');await v3.waitForFunction(()=>!document.getElementById('start').disabled);assert.match(await v3.locator('#loadStatus').innerText(),/1172 词 · 309 识别题 · 46 近义词题/);assert.match(await v3.locator('#selectionSummary').innerText(),/309 题/);
+  await v3.setViewportSize({width:1280,height:768});
+  const setupPanelBox=await v3.locator('.p-setup-panel').boundingBox(),startButtonBox=await v3.locator('#start').boundingBox(),previewPanelBox=await v3.locator('.p-preview-below').boundingBox();
+  assert.ok(startButtonBox.y+startButtonBox.height<=768,'all setup controls must fit in the initial desktop viewport');
+  assert.ok(previewPanelBox.y>=setupPanelBox.y+setupPanelBox.height-1,'vocabulary preview must sit below the setup panel');
+  assert.ok(setupPanelBox.width>1100,'desktop setup panel should use the full content width');
+  await v3.locator('#wordSearch').fill('archery');assert.match(await v3.locator('#wordRows').innerText(),/archery/i);await v3.locator('#questionCount').fill('10');await v3.locator('#start').click();assert.equal(await v3.locator('#options .p-option').count(),4);assert.equal(await v3.locator('#progressText').innerText(),'1 / 10');
+  const wrongRecognitionId=await v3.evaluate(async()=>{const bank=await fetch('data/recognition_v3_pilot.json').then(r=>r.json()),prompt=document.getElementById('headword').textContent,q=bank.questions.find(item=>item.prompt_en===prompt);return q.options.find(option=>option.id!==q.correct_option_id).id});await v3.locator(`[data-option-id="${wrongRecognitionId}"]`).click();await v3.locator('#submit').click();assert.match(await v3.locator('#feedback').innerText(),/正确答案/);assert.equal(await v3.locator('#options').getAttribute('aria-disabled'),'true');
+  v3.once('dialog',d=>d.accept());await v3.locator('#exit').click();assert.match(await v3.locator('#resultSummary').innerText(),/已作答 1 \/ 10 题/);assert.equal(await v3.evaluate(()=>JSON.parse(localStorage.getItem('wordcheck.v3.practice.local.v1')).attempts.length),1);await v3.locator('#restart').click();await v3.locator('#reviewOnly').check();await v3.locator('#start').click();assert.equal(await v3.locator('#progressText').innerText(),'1 / 1');v3.once('dialog',d=>d.accept());await v3.locator('#exit').click();await v3.locator('#restart').click();
+  await v3.locator('[name=practiceMode][value=synonym]').check();assert.equal(await v3.locator('#categoryWrap').isHidden(),true);await v3.locator('#reviewOnly').uncheck();await v3.locator('#questionCount').fill('10');await v3.locator('#start').click();assert.ok(await v3.locator('#options .p-option').count()>=6);await v3.locator('#options .p-option').first().click();assert.equal(await v3.locator('#options .p-option').first().getAttribute('aria-pressed'),'true');await v3.locator('#submit').click();assert.match(await v3.locator('#feedback').innerText(),/正确答案/);v3.once('dialog',d=>d.accept());await v3.locator('#exit').click();assert.match(await v3.locator('#resultSummary').innerText(),/同义词多选/);
+  // The primary action must keep its screen position when feedback appears.
+  for (const width of [1280,390]) {
+    await v3.setViewportSize({width,height:844});
+    await v3.locator('#restart').click();
+    await v3.locator('#questionCount').fill('15');
+    assert.match(await v3.locator('#selectionSummary').innerText(),/本轮 15 题/);
+    await v3.locator('#start').click();
+    assert.equal(await v3.locator('#progressText').innerText(),'1 / 15');
+    await v3.locator('#options .p-option').first().click();
+    await v3.locator('#submit').scrollIntoViewIfNeeded();
+    const before=await v3.locator('#submit').boundingBox();
+    await v3.locator('#submit').click();
+    const after=await v3.locator('#next').boundingBox();
+    for(const key of ['x','y','width','height'])assert.ok(Math.abs(before[key]-after[key])<1, 'Action moved: '+key);
+    v3.once('dialog',d=>d.accept());await v3.locator('#exit').click();
+  }
+  await v3.setViewportSize({width:390,height:844});await v3.locator('#restart').click();assert.ok(await v3.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(v3Errors,[]);await v3.close();log('V3 recognition, exact-set synonym selection, local review pool and mobile layout');
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}
 }
 main().catch(e=>{console.error(e);server.close();process.exitCode=1});

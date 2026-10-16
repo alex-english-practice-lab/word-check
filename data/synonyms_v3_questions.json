@@ -1,0 +1,2987 @@
+{
+  "schema": "wordcheck-quiz-content-editorial-v3",
+  "library_id": "synonym-core-v3",
+  "title": "Common Synonyms — 多选辨析",
+  "scoring_suggestion": "Exact set for full credit; also store omitted correct IDs and incorrectly selected IDs, context and question version.",
+  "questions": [
+    {
+      "id": "syn_b0c5e63be0bfec",
+      "question_type": "synonym_multi",
+      "headword": "important",
+      "sense_zh": "重要的；关键的",
+      "context_en": "important information for an emergency response",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_abc79094b4b43d",
+          "text": "essential"
+        },
+        {
+          "id": "o_ac9024dd067b81",
+          "text": "optional"
+        },
+        {
+          "id": "o_5028b74c2711ff",
+          "text": "critical"
+        },
+        {
+          "id": "o_813a6451ead86a",
+          "text": "prominent"
+        },
+        {
+          "id": "o_df429ce0c92e03",
+          "text": "crucial"
+        },
+        {
+          "id": "o_b3f0ffcb0bed41",
+          "text": "vital"
+        },
+        {
+          "id": "o_6e3f242347b63d",
+          "text": "fatal"
+        }
+      ],
+      "correct_option_ids": [
+        "o_abc79094b4b43d",
+        "o_df429ce0c92e03",
+        "o_5028b74c2711ff",
+        "o_b3f0ffcb0bed41"
+      ],
+      "explanation_zh": "这些词在紧急信息语境下表示关键或非常重要；fatal 表示致命。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_71bd94d9e7d6",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_c114dd5ec799c6",
+      "related_master_word_id": "w_279ddb1a40323d",
+      "sense_id": "s_73327d9f73eec0",
+      "answer_snapshot": {
+        "context_en": "important information for an emergency response",
+        "correct_option_texts": [
+          "essential",
+          "crucial",
+          "critical",
+          "vital"
+        ],
+        "option_texts": [
+          "essential",
+          "optional",
+          "critical",
+          "prominent",
+          "crucial",
+          "vital",
+          "fatal"
+        ]
+      }
+    },
+    {
+      "id": "syn_b95f77443da26f",
+      "question_type": "synonym_multi",
+      "headword": "necessary",
+      "sense_zh": "必要的",
+      "context_en": "necessary equipment for this experiment",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_8fbf94e00f9a7f",
+          "text": "optional"
+        },
+        {
+          "id": "o_92f5068cb16a81",
+          "text": "required"
+        },
+        {
+          "id": "o_cda73b95f3286a",
+          "text": "convenient"
+        },
+        {
+          "id": "o_302c5a98b76f46",
+          "text": "indispensable"
+        },
+        {
+          "id": "o_b27d8d5e32d1cc",
+          "text": "essential"
+        },
+        {
+          "id": "o_9ded57ef24961a",
+          "text": "recommended"
+        }
+      ],
+      "correct_option_ids": [
+        "o_b27d8d5e32d1cc",
+        "o_92f5068cb16a81",
+        "o_302c5a98b76f46"
+      ],
+      "explanation_zh": "required/essential/indispensable 表示必需；recommended 只是建议。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_1ccff5199b83",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_df725b8a19a150",
+      "related_master_word_id": "w_53af8689132194",
+      "sense_id": "s_3b4f46691881fb",
+      "answer_snapshot": {
+        "context_en": "necessary equipment for this experiment",
+        "correct_option_texts": [
+          "essential",
+          "required",
+          "indispensable"
+        ],
+        "option_texts": [
+          "optional",
+          "required",
+          "convenient",
+          "indispensable",
+          "essential",
+          "recommended"
+        ]
+      }
+    },
+    {
+      "id": "syn_6e5fecc075536f",
+      "question_type": "synonym_multi",
+      "headword": "difficult",
+      "sense_zh": "困难的",
+      "context_en": "a difficult assignment",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_78b45eace50a67",
+          "text": "straightforward"
+        },
+        {
+          "id": "o_2a7ac152abf368",
+          "text": "hard"
+        },
+        {
+          "id": "o_7d879d3a74ab58",
+          "text": "demanding"
+        },
+        {
+          "id": "o_9a52dc8933ad28",
+          "text": "effortless"
+        },
+        {
+          "id": "o_61126d275e46da",
+          "text": "challenging"
+        },
+        {
+          "id": "o_ad6d2594cb6805",
+          "text": "simple"
+        }
+      ],
+      "correct_option_ids": [
+        "o_61126d275e46da",
+        "o_2a7ac152abf368",
+        "o_7d879d3a74ab58"
+      ],
+      "explanation_zh": "demanding 更强调任务要求高，与 difficult 接近但不总能直接替换。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_afb4037604ef",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_3905836a0ed5e6",
+      "related_master_word_id": "w_edf98362ba1f87",
+      "sense_id": "s_426cac1126a345",
+      "answer_snapshot": {
+        "context_en": "a difficult assignment",
+        "correct_option_texts": [
+          "challenging",
+          "hard",
+          "demanding"
+        ],
+        "option_texts": [
+          "straightforward",
+          "hard",
+          "demanding",
+          "effortless",
+          "challenging",
+          "simple"
+        ]
+      }
+    },
+    {
+      "id": "syn_cbc545649b2171",
+      "question_type": "synonym_multi",
+      "headword": "easy",
+      "sense_zh": "容易的",
+      "context_en": "an easy question",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_9aee10f4820184",
+          "text": "arduous"
+        },
+        {
+          "id": "o_535758452303d4",
+          "text": "challenging"
+        },
+        {
+          "id": "o_4ec0875117bd94",
+          "text": "complicated"
+        },
+        {
+          "id": "o_d751ddf14a32a6",
+          "text": "straightforward"
+        },
+        {
+          "id": "o_a3519b9317e380",
+          "text": "demanding"
+        },
+        {
+          "id": "o_807001038a3b9c",
+          "text": "simple"
+        }
+      ],
+      "correct_option_ids": [
+        "o_807001038a3b9c",
+        "o_d751ddf14a32a6"
+      ],
+      "explanation_zh": "easy 在该语境指题目不难；simple 与 straightforward 均接近。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_2b823fdd79f6",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_d5f1c9dd6c4f68",
+      "related_master_word_id": null,
+      "sense_id": "s_098a0afab1fed4",
+      "answer_snapshot": {
+        "context_en": "an easy question",
+        "correct_option_texts": [
+          "simple",
+          "straightforward"
+        ],
+        "option_texts": [
+          "arduous",
+          "challenging",
+          "complicated",
+          "straightforward",
+          "demanding",
+          "simple"
+        ]
+      }
+    },
+    {
+      "id": "syn_ad70ebc86e4f7a",
+      "question_type": "synonym_multi",
+      "headword": "accurate",
+      "sense_zh": "准确的",
+      "context_en": "The measurement was accurate because it matched the reference value.",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_3367de29127f1c",
+          "text": "wrong"
+        },
+        {
+          "id": "o_1a4532331a21e0",
+          "text": "right"
+        },
+        {
+          "id": "o_73d7fb11ed3d59",
+          "text": "approximate"
+        },
+        {
+          "id": "o_b4d154ad951746",
+          "text": "correct"
+        },
+        {
+          "id": "o_b637d14519884c",
+          "text": "repeatable"
+        },
+        {
+          "id": "o_c80acb51c337f6",
+          "text": "precise"
+        }
+      ],
+      "correct_option_ids": [
+        "o_b4d154ad951746",
+        "o_1a4532331a21e0"
+      ],
+      "explanation_zh": "准确性指结果接近真值；精密/重复性本身不保证准确。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_68fdb5a2c895",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_4667d5b9df9c69",
+      "related_master_word_id": null,
+      "sense_id": "s_eeaaa1ec80c47f",
+      "answer_snapshot": {
+        "context_en": "The measurement was accurate because it matched the reference value.",
+        "correct_option_texts": [
+          "correct",
+          "right"
+        ],
+        "option_texts": [
+          "wrong",
+          "right",
+          "approximate",
+          "correct",
+          "repeatable",
+          "precise"
+        ]
+      }
+    },
+    {
+      "id": "syn_81153a70e3fe9b",
+      "question_type": "synonym_multi",
+      "headword": "incorrect",
+      "sense_zh": "错误的",
+      "context_en": "an incorrect answer",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_15f30928b1a90b",
+          "text": "valid"
+        },
+        {
+          "id": "o_e88749a9133d47",
+          "text": "inaccurate"
+        },
+        {
+          "id": "o_0688f793c160a8",
+          "text": "wrong"
+        },
+        {
+          "id": "o_68d5b3a5ba1f61",
+          "text": "precise"
+        },
+        {
+          "id": "o_449f04a0b13cd2",
+          "text": "erroneous"
+        },
+        {
+          "id": "o_6b83f29c80f6b1",
+          "text": "correct"
+        }
+      ],
+      "correct_option_ids": [
+        "o_0688f793c160a8",
+        "o_449f04a0b13cd2",
+        "o_e88749a9133d47"
+      ],
+      "explanation_zh": "inaccurate 在答案不准确的语境接近 incorrect，但其他场景不总相同。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_c4f017f059b2",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_0f4ac50fd3e60a",
+      "related_master_word_id": null,
+      "sense_id": "s_d8dbc0876bb286",
+      "answer_snapshot": {
+        "context_en": "an incorrect answer",
+        "correct_option_texts": [
+          "wrong",
+          "erroneous",
+          "inaccurate"
+        ],
+        "option_texts": [
+          "valid",
+          "inaccurate",
+          "wrong",
+          "precise",
+          "erroneous",
+          "correct"
+        ]
+      }
+    },
+    {
+      "id": "syn_c08b70bf3fb282",
+      "question_type": "synonym_multi",
+      "headword": "common",
+      "sense_zh": "普遍的；常见的",
+      "context_en": "a common problem experienced by many students",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_450196540c3c1e",
+          "text": "unusual"
+        },
+        {
+          "id": "o_f79c266fa87c84",
+          "text": "unique"
+        },
+        {
+          "id": "o_8719e1909c790e",
+          "text": "prevalent"
+        },
+        {
+          "id": "o_39ad9e06f00909",
+          "text": "frequent"
+        },
+        {
+          "id": "o_3fd4445c23c4d1",
+          "text": "widespread"
+        },
+        {
+          "id": "o_92b64cddca1800",
+          "text": "rare"
+        }
+      ],
+      "correct_option_ids": [
+        "o_3fd4445c23c4d1",
+        "o_39ad9e06f00909",
+        "o_8719e1909c790e"
+      ],
+      "explanation_zh": "common 在此既可指发生频繁也可指广泛存在；frequent/widespread 侧重不同。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_fdcded5f3e23",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_649e9e4ed89789",
+      "related_master_word_id": "w_7171c09145110e",
+      "sense_id": "s_e68bde366242fb",
+      "answer_snapshot": {
+        "context_en": "a common problem experienced by many students",
+        "correct_option_texts": [
+          "widespread",
+          "frequent",
+          "prevalent"
+        ],
+        "option_texts": [
+          "unusual",
+          "unique",
+          "prevalent",
+          "frequent",
+          "widespread",
+          "rare"
+        ]
+      }
+    },
+    {
+      "id": "syn_a7af7d610854c0",
+      "question_type": "synonym_multi",
+      "headword": "rare",
+      "sense_zh": "罕见的",
+      "context_en": "a rare species that is seldom encountered",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_7e1b1a344a8bdc",
+          "text": "ordinary"
+        },
+        {
+          "id": "o_bee645a758396e",
+          "text": "common"
+        },
+        {
+          "id": "o_fe717a6e94019e",
+          "text": "widespread"
+        },
+        {
+          "id": "o_18f763d6517b99",
+          "text": "uncommon"
+        },
+        {
+          "id": "o_f3bdc0ede859c1",
+          "text": "plentiful"
+        },
+        {
+          "id": "o_091c6e07a631ce",
+          "text": "seldom-seen"
+        }
+      ],
+      "correct_option_ids": [
+        "o_18f763d6517b99",
+        "o_091c6e07a631ce"
+      ],
+      "explanation_zh": "rare 在此强调不常见；scarce 更偏资源或数量不足，因此没有用来充当固定正确项。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_647852511236",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_3dfc7fa8be6ee4",
+      "related_master_word_id": null,
+      "sense_id": "s_9ed1047c9a31ff",
+      "answer_snapshot": {
+        "context_en": "a rare species that is seldom encountered",
+        "correct_option_texts": [
+          "uncommon",
+          "seldom-seen"
+        ],
+        "option_texts": [
+          "ordinary",
+          "common",
+          "widespread",
+          "uncommon",
+          "plentiful",
+          "seldom-seen"
+        ]
+      }
+    },
+    {
+      "id": "syn_271d63f8356db0",
+      "question_type": "synonym_multi",
+      "headword": "expensive",
+      "sense_zh": "昂贵的",
+      "context_en": "an expensive restaurant",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_e622609b30b09c",
+          "text": "inexpensive"
+        },
+        {
+          "id": "o_ba361e343da386",
+          "text": "costly"
+        },
+        {
+          "id": "o_062b77dd3bde2a",
+          "text": "cheap"
+        },
+        {
+          "id": "o_8749c7d2406bf6",
+          "text": "affordable"
+        },
+        {
+          "id": "o_e794951fb15aa3",
+          "text": "high-priced"
+        },
+        {
+          "id": "o_4e994efa7eedcf",
+          "text": "pricey"
+        }
+      ],
+      "correct_option_ids": [
+        "o_4e994efa7eedcf",
+        "o_e794951fb15aa3",
+        "o_ba361e343da386"
+      ],
+      "explanation_zh": "三个答案均指价格高；pricey 较口语。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_f1e77b3f3cc0",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_d8089ee27e7d29",
+      "related_master_word_id": "w_c39b2bf0aa8e02",
+      "sense_id": "s_7a2dcd86a7339b",
+      "answer_snapshot": {
+        "context_en": "an expensive restaurant",
+        "correct_option_texts": [
+          "pricey",
+          "high-priced",
+          "costly"
+        ],
+        "option_texts": [
+          "inexpensive",
+          "costly",
+          "cheap",
+          "affordable",
+          "high-priced",
+          "pricey"
+        ]
+      }
+    },
+    {
+      "id": "syn_481e2a8b5068a4",
+      "question_type": "synonym_multi",
+      "headword": "cheap",
+      "sense_zh": "价格低的",
+      "context_en": "a cheap ticket because its price is low",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_b2b7380f1b8e2d",
+          "text": "pricey"
+        },
+        {
+          "id": "o_9957b57f933d7e",
+          "text": "costly"
+        },
+        {
+          "id": "o_1af7548065c0af",
+          "text": "low-cost"
+        },
+        {
+          "id": "o_baa8d2d54fbe62",
+          "text": "inexpensive"
+        },
+        {
+          "id": "o_82a70bdd3844e6",
+          "text": "premium-priced"
+        },
+        {
+          "id": "o_633625c702b422",
+          "text": "luxurious"
+        }
+      ],
+      "correct_option_ids": [
+        "o_baa8d2d54fbe62",
+        "o_1af7548065c0af"
+      ],
+      "explanation_zh": "cheap 在此仅表示便宜，不表示质量差；affordable 可能只强调负担得起，暂不作为标准同义。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_c786a6caa06d",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_444f699f4685ae",
+      "related_master_word_id": "w_afdf344ea6856b",
+      "sense_id": "s_f846959fd44211",
+      "answer_snapshot": {
+        "context_en": "a cheap ticket because its price is low",
+        "correct_option_texts": [
+          "inexpensive",
+          "low-cost"
+        ],
+        "option_texts": [
+          "pricey",
+          "costly",
+          "low-cost",
+          "inexpensive",
+          "premium-priced",
+          "luxurious"
+        ]
+      }
+    },
+    {
+      "id": "syn_27600166da9324",
+      "question_type": "synonym_multi",
+      "headword": "simple",
+      "sense_zh": "简单的",
+      "context_en": "simple instructions that are easy to follow",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_7d5341aaa53ac4",
+          "text": "straightforward"
+        },
+        {
+          "id": "o_27b14a0ea293a0",
+          "text": "convoluted"
+        },
+        {
+          "id": "o_a7583db037e8ad",
+          "text": "easy"
+        },
+        {
+          "id": "o_42f658c5b45eb1",
+          "text": "complex"
+        },
+        {
+          "id": "o_072dd70a29596e",
+          "text": "uncomplicated"
+        },
+        {
+          "id": "o_2417614e5d7bf1",
+          "text": "intricate"
+        }
+      ],
+      "correct_option_ids": [
+        "o_7d5341aaa53ac4",
+        "o_072dd70a29596e",
+        "o_a7583db037e8ad"
+      ],
+      "explanation_zh": "simple 此处指容易理解/操作。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_31b11f29dcdd",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_096b2c4268ab35",
+      "related_master_word_id": "w_40febb9a2809b9",
+      "sense_id": "s_e6f11ddb0383d2",
+      "answer_snapshot": {
+        "context_en": "simple instructions that are easy to follow",
+        "correct_option_texts": [
+          "straightforward",
+          "uncomplicated",
+          "easy"
+        ],
+        "option_texts": [
+          "straightforward",
+          "convoluted",
+          "easy",
+          "complex",
+          "uncomplicated",
+          "intricate"
+        ]
+      }
+    },
+    {
+      "id": "syn_218f026a58db03",
+      "question_type": "synonym_multi",
+      "headword": "complex",
+      "sense_zh": "复杂的",
+      "context_en": "a complex system with many connected parts",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_6f7b9985125ea1",
+          "text": "intricate"
+        },
+        {
+          "id": "o_f1fb04df29b01f",
+          "text": "straightforward"
+        },
+        {
+          "id": "o_ba2e29c7d0f6b2",
+          "text": "sophisticated"
+        },
+        {
+          "id": "o_d0ea7ea9c0653b",
+          "text": "complicated"
+        },
+        {
+          "id": "o_206880d235916a",
+          "text": "elementary"
+        },
+        {
+          "id": "o_95a0e99f388449",
+          "text": "basic"
+        }
+      ],
+      "correct_option_ids": [
+        "o_d0ea7ea9c0653b",
+        "o_6f7b9985125ea1",
+        "o_ba2e29c7d0f6b2"
+      ],
+      "explanation_zh": "sophisticated 有时偏先进或精密，在此指系统高度复杂。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_28a2447ea75c",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_6297f5a6cde569",
+      "related_master_word_id": null,
+      "sense_id": "s_50f18eb2f36bc1",
+      "answer_snapshot": {
+        "context_en": "a complex system with many connected parts",
+        "correct_option_texts": [
+          "complicated",
+          "intricate",
+          "sophisticated"
+        ],
+        "option_texts": [
+          "intricate",
+          "straightforward",
+          "sophisticated",
+          "complicated",
+          "elementary",
+          "basic"
+        ]
+      }
+    },
+    {
+      "id": "syn_f02bafa2ea8196",
+      "question_type": "synonym_multi",
+      "headword": "significant",
+      "sense_zh": "重要的",
+      "context_en": "a significant increase in costs, meaning a large rise",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_aff8a22afb37f9",
+          "text": "tiny"
+        },
+        {
+          "id": "o_e05a96991a9e39",
+          "text": "major"
+        },
+        {
+          "id": "o_e77a2d0c564c83",
+          "text": "minor"
+        },
+        {
+          "id": "o_c062c3de5629d9",
+          "text": "substantial"
+        },
+        {
+          "id": "o_041d4f08433a7f",
+          "text": "negligible"
+        },
+        {
+          "id": "o_593597db46dfb1",
+          "text": "considerable"
+        }
+      ],
+      "correct_option_ids": [
+        "o_c062c3de5629d9",
+        "o_593597db46dfb1",
+        "o_e05a96991a9e39"
+      ],
+      "explanation_zh": "这里限定为增幅很大，不考察 important 的“重要性”义。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_e239a34a02c0",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_6849568961e8cd",
+      "related_master_word_id": null,
+      "sense_id": "s_9e09a3d447f06c",
+      "answer_snapshot": {
+        "context_en": "a significant increase in costs, meaning a large rise",
+        "correct_option_texts": [
+          "substantial",
+          "considerable",
+          "major"
+        ],
+        "option_texts": [
+          "tiny",
+          "major",
+          "minor",
+          "substantial",
+          "negligible",
+          "considerable"
+        ]
+      }
+    },
+    {
+      "id": "syn_3cc328c189dc7c",
+      "question_type": "synonym_multi",
+      "headword": "possible",
+      "sense_zh": "可实现的；可能的",
+      "context_en": "a possible explanation that has not yet been tested",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_4d7ad3fddcef0a",
+          "text": "impossible"
+        },
+        {
+          "id": "o_2ab97751adec0c",
+          "text": "confirmed"
+        },
+        {
+          "id": "o_2b67b1e30dc750",
+          "text": "conceivable"
+        },
+        {
+          "id": "o_d357d643bd0581",
+          "text": "certain"
+        },
+        {
+          "id": "o_324b41bb7f7a80",
+          "text": "potential"
+        },
+        {
+          "id": "o_92c7c0de92c275",
+          "text": "guaranteed"
+        }
+      ],
+      "correct_option_ids": [
+        "o_2b67b1e30dc750",
+        "o_324b41bb7f7a80"
+      ],
+      "explanation_zh": "possible 指可能成立，不等于 feasible/viable 所强调的现实可行。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_38ddcca4a7fd",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_9fc7edacc32d0e",
+      "related_master_word_id": "w_dba523970af8ce",
+      "sense_id": "s_fce8ddce069655",
+      "answer_snapshot": {
+        "context_en": "a possible explanation that has not yet been tested",
+        "correct_option_texts": [
+          "conceivable",
+          "potential"
+        ],
+        "option_texts": [
+          "impossible",
+          "confirmed",
+          "conceivable",
+          "certain",
+          "potential",
+          "guaranteed"
+        ]
+      }
+    },
+    {
+      "id": "syn_911a3f479e9e8b",
+      "question_type": "synonym_multi",
+      "headword": "dangerous",
+      "sense_zh": "危险的",
+      "context_en": "a dangerous situation where people may be hurt",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_c7658620a5d1dc",
+          "text": "unsafe"
+        },
+        {
+          "id": "o_3a2c47f263f3d6",
+          "text": "harmless"
+        },
+        {
+          "id": "o_0b295f807b4d5f",
+          "text": "safe"
+        },
+        {
+          "id": "o_08c628d9edf559",
+          "text": "secure"
+        },
+        {
+          "id": "o_0759097223e806",
+          "text": "risky"
+        },
+        {
+          "id": "o_5e81855735093f",
+          "text": "hazardous"
+        }
+      ],
+      "correct_option_ids": [
+        "o_c7658620a5d1dc",
+        "o_0759097223e806",
+        "o_5e81855735093f"
+      ],
+      "explanation_zh": "risky/hazardous 强调风险；unsafe 表示不安全。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_09de4c6ea0d9",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_245216d84532ab",
+      "related_master_word_id": "w_4da99632b6d8ac",
+      "sense_id": "s_145b374518f706",
+      "answer_snapshot": {
+        "context_en": "a dangerous situation where people may be hurt",
+        "correct_option_texts": [
+          "unsafe",
+          "risky",
+          "hazardous"
+        ],
+        "option_texts": [
+          "unsafe",
+          "harmless",
+          "safe",
+          "secure",
+          "risky",
+          "hazardous"
+        ]
+      }
+    },
+    {
+      "id": "syn_1e338aadc69dce",
+      "question_type": "synonym_multi",
+      "headword": "safe",
+      "sense_zh": "安全的",
+      "context_en": "a safe place to keep valuable documents from theft",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_d2ab5f68efb131",
+          "text": "well-protected"
+        },
+        {
+          "id": "o_253ee1bc4df1b6",
+          "text": "unguarded"
+        },
+        {
+          "id": "o_fcd92934c688bc",
+          "text": "unsafe"
+        },
+        {
+          "id": "o_cd537600e87bdb",
+          "text": "exposed"
+        },
+        {
+          "id": "o_e7d9c85d0e2bf2",
+          "text": "secure"
+        },
+        {
+          "id": "o_6c819e1f27b4b9",
+          "text": "vulnerable"
+        }
+      ],
+      "correct_option_ids": [
+        "o_e7d9c85d0e2bf2",
+        "o_d2ab5f68efb131"
+      ],
+      "explanation_zh": "该语境下的安全强调存放保护；low-risk 不等同于绝对安全。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_9fe7e548dd85",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_ca9578eccf955b",
+      "related_master_word_id": "w_c7bae6102c05dc",
+      "sense_id": "s_846f39ef075d9d",
+      "answer_snapshot": {
+        "context_en": "a safe place to keep valuable documents from theft",
+        "correct_option_texts": [
+          "secure",
+          "well-protected"
+        ],
+        "option_texts": [
+          "well-protected",
+          "unguarded",
+          "unsafe",
+          "exposed",
+          "secure",
+          "vulnerable"
+        ]
+      }
+    },
+    {
+      "id": "syn_11aae6f5ca6c0d",
+      "question_type": "synonym_multi",
+      "headword": "serious",
+      "sense_zh": "严重的",
+      "context_en": "a serious medical condition that needs urgent attention",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_5a0b9287f78d9d",
+          "text": "harmless"
+        },
+        {
+          "id": "o_863756608b6b9d",
+          "text": "minor"
+        },
+        {
+          "id": "o_5c26ac99de416a",
+          "text": "grave"
+        },
+        {
+          "id": "o_c951ebe5351e3a",
+          "text": "severe"
+        },
+        {
+          "id": "o_89c59a3bc5e192",
+          "text": "trivial"
+        },
+        {
+          "id": "o_8d0f07db95b79c",
+          "text": "critical"
+        }
+      ],
+      "correct_option_ids": [
+        "o_c951ebe5351e3a",
+        "o_5c26ac99de416a",
+        "o_8d0f07db95b79c"
+      ],
+      "explanation_zh": "critical 通常比 serious 程度更重，均表达严重风险。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_ea99e5c43070",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_bd80d441697604",
+      "related_master_word_id": "w_c2a9aae0ed2af1",
+      "sense_id": "s_de5011092a31f6",
+      "answer_snapshot": {
+        "context_en": "a serious medical condition that needs urgent attention",
+        "correct_option_texts": [
+          "severe",
+          "grave",
+          "critical"
+        ],
+        "option_texts": [
+          "harmless",
+          "minor",
+          "grave",
+          "severe",
+          "trivial",
+          "critical"
+        ]
+      }
+    },
+    {
+      "id": "syn_8ec470a8c38037",
+      "question_type": "synonym_multi",
+      "headword": "weak",
+      "sense_zh": "身体虚弱的",
+      "context_en": "a physically weak patient recovering from an illness",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_91c62366e3c8af",
+          "text": "feeble"
+        },
+        {
+          "id": "o_c5e64eb9a4ea37",
+          "text": "robust"
+        },
+        {
+          "id": "o_da2c50da40b17c",
+          "text": "debilitated"
+        },
+        {
+          "id": "o_cfb10028798be3",
+          "text": "vigorous"
+        },
+        {
+          "id": "o_bbc5857ba54222",
+          "text": "strong"
+        },
+        {
+          "id": "o_33b67c368e5f58",
+          "text": "frail"
+        }
+      ],
+      "correct_option_ids": [
+        "o_91c62366e3c8af",
+        "o_33b67c368e5f58",
+        "o_da2c50da40b17c"
+      ],
+      "explanation_zh": "三个正确项侧重点不同，但这里都指体力虚弱。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_aab308c797bd",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_8fb81bef49efaf",
+      "related_master_word_id": "w_2747519265bf15",
+      "sense_id": "s_a98b5d9f7ca7bc",
+      "answer_snapshot": {
+        "context_en": "a physically weak patient recovering from an illness",
+        "correct_option_texts": [
+          "feeble",
+          "frail",
+          "debilitated"
+        ],
+        "option_texts": [
+          "feeble",
+          "robust",
+          "debilitated",
+          "vigorous",
+          "strong",
+          "frail"
+        ]
+      }
+    },
+    {
+      "id": "syn_08d5b868275d0b",
+      "question_type": "synonym_multi",
+      "headword": "strong",
+      "sense_zh": "结实的；坚固的",
+      "context_en": "a strong building structure that resists damage",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_e8f850150ef20b",
+          "text": "sturdy"
+        },
+        {
+          "id": "o_eda9ffeac06d41",
+          "text": "solid"
+        },
+        {
+          "id": "o_429c9a79382d22",
+          "text": "robust"
+        },
+        {
+          "id": "o_b3bb4ffe7f9aab",
+          "text": "delicate"
+        },
+        {
+          "id": "o_e781655a6f0006",
+          "text": "flimsy"
+        },
+        {
+          "id": "o_a0f2c3274a98f6",
+          "text": "fragile"
+        }
+      ],
+      "correct_option_ids": [
+        "o_e8f850150ef20b",
+        "o_429c9a79382d22",
+        "o_eda9ffeac06d41"
+      ],
+      "explanation_zh": "这里强调结构牢固，不是身体力量。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_ddaa7ebc2b31",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_7f88bd46a3b9b9",
+      "related_master_word_id": "w_85198c2411d6a0",
+      "sense_id": "s_5c73c7e698a635",
+      "answer_snapshot": {
+        "context_en": "a strong building structure that resists damage",
+        "correct_option_texts": [
+          "sturdy",
+          "robust",
+          "solid"
+        ],
+        "option_texts": [
+          "sturdy",
+          "solid",
+          "robust",
+          "delicate",
+          "flimsy",
+          "fragile"
+        ]
+      }
+    },
+    {
+      "id": "syn_78e57b8193e55d",
+      "question_type": "synonym_multi",
+      "headword": "quiet",
+      "sense_zh": "安静的",
+      "context_en": "a quiet library with very little noise",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_03603f2011f49d",
+          "text": "boisterous"
+        },
+        {
+          "id": "o_527143eac03c10",
+          "text": "hushed"
+        },
+        {
+          "id": "o_a09abe96a1c3cb",
+          "text": "noisy"
+        },
+        {
+          "id": "o_c688a1a00f05ab",
+          "text": "clamorous"
+        },
+        {
+          "id": "o_b0dc3c1121c7ed",
+          "text": "loud"
+        },
+        {
+          "id": "o_a6f91c4392aac6",
+          "text": "silent"
+        }
+      ],
+      "correct_option_ids": [
+        "o_527143eac03c10",
+        "o_a6f91c4392aac6"
+      ],
+      "explanation_zh": "silent 表示完全无声，强度更高；peaceful 指宁静感，不等于声音小。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_b3242b540c88",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_a2b7e880bcb6a5",
+      "related_master_word_id": "w_814783916ecfbc",
+      "sense_id": "s_3e4965364f05dd",
+      "answer_snapshot": {
+        "context_en": "a quiet library with very little noise",
+        "correct_option_texts": [
+          "hushed",
+          "silent"
+        ],
+        "option_texts": [
+          "boisterous",
+          "hushed",
+          "noisy",
+          "clamorous",
+          "loud",
+          "silent"
+        ]
+      }
+    },
+    {
+      "id": "syn_4c8b10000b24f0",
+      "question_type": "synonym_multi",
+      "headword": "noisy",
+      "sense_zh": "吵闹的",
+      "context_en": "a noisy crowd at a stadium",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_350b2b0801e537",
+          "text": "hushed"
+        },
+        {
+          "id": "o_22c3588e2c41f2",
+          "text": "boisterous"
+        },
+        {
+          "id": "o_b9aacafd5157ec",
+          "text": "tranquil"
+        },
+        {
+          "id": "o_0324c25f4556f4",
+          "text": "clamorous"
+        },
+        {
+          "id": "o_882bb971fe01d1",
+          "text": "silent"
+        },
+        {
+          "id": "o_1720c8b87d9b26",
+          "text": "loud"
+        }
+      ],
+      "correct_option_ids": [
+        "o_1720c8b87d9b26",
+        "o_22c3588e2c41f2",
+        "o_0324c25f4556f4"
+      ],
+      "explanation_zh": "boisterous 指人群喧闹活跃，适合该语境。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_fb9f9070f2d9",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_9e0020092d2dbb",
+      "related_master_word_id": "w_3d1363c3cd0f69",
+      "sense_id": "s_e148685f223cfe",
+      "answer_snapshot": {
+        "context_en": "a noisy crowd at a stadium",
+        "correct_option_texts": [
+          "loud",
+          "boisterous",
+          "clamorous"
+        ],
+        "option_texts": [
+          "hushed",
+          "boisterous",
+          "tranquil",
+          "clamorous",
+          "silent",
+          "loud"
+        ]
+      }
+    },
+    {
+      "id": "syn_367b6fde9e892f",
+      "question_type": "synonym_multi",
+      "headword": "beautiful",
+      "sense_zh": "漂亮的",
+      "context_en": "a beautiful landscape admired by visitors",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_60b22dcd4e51a0",
+          "text": "unsightly"
+        },
+        {
+          "id": "o_b18f37a9404361",
+          "text": "ugly"
+        },
+        {
+          "id": "o_448462bf60f629",
+          "text": "lovely"
+        },
+        {
+          "id": "o_35e93c6805640a",
+          "text": "unattractive"
+        },
+        {
+          "id": "o_54acb1a3b857c3",
+          "text": "stunning"
+        },
+        {
+          "id": "o_ed364aaf820bd2",
+          "text": "gorgeous"
+        },
+        {
+          "id": "o_a599d839a4d821",
+          "text": "attractive"
+        }
+      ],
+      "correct_option_ids": [
+        "o_ed364aaf820bd2",
+        "o_448462bf60f629",
+        "o_54acb1a3b857c3",
+        "o_a599d839a4d821"
+      ],
+      "explanation_zh": "stunning 是程度较强的赞美，不一定与 beautiful 完全等强。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_822b9d9f66f1",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_93347c9aee594f",
+      "related_master_word_id": "w_65ed82cf63a461",
+      "sense_id": "s_f107c77d7e3188",
+      "answer_snapshot": {
+        "context_en": "a beautiful landscape admired by visitors",
+        "correct_option_texts": [
+          "gorgeous",
+          "lovely",
+          "stunning",
+          "attractive"
+        ],
+        "option_texts": [
+          "unsightly",
+          "ugly",
+          "lovely",
+          "unattractive",
+          "stunning",
+          "gorgeous",
+          "attractive"
+        ]
+      }
+    },
+    {
+      "id": "syn_098e92a6a53b3a",
+      "question_type": "synonym_multi",
+      "headword": "rapid",
+      "sense_zh": "迅速的",
+      "context_en": "a rapid increase over just a few days",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_104f7cda3ab623",
+          "text": "quick"
+        },
+        {
+          "id": "o_dd9e705015d6be",
+          "text": "slow"
+        },
+        {
+          "id": "o_e3ae1b9d2c5892",
+          "text": "fast"
+        },
+        {
+          "id": "o_917f2b364758c7",
+          "text": "delayed"
+        },
+        {
+          "id": "o_d24620291f0161",
+          "text": "gradual"
+        },
+        {
+          "id": "o_23df28ba35e327",
+          "text": "swift"
+        }
+      ],
+      "correct_option_ids": [
+        "o_104f7cda3ab623",
+        "o_e3ae1b9d2c5892",
+        "o_23df28ba35e327"
+      ],
+      "explanation_zh": "强调变化速度快。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_4523d3483486",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_e05da08b5a2e6a",
+      "related_master_word_id": null,
+      "sense_id": "s_979e6e65d6726e",
+      "answer_snapshot": {
+        "context_en": "a rapid increase over just a few days",
+        "correct_option_texts": [
+          "quick",
+          "fast",
+          "swift"
+        ],
+        "option_texts": [
+          "quick",
+          "slow",
+          "fast",
+          "delayed",
+          "gradual",
+          "swift"
+        ]
+      }
+    },
+    {
+      "id": "syn_37b93b92bbb13c",
+      "question_type": "synonym_multi",
+      "headword": "slow",
+      "sense_zh": "缓慢的",
+      "context_en": "a slow response from an overloaded computer",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_b9de8f0dd58725",
+          "text": "immediate"
+        },
+        {
+          "id": "o_6f737af9e4850b",
+          "text": "delayed"
+        },
+        {
+          "id": "o_9513ee5d9e4cc2",
+          "text": "sluggish"
+        },
+        {
+          "id": "o_815f0e2d17e8de",
+          "text": "rapid"
+        },
+        {
+          "id": "o_568c3f1795ba1f",
+          "text": "swift"
+        },
+        {
+          "id": "o_ccbe65db3a4b33",
+          "text": "prompt"
+        }
+      ],
+      "correct_option_ids": [
+        "o_9513ee5d9e4cc2",
+        "o_6f737af9e4850b"
+      ],
+      "explanation_zh": "电脑响应慢可用 sluggish/delayed；leisurely/unhurried 暗示从容自主，与机器迟缓不符。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_b40dfc5803f7",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_825aa07180d92d",
+      "related_master_word_id": null,
+      "sense_id": "s_9f8fbf21ae7df2",
+      "answer_snapshot": {
+        "context_en": "a slow response from an overloaded computer",
+        "correct_option_texts": [
+          "sluggish",
+          "delayed"
+        ],
+        "option_texts": [
+          "immediate",
+          "delayed",
+          "sluggish",
+          "rapid",
+          "swift",
+          "prompt"
+        ]
+      }
+    },
+    {
+      "id": "syn_dd94028d36af7d",
+      "question_type": "synonym_multi",
+      "headword": "begin",
+      "sense_zh": "开始",
+      "context_en": "begin a discussion at the meeting",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_df8d26e8e15cc7",
+          "text": "commence"
+        },
+        {
+          "id": "o_88a82ba5d47aba",
+          "text": "conclude"
+        },
+        {
+          "id": "o_aa2dea5563d6f1",
+          "text": "start"
+        },
+        {
+          "id": "o_6acf5e6399b6d3",
+          "text": "finish"
+        },
+        {
+          "id": "o_50e5f8704a3aac",
+          "text": "initiate"
+        },
+        {
+          "id": "o_271c11d457188f",
+          "text": "terminate"
+        }
+      ],
+      "correct_option_ids": [
+        "o_aa2dea5563d6f1",
+        "o_50e5f8704a3aac",
+        "o_df8d26e8e15cc7"
+      ],
+      "explanation_zh": "start/initiate/commence 均表示开始，正式程度不同。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_6deffd2b7d9b",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_1d515fae94f696",
+      "related_master_word_id": null,
+      "sense_id": "s_4d0062f3a629ea",
+      "answer_snapshot": {
+        "context_en": "begin a discussion at the meeting",
+        "correct_option_texts": [
+          "start",
+          "initiate",
+          "commence"
+        ],
+        "option_texts": [
+          "commence",
+          "conclude",
+          "start",
+          "finish",
+          "initiate",
+          "terminate"
+        ]
+      }
+    },
+    {
+      "id": "syn_c8ef7ea09520d5",
+      "question_type": "synonym_multi",
+      "headword": "finish",
+      "sense_zh": "完成；结束",
+      "context_en": "finish the written assignment before the deadline",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_d797fa10c1a92e",
+          "text": "complete"
+        },
+        {
+          "id": "o_91eadfbf66c86f",
+          "text": "wrap up"
+        },
+        {
+          "id": "o_1d891beb39b6ac",
+          "text": "abandon"
+        },
+        {
+          "id": "o_91e1866bfa0292",
+          "text": "start"
+        },
+        {
+          "id": "o_4b564a2689c043",
+          "text": "initiate"
+        },
+        {
+          "id": "o_c5573da391f511",
+          "text": "postpone"
+        }
+      ],
+      "correct_option_ids": [
+        "o_d797fa10c1a92e",
+        "o_91eadfbf66c86f"
+      ],
+      "explanation_zh": "finalize 更常用于定稿/最终决定，conclude 更常见于讨论或活动，未强行当作该语境正确项。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_850fe6ffb706",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_a8c5a28ecd547b",
+      "related_master_word_id": null,
+      "sense_id": "s_312cf952679c30",
+      "answer_snapshot": {
+        "context_en": "finish the written assignment before the deadline",
+        "correct_option_texts": [
+          "complete",
+          "wrap up"
+        ],
+        "option_texts": [
+          "complete",
+          "wrap up",
+          "abandon",
+          "start",
+          "initiate",
+          "postpone"
+        ]
+      }
+    },
+    {
+      "id": "syn_003daef068ad70",
+      "question_type": "synonym_multi",
+      "headword": "increase",
+      "sense_zh": "增加",
+      "context_en": "the number of visitors will increase",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_d227ad21409070",
+          "text": "drop"
+        },
+        {
+          "id": "o_2a5f5cb9772670",
+          "text": "fall"
+        },
+        {
+          "id": "o_de2de04f282eec",
+          "text": "grow"
+        },
+        {
+          "id": "o_c675ecd044142f",
+          "text": "decrease"
+        },
+        {
+          "id": "o_a4ee9e14808f63",
+          "text": "rise"
+        },
+        {
+          "id": "o_d57f619fd8ace0",
+          "text": "climb"
+        }
+      ],
+      "correct_option_ids": [
+        "o_a4ee9e14808f63",
+        "o_de2de04f282eec",
+        "o_d57f619fd8ace0"
+      ],
+      "explanation_zh": "rise/grow/climb 都能描述数量增多。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_7b50960d4807",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_68f4b1674e2493",
+      "related_master_word_id": "w_4b242853425ded",
+      "sense_id": "s_a66331bda3a226",
+      "answer_snapshot": {
+        "context_en": "the number of visitors will increase",
+        "correct_option_texts": [
+          "rise",
+          "grow",
+          "climb"
+        ],
+        "option_texts": [
+          "drop",
+          "fall",
+          "grow",
+          "decrease",
+          "rise",
+          "climb"
+        ]
+      }
+    },
+    {
+      "id": "syn_690acb69da47a7",
+      "question_type": "synonym_multi",
+      "headword": "decrease",
+      "sense_zh": "减少",
+      "context_en": "prices decrease over the summer",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_81aee5d316de4b",
+          "text": "fall"
+        },
+        {
+          "id": "o_69fa49d9536a25",
+          "text": "climb"
+        },
+        {
+          "id": "o_efa49c6eab009c",
+          "text": "rise"
+        },
+        {
+          "id": "o_8a84cc3878ea46",
+          "text": "surge"
+        },
+        {
+          "id": "o_5b88b0a24b3bf5",
+          "text": "drop"
+        },
+        {
+          "id": "o_225963d601efd2",
+          "text": "decline"
+        }
+      ],
+      "correct_option_ids": [
+        "o_5b88b0a24b3bf5",
+        "o_225963d601efd2",
+        "o_81aee5d316de4b"
+      ],
+      "explanation_zh": "drop/decline/fall 都能描述价格降低。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_3be0e41d4190",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_1a1654accd176c",
+      "related_master_word_id": "w_af9f46fe90a744",
+      "sense_id": "s_2ed5f65634be19",
+      "answer_snapshot": {
+        "context_en": "prices decrease over the summer",
+        "correct_option_texts": [
+          "drop",
+          "decline",
+          "fall"
+        ],
+        "option_texts": [
+          "fall",
+          "climb",
+          "rise",
+          "surge",
+          "drop",
+          "decline"
+        ]
+      }
+    },
+    {
+      "id": "syn_f5ecd474fb2036",
+      "question_type": "synonym_multi",
+      "headword": "reduce",
+      "sense_zh": "降低；减少",
+      "context_en": "reduce the cost of production",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_df0c02f74f286d",
+          "text": "boost"
+        },
+        {
+          "id": "o_4e3ea2a06e6763",
+          "text": "lower"
+        },
+        {
+          "id": "o_a02597ff44be40",
+          "text": "decrease"
+        },
+        {
+          "id": "o_69502ed9a71cd9",
+          "text": "cut"
+        },
+        {
+          "id": "o_2bcdbaabe80c54",
+          "text": "increase"
+        },
+        {
+          "id": "o_89ebb04e38af59",
+          "text": "raise"
+        }
+      ],
+      "correct_option_ids": [
+        "o_4e3ea2a06e6763",
+        "o_69502ed9a71cd9",
+        "o_a02597ff44be40"
+      ],
+      "explanation_zh": "都表达降低成本，cut 更口语直接。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_632ec996fba8",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_5574c9ef4ae00b",
+      "related_master_word_id": "w_fd8f8e71ee406c",
+      "sense_id": "s_56cc64630af8f7",
+      "answer_snapshot": {
+        "context_en": "reduce the cost of production",
+        "correct_option_texts": [
+          "lower",
+          "cut",
+          "decrease"
+        ],
+        "option_texts": [
+          "boost",
+          "lower",
+          "decrease",
+          "cut",
+          "increase",
+          "raise"
+        ]
+      }
+    },
+    {
+      "id": "syn_65b3fc1f8446ab",
+      "question_type": "synonym_multi",
+      "headword": "improve",
+      "sense_zh": "改善；提高",
+      "context_en": "improve a computer system to make it better",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_21eb7d2f9e3163",
+          "text": "degrade"
+        },
+        {
+          "id": "o_a6752c3d509e46",
+          "text": "enhance"
+        },
+        {
+          "id": "o_fa58f5395b99f7",
+          "text": "refine"
+        },
+        {
+          "id": "o_dc864dcd2e8f28",
+          "text": "ignore"
+        },
+        {
+          "id": "o_f45f21b2170f4c",
+          "text": "damage"
+        },
+        {
+          "id": "o_e8b04990c46169",
+          "text": "upgrade"
+        }
+      ],
+      "correct_option_ids": [
+        "o_a6752c3d509e46",
+        "o_e8b04990c46169",
+        "o_fa58f5395b99f7"
+      ],
+      "explanation_zh": "upgrade 强调提升版本或性能，refine 更偏调整细节。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_4d15314a87c6",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_74ece069c5ede7",
+      "related_master_word_id": "w_4c964dd27ef0ad",
+      "sense_id": "s_6459f149d44a8f",
+      "answer_snapshot": {
+        "context_en": "improve a computer system to make it better",
+        "correct_option_texts": [
+          "enhance",
+          "upgrade",
+          "refine"
+        ],
+        "option_texts": [
+          "degrade",
+          "enhance",
+          "refine",
+          "ignore",
+          "damage",
+          "upgrade"
+        ]
+      }
+    },
+    {
+      "id": "syn_f7d9182bc5d413",
+      "question_type": "synonym_multi",
+      "headword": "protect",
+      "sense_zh": "保护",
+      "context_en": "protect the environment from further harm",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_794cf33df00065",
+          "text": "expose"
+        },
+        {
+          "id": "o_d8517f72423fb8",
+          "text": "endanger"
+        },
+        {
+          "id": "o_4c51965d7c7938",
+          "text": "preserve"
+        },
+        {
+          "id": "o_9df87689d48be3",
+          "text": "safeguard"
+        },
+        {
+          "id": "o_f4f89878342ae5",
+          "text": "damage"
+        },
+        {
+          "id": "o_5238e86b83f16b",
+          "text": "harm"
+        }
+      ],
+      "correct_option_ids": [
+        "o_9df87689d48be3",
+        "o_4c51965d7c7938"
+      ],
+      "explanation_zh": "preserve 常指保护使其保持原状；shield 搭配环境的适用性不够一致。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_d847e26aff2c",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_b0087efa02d795",
+      "related_master_word_id": "w_9ad82cab436d4d",
+      "sense_id": "s_53d5bdf333e4ab",
+      "answer_snapshot": {
+        "context_en": "protect the environment from further harm",
+        "correct_option_texts": [
+          "safeguard",
+          "preserve"
+        ],
+        "option_texts": [
+          "expose",
+          "endanger",
+          "preserve",
+          "safeguard",
+          "damage",
+          "harm"
+        ]
+      }
+    },
+    {
+      "id": "syn_b15d8d15278431",
+      "question_type": "synonym_multi",
+      "headword": "prevent",
+      "sense_zh": "防止；阻止",
+      "context_en": "prevent an accident before it happens",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_bbbb2e7bf26383",
+          "text": "encourage"
+        },
+        {
+          "id": "o_17e2a76891c234",
+          "text": "cause"
+        },
+        {
+          "id": "o_e71e8cc2ffcba8",
+          "text": "stop"
+        },
+        {
+          "id": "o_ec2473e447fc11",
+          "text": "avert"
+        },
+        {
+          "id": "o_a1c848d50642a6",
+          "text": "allow"
+        },
+        {
+          "id": "o_825b558b4e6622",
+          "text": "forestall"
+        }
+      ],
+      "correct_option_ids": [
+        "o_ec2473e447fc11",
+        "o_825b558b4e6622",
+        "o_e71e8cc2ffcba8"
+      ],
+      "explanation_zh": "avert/forestall 更强调事前避免；stop 在这里指阻止事故发生。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_e9e180b5b858",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_99ee3eeff53eda",
+      "related_master_word_id": "w_ff77d7505fe9a0",
+      "sense_id": "s_ea5c9a9a10e347",
+      "answer_snapshot": {
+        "context_en": "prevent an accident before it happens",
+        "correct_option_texts": [
+          "avert",
+          "forestall",
+          "stop"
+        ],
+        "option_texts": [
+          "encourage",
+          "cause",
+          "stop",
+          "avert",
+          "allow",
+          "forestall"
+        ]
+      }
+    },
+    {
+      "id": "syn_2b004178092e16",
+      "question_type": "synonym_multi",
+      "headword": "help",
+      "sense_zh": "帮助",
+      "context_en": "help a student who is struggling with homework",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_60188978eefb0d",
+          "text": "discourage"
+        },
+        {
+          "id": "o_8235f8dbeab3e3",
+          "text": "lend a hand to"
+        },
+        {
+          "id": "o_5f79e1543a588c",
+          "text": "hinder"
+        },
+        {
+          "id": "o_cc7399612bdcf7",
+          "text": "support"
+        },
+        {
+          "id": "o_7aa27864ead39d",
+          "text": "assist"
+        },
+        {
+          "id": "o_7db959bc5570fc",
+          "text": "aid"
+        }
+      ],
+      "correct_option_ids": [
+        "o_7db959bc5570fc",
+        "o_7aa27864ead39d",
+        "o_cc7399612bdcf7",
+        "o_8235f8dbeab3e3"
+      ],
+      "explanation_zh": "support 往往有持续帮助之意，lend a hand 更口语。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_60327224b3b1",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_c6b3fa09f3c47e",
+      "related_master_word_id": null,
+      "sense_id": "s_23096fd4788f46",
+      "answer_snapshot": {
+        "context_en": "help a student who is struggling with homework",
+        "correct_option_texts": [
+          "aid",
+          "assist",
+          "support",
+          "lend a hand to"
+        ],
+        "option_texts": [
+          "discourage",
+          "lend a hand to",
+          "hinder",
+          "support",
+          "assist",
+          "aid"
+        ]
+      }
+    },
+    {
+      "id": "syn_daab8ddbb05c8a",
+      "question_type": "synonym_multi",
+      "headword": "provide",
+      "sense_zh": "提供",
+      "context_en": "provide information to customers",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_902fd9ce4d0285",
+          "text": "withhold"
+        },
+        {
+          "id": "o_273da600ef2f08",
+          "text": "supply"
+        },
+        {
+          "id": "o_192612baeaac5b",
+          "text": "request"
+        },
+        {
+          "id": "o_27378621682318",
+          "text": "offer"
+        },
+        {
+          "id": "o_f5e60c27885675",
+          "text": "furnish"
+        },
+        {
+          "id": "o_3dacfd359b76ab",
+          "text": "conceal"
+        }
+      ],
+      "correct_option_ids": [
+        "o_273da600ef2f08",
+        "o_f5e60c27885675",
+        "o_27378621682318"
+      ],
+      "explanation_zh": "offer 可能强调提出提供，实际交付不必然完成；这里仅考近义表达。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_7278e0b7ab5d",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_c9b0778914fedf",
+      "related_master_word_id": "w_501e7c22269f65",
+      "sense_id": "s_f69b9880dba485",
+      "answer_snapshot": {
+        "context_en": "provide information to customers",
+        "correct_option_texts": [
+          "supply",
+          "furnish",
+          "offer"
+        ],
+        "option_texts": [
+          "withhold",
+          "supply",
+          "request",
+          "offer",
+          "furnish",
+          "conceal"
+        ]
+      }
+    },
+    {
+      "id": "syn_a2f2bdcfebe270",
+      "question_type": "synonym_multi",
+      "headword": "recommend",
+      "sense_zh": "推荐；建议",
+      "context_en": "recommend a course to a student looking for options",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_f322477b5fc41a",
+          "text": "advise someone to consider"
+        },
+        {
+          "id": "o_d7aca789ee8b00",
+          "text": "require"
+        },
+        {
+          "id": "o_5322f2543f4ba8",
+          "text": "suggest"
+        },
+        {
+          "id": "o_f2d2c866759f0f",
+          "text": "describe"
+        },
+        {
+          "id": "o_7c617c5a407954",
+          "text": "assign"
+        },
+        {
+          "id": "o_004cc79f85babf",
+          "text": "forbid"
+        }
+      ],
+      "correct_option_ids": [
+        "o_5322f2543f4ba8",
+        "o_f322477b5fc41a"
+      ],
+      "explanation_zh": "recommend 是提出建议；endorse 可以表示认可，但未必是推荐给特定学生。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_5cc8c84e9606",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_5fa75a5a652190",
+      "related_master_word_id": "w_0c4d65cf315e81",
+      "sense_id": "s_06152e7ce2ce9e",
+      "answer_snapshot": {
+        "context_en": "recommend a course to a student looking for options",
+        "correct_option_texts": [
+          "suggest",
+          "advise someone to consider"
+        ],
+        "option_texts": [
+          "advise someone to consider",
+          "require",
+          "suggest",
+          "describe",
+          "assign",
+          "forbid"
+        ]
+      }
+    },
+    {
+      "id": "syn_caf2bb2bc2c05d",
+      "question_type": "synonym_multi",
+      "headword": "choose",
+      "sense_zh": "选择",
+      "context_en": "choose an option from a list",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_56891b1f3ecbb8",
+          "text": "reject"
+        },
+        {
+          "id": "o_8914799f07ba6f",
+          "text": "discard"
+        },
+        {
+          "id": "o_81244d6d526d22",
+          "text": "pick"
+        },
+        {
+          "id": "o_8cc9225872b4a3",
+          "text": "opt for"
+        },
+        {
+          "id": "o_6f8e3550539b26",
+          "text": "avoid"
+        },
+        {
+          "id": "o_109b81d24d4198",
+          "text": "select"
+        }
+      ],
+      "correct_option_ids": [
+        "o_109b81d24d4198",
+        "o_81244d6d526d22",
+        "o_8cc9225872b4a3"
+      ],
+      "explanation_zh": "opt for 可表示选择，但句法上常需搭配适当宾语。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_8b53b4bc9d14",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_9cf163e16d714f",
+      "related_master_word_id": "w_43e29691351116",
+      "sense_id": "s_a18f185cade12e",
+      "answer_snapshot": {
+        "context_en": "choose an option from a list",
+        "correct_option_texts": [
+          "select",
+          "pick",
+          "opt for"
+        ],
+        "option_texts": [
+          "reject",
+          "discard",
+          "pick",
+          "opt for",
+          "avoid",
+          "select"
+        ]
+      }
+    },
+    {
+      "id": "syn_a11a66a7e43ff2",
+      "question_type": "synonym_multi",
+      "headword": "require",
+      "sense_zh": "要求；需要",
+      "context_en": "the job requires previous experience",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_b43f1b410fd7d0",
+          "text": "need"
+        },
+        {
+          "id": "o_419f3b7ee3a44f",
+          "text": "demand"
+        },
+        {
+          "id": "o_deb3990e58262c",
+          "text": "prefer"
+        },
+        {
+          "id": "o_e8bd6a092327d6",
+          "text": "suggest"
+        },
+        {
+          "id": "o_d7ec785b17554d",
+          "text": "permit"
+        },
+        {
+          "id": "o_5dd1ecfdacc4a7",
+          "text": "necessitate"
+        }
+      ],
+      "correct_option_ids": [
+        "o_b43f1b410fd7d0",
+        "o_419f3b7ee3a44f",
+        "o_5dd1ecfdacc4a7"
+      ],
+      "explanation_zh": "demand 较强势；这里皆可表达岗位必需。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_1afb930ead58",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_44ed960c3adb70",
+      "related_master_word_id": "w_1e3d5ae4001c0a",
+      "sense_id": "s_7252f7bf83ee82",
+      "answer_snapshot": {
+        "context_en": "the job requires previous experience",
+        "correct_option_texts": [
+          "need",
+          "demand",
+          "necessitate"
+        ],
+        "option_texts": [
+          "need",
+          "demand",
+          "prefer",
+          "suggest",
+          "permit",
+          "necessitate"
+        ]
+      }
+    },
+    {
+      "id": "syn_a4ee8e22251765",
+      "question_type": "synonym_multi",
+      "headword": "confirm",
+      "sense_zh": "确认",
+      "context_en": "confirm the meeting date by checking the original email",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_31d98209dc781c",
+          "text": "suspect"
+        },
+        {
+          "id": "o_2aed47dc8005b0",
+          "text": "double-check"
+        },
+        {
+          "id": "o_1168dee1e4d6a7",
+          "text": "assume"
+        },
+        {
+          "id": "o_6fe6315655d0a6",
+          "text": "guess"
+        },
+        {
+          "id": "o_081cf940bfc42b",
+          "text": "verify"
+        },
+        {
+          "id": "o_a3387ff0f33cdb",
+          "text": "invent"
+        }
+      ],
+      "correct_option_ids": [
+        "o_081cf940bfc42b",
+        "o_2aed47dc8005b0"
+      ],
+      "explanation_zh": "通过原始邮件核实日期；establish 不是所有情况下都等于 confirm。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_97d8d03e8b80",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_a1cc151cf7e9ed",
+      "related_master_word_id": "w_7a6900f2a40fea",
+      "sense_id": "s_5682a915ef2802",
+      "answer_snapshot": {
+        "context_en": "confirm the meeting date by checking the original email",
+        "correct_option_texts": [
+          "verify",
+          "double-check"
+        ],
+        "option_texts": [
+          "suspect",
+          "double-check",
+          "assume",
+          "guess",
+          "verify",
+          "invent"
+        ]
+      }
+    },
+    {
+      "id": "syn_c739437d64bed7",
+      "question_type": "synonym_multi",
+      "headword": "repair",
+      "sense_zh": "修理",
+      "context_en": "repair a torn jacket",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_876027a709edc8",
+          "text": "fix"
+        },
+        {
+          "id": "o_2c6cba9bb1384c",
+          "text": "stain"
+        },
+        {
+          "id": "o_d34d89361c2564",
+          "text": "mend"
+        },
+        {
+          "id": "o_e23f2316d3a127",
+          "text": "discard"
+        },
+        {
+          "id": "o_f193ec410ce193",
+          "text": "damage"
+        },
+        {
+          "id": "o_0fa3ede0bd3652",
+          "text": "replace"
+        }
+      ],
+      "correct_option_ids": [
+        "o_d34d89361c2564",
+        "o_876027a709edc8"
+      ],
+      "explanation_zh": "mend 特别适用于修补衣物；restore 往往指更大范围恢复状态。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_70b0805e8e73",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_aea0afd3d76b1a",
+      "related_master_word_id": "w_60d4b7d23ac708",
+      "sense_id": "s_90607e932e09ac",
+      "answer_snapshot": {
+        "context_en": "repair a torn jacket",
+        "correct_option_texts": [
+          "mend",
+          "fix"
+        ],
+        "option_texts": [
+          "fix",
+          "stain",
+          "mend",
+          "discard",
+          "damage",
+          "replace"
+        ]
+      }
+    },
+    {
+      "id": "syn_910d4495c8f8c9",
+      "question_type": "synonym_multi",
+      "headword": "create",
+      "sense_zh": "创造；创建",
+      "context_en": "create a new design",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_66d733c614236a",
+          "text": "erase"
+        },
+        {
+          "id": "o_5f9b1714503a63",
+          "text": "make"
+        },
+        {
+          "id": "o_88032568de4ec7",
+          "text": "generate"
+        },
+        {
+          "id": "o_e5d1dd13cd27bc",
+          "text": "produce"
+        },
+        {
+          "id": "o_c1bb66dd5c902c",
+          "text": "destroy"
+        },
+        {
+          "id": "o_8d72eb0088c481",
+          "text": "remove"
+        }
+      ],
+      "correct_option_ids": [
+        "o_5f9b1714503a63",
+        "o_e5d1dd13cd27bc",
+        "o_88032568de4ec7"
+      ],
+      "explanation_zh": "generate 偏产出或生成，与 create 接近。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_4902dfdd6543",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_4b8f4018aafd95",
+      "related_master_word_id": "w_00a3bd571d27f5",
+      "sense_id": "s_c68091f04ecceb",
+      "answer_snapshot": {
+        "context_en": "create a new design",
+        "correct_option_texts": [
+          "make",
+          "produce",
+          "generate"
+        ],
+        "option_texts": [
+          "erase",
+          "make",
+          "generate",
+          "produce",
+          "destroy",
+          "remove"
+        ]
+      }
+    },
+    {
+      "id": "syn_e3c82b30c1d0ad",
+      "question_type": "synonym_multi",
+      "headword": "change",
+      "sense_zh": "改变",
+      "context_en": "change a plan after new information arrives",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_78ac59531e2a71",
+          "text": "adjust"
+        },
+        {
+          "id": "o_b029f3460671a6",
+          "text": "maintain"
+        },
+        {
+          "id": "o_a5efb0221e2c76",
+          "text": "alter"
+        },
+        {
+          "id": "o_bea1802bf1a530",
+          "text": "preserve"
+        },
+        {
+          "id": "o_c57b1ae9920ce4",
+          "text": "retain"
+        },
+        {
+          "id": "o_ac1be5402491f4",
+          "text": "modify"
+        }
+      ],
+      "correct_option_ids": [
+        "o_ac1be5402491f4",
+        "o_a5efb0221e2c76",
+        "o_78ac59531e2a71"
+      ],
+      "explanation_zh": "modify/adjust 可强调小范围修改；change 范围更广。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_e65d2602f8a0",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_1b7b9ff2e68fb4",
+      "related_master_word_id": "w_14f833e07254b8",
+      "sense_id": "s_97235b2015ad92",
+      "answer_snapshot": {
+        "context_en": "change a plan after new information arrives",
+        "correct_option_texts": [
+          "modify",
+          "alter",
+          "adjust"
+        ],
+        "option_texts": [
+          "adjust",
+          "maintain",
+          "alter",
+          "preserve",
+          "retain",
+          "modify"
+        ]
+      }
+    },
+    {
+      "id": "syn_4e0c3ef049dbef",
+      "question_type": "synonym_multi",
+      "headword": "continue",
+      "sense_zh": "继续",
+      "context_en": "continue working after a short break",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_e206d6090fe8be",
+          "text": "give up"
+        },
+        {
+          "id": "o_525e6b101e5071",
+          "text": "stop"
+        },
+        {
+          "id": "o_93cd230b6549e1",
+          "text": "quit"
+        },
+        {
+          "id": "o_865ca809d2e231",
+          "text": "keep going"
+        },
+        {
+          "id": "o_fbab013511eb04",
+          "text": "carry on"
+        },
+        {
+          "id": "o_a21808a8d6e02b",
+          "text": "proceed"
+        }
+      ],
+      "correct_option_ids": [
+        "o_fbab013511eb04",
+        "o_865ca809d2e231",
+        "o_a21808a8d6e02b"
+      ],
+      "explanation_zh": "proceed 较正式，词法搭配不一定逐字相同。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_abe922a080ab",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_18227828100fc9",
+      "related_master_word_id": "w_31ab89bcd6995a",
+      "sense_id": "s_5692f34f4712fc",
+      "answer_snapshot": {
+        "context_en": "continue working after a short break",
+        "correct_option_texts": [
+          "carry on",
+          "keep going",
+          "proceed"
+        ],
+        "option_texts": [
+          "give up",
+          "stop",
+          "quit",
+          "keep going",
+          "carry on",
+          "proceed"
+        ]
+      }
+    },
+    {
+      "id": "syn_188126e9b2d64c",
+      "question_type": "synonym_multi",
+      "headword": "clear",
+      "sense_zh": "清晰明确的",
+      "context_en": "a clear explanation that students can understand",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_fbff851cb4b04c",
+          "text": "confusing"
+        },
+        {
+          "id": "o_fc7fcf56d7d16b",
+          "text": "ambiguous"
+        },
+        {
+          "id": "o_e46e8e66792483",
+          "text": "understandable"
+        },
+        {
+          "id": "o_7bfa63f9e50149",
+          "text": "comprehensible"
+        },
+        {
+          "id": "o_8bca2da8254144",
+          "text": "obscure"
+        },
+        {
+          "id": "o_7ade7fbfddea2b",
+          "text": "lucid"
+        }
+      ],
+      "correct_option_ids": [
+        "o_7ade7fbfddea2b",
+        "o_e46e8e66792483",
+        "o_7bfa63f9e50149"
+      ],
+      "explanation_zh": "强调表达清晰易懂，不考察透明或空白等其他义项。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_e74cdb70b531",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_84981c3b1405d3",
+      "related_master_word_id": null,
+      "sense_id": "s_522f015c3c463e",
+      "answer_snapshot": {
+        "context_en": "a clear explanation that students can understand",
+        "correct_option_texts": [
+          "lucid",
+          "understandable",
+          "comprehensible"
+        ],
+        "option_texts": [
+          "confusing",
+          "ambiguous",
+          "understandable",
+          "comprehensible",
+          "obscure",
+          "lucid"
+        ]
+      }
+    },
+    {
+      "id": "syn_5b5c7b99bc142b",
+      "question_type": "synonym_multi",
+      "headword": "suitable",
+      "sense_zh": "合适的",
+      "context_en": "a suitable candidate for the position",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_c4f63856b091f5",
+          "text": "irrelevant"
+        },
+        {
+          "id": "o_f270a9ea4dad3f",
+          "text": "unsuitable"
+        },
+        {
+          "id": "o_31891a9e0c46c6",
+          "text": "appropriate"
+        },
+        {
+          "id": "o_dea4fea35d456f",
+          "text": "inappropriate"
+        },
+        {
+          "id": "o_40aeb691704ac8",
+          "text": "fitting"
+        },
+        {
+          "id": "o_ec020f7fbac71a",
+          "text": "well-suited"
+        }
+      ],
+      "correct_option_ids": [
+        "o_31891a9e0c46c6",
+        "o_ec020f7fbac71a",
+        "o_40aeb691704ac8"
+      ],
+      "explanation_zh": "这些答案强调职位匹配的适宜性。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_5e4d3c20eb31",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_db9b127c20d06c",
+      "related_master_word_id": "w_5870064ae9e934",
+      "sense_id": "s_1b630eaf5ad574",
+      "answer_snapshot": {
+        "context_en": "a suitable candidate for the position",
+        "correct_option_texts": [
+          "appropriate",
+          "well-suited",
+          "fitting"
+        ],
+        "option_texts": [
+          "irrelevant",
+          "unsuitable",
+          "appropriate",
+          "inappropriate",
+          "fitting",
+          "well-suited"
+        ]
+      }
+    },
+    {
+      "id": "syn_19ad6d10a11920",
+      "question_type": "synonym_multi",
+      "headword": "convenient",
+      "sense_zh": "方便的",
+      "context_en": "a convenient meeting location near the train station",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_dc1449c3738c90",
+          "text": "far away"
+        },
+        {
+          "id": "o_590cff88c6726d",
+          "text": "handy"
+        },
+        {
+          "id": "o_d26d116db173a0",
+          "text": "remote"
+        },
+        {
+          "id": "o_8a79284c1ccdcc",
+          "text": "easy to reach"
+        },
+        {
+          "id": "o_8af65953e57de5",
+          "text": "impractical"
+        },
+        {
+          "id": "o_d175f5f199d3d1",
+          "text": "inaccessible"
+        }
+      ],
+      "correct_option_ids": [
+        "o_590cff88c6726d",
+        "o_8a79284c1ccdcc"
+      ],
+      "explanation_zh": "地点便利在这里指容易抵达；practical 不一定意味着地理位置便利。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_81e18b5f8766",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_1f74848b77e4df",
+      "related_master_word_id": "w_95ac7be439a4de",
+      "sense_id": "s_6542a321d7d7e5",
+      "answer_snapshot": {
+        "context_en": "a convenient meeting location near the train station",
+        "correct_option_texts": [
+          "handy",
+          "easy to reach"
+        ],
+        "option_texts": [
+          "far away",
+          "handy",
+          "remote",
+          "easy to reach",
+          "impractical",
+          "inaccessible"
+        ]
+      }
+    },
+    {
+      "id": "syn_abb06095aafcdb",
+      "question_type": "synonym_multi",
+      "headword": "full",
+      "sense_zh": "满的",
+      "context_en": "a full box packed with books",
+      "instruction_en": "Select ALL options that have a similar meaning in this specific context. They need not be grammatically interchangeable.",
+      "options": [
+        {
+          "id": "o_2f9bcde22a74ce",
+          "text": "crammed"
+        },
+        {
+          "id": "o_f29bf9f488934a",
+          "text": "packed"
+        },
+        {
+          "id": "o_c49f52d69543b3",
+          "text": "vacant"
+        },
+        {
+          "id": "o_367d4328c5c641",
+          "text": "empty"
+        },
+        {
+          "id": "o_eae00697e23298",
+          "text": "half-empty"
+        },
+        {
+          "id": "o_b4254e50b9c88c",
+          "text": "filled"
+        }
+      ],
+      "correct_option_ids": [
+        "o_b4254e50b9c88c",
+        "o_f29bf9f488934a",
+        "o_2f9bcde22a74ce"
+      ],
+      "explanation_zh": "box 装满书可称 packed/crammed；brimming 更多用于液体/溢满或比喻，不做固定同义。",
+      "source": "v3_editorial_revision_of_v2",
+      "review_status": "ready_for_pilot",
+      "legacy_id": "syn_507dd7bf6bfd",
+      "scoring_policy": "exact_set_match",
+      "question_version": 1,
+      "review_method": "context_and_answer_set_revised_v3",
+      "word_id": "w_823de2913438ce",
+      "related_master_word_id": "w_2ef5bea56376f3",
+      "sense_id": "s_6160a6586302d2",
+      "answer_snapshot": {
+        "context_en": "a full box packed with books",
+        "correct_option_texts": [
+          "filled",
+          "packed",
+          "crammed"
+        ],
+        "option_texts": [
+          "crammed",
+          "packed",
+          "vacant",
+          "empty",
+          "half-empty",
+          "filled"
+        ]
+      }
+    }
+  ],
+  "version": 3
+}

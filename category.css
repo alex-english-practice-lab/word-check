@@ -6,3 +6,9 @@
 .group-choice span{font-size:14px;font-weight:600}
 .group-choice small{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:4px}
 #loadErrorDetail{display:block;overflow-wrap:anywhere;margin-top:6px}
+
+.practice-entry{padding:20px 24px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.practice-entry strong{display:block;font-size:17px;color:#23335d;margin-top:7px}
+.practice-entry p{font-size:13px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+.practice-entry-link{white-space:nowrap;background:var(--blue);color:#fff;text-decoration:none;padding:12px 16px;border-radius:8px;font-weight:650;font-size:14px}
+@media(max-width:680px){.practice-entry{display:block}.practice-entry-link{display:inline-block;margin-top:14px}}

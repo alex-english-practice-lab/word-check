@@ -28,6 +28,17 @@ compatible; version 1 uses the legacy defaults of no timer and hints allowed.
 Because GitHub Pages is static hosting, this is UI locking and corruption
 detection rather than server-backed authorization.
 
+The home page also links to a separate **Daily Vocabulary V3** pilot. It keeps
+the existing spelling checker untouched and provides:
+
+- Recognition: 309 reviewed English-to-Chinese four-choice questions.
+- Synonym: 46 contextual exact-set multiple-selection questions.
+- A searchable preview of the 1,172-entry V3 master vocabulary.
+- Browser-local attempt history and a review pool; no account or cloud sync.
+
+The V3 data review and pilot limitations are recorded in
+[`docs/V3-REVIEW.md`](docs/V3-REVIEW.md).
+
 The temporary TXT-import controls are hidden from the setup page for now. The
 parser and import wiring remain in the code so the entry point can be restored
 without rebuilding the feature.
@@ -65,6 +76,8 @@ images from another browser version. The test starts and closes its own local
 HTTP server, tests the `/word-check/` project subpath, and writes ignored
 `test-artifacts/` screenshots. It requires Git history containing the baseline.
 
-`practice-records.js` is pure tested data logic, intentionally NOT connected to
-the page or a persistence backend in Phase 1. No learning records are saved yet.
+`practice-records.js` remains pure tested Phase 1 data logic and is not connected
+to a backend. The V3 pilot saves its own isolated practice state in localStorage;
+it does not implement accounts, cross-device sync, or the general Phase 2 record
+system.
 
