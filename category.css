@@ -12,3 +12,53 @@
 .practice-entry p{font-size:13px;color:var(--muted);margin:6px 0 0;line-height:1.5}
 .practice-entry-link{white-space:nowrap;background:var(--blue);color:#fff;text-decoration:none;padding:12px 16px;border-radius:8px;font-weight:650;font-size:14px}
 @media(max-width:680px){.practice-entry{display:block}.practice-entry-link{display:inline-block;margin-top:14px}}
+
+/* Homepage setup: keep every choice together, then show the vocabulary below. */
+.home-page:has(#setup:not([hidden])) header{height:76px}
+.home-page:has(#setup:not([hidden])) main{padding-top:24px}
+.home-page:has(#setup:not([hidden])) .page-heading{margin-bottom:18px}
+.home-page:has(#setup:not([hidden])) .practice-entry{padding:16px 20px;margin-bottom:18px}
+.home-workspace{display:block}
+.home-setup{padding:22px 26px}
+.home-setup>.section-heading{margin-bottom:18px}
+.home-setup-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 20px;align-items:start}
+.setup-block{min-width:0}
+.home-setup fieldset{margin:0}
+.home-setup #librarySettings .divider,.home-setup #customImport .divider{display:none}
+.home-setup #librarySettings>.small{margin:7px 0 14px}
+.home-setup #numberedLists>.small,.home-setup #namedLists>.small{margin:7px 0 0}
+.home-setup .mode{padding:10px;margin:7px 0}
+.home-setup .toggle-setting{margin-top:13px}
+.home-setup #questionTimeHelp{margin:7px 0 0}
+.home-setup #totalSettings{margin-top:14px}
+.home-setup #countHelp{margin:7px 0 0}
+.home-setup #groupChoices{gap:6px}
+.home-setup .group-choice{padding:8px 10px}
+.setup-counts{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;min-width:0}
+.setup-counts>#samplingHelp{margin:0 0 7px}
+.home-setup #listCounts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 18px;max-height:132px;padding:0}
+.home-setup .count-row{grid-template-columns:minmax(0,1fr) 76px 15px;padding:7px 0}
+.setup-actions{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,220px) minmax(200px,250px);gap:12px 14px;align-items:center;border-top:1px solid var(--line);padding-top:14px}
+.setup-status{min-width:0}
+.setup-status p{margin:3px 0}
+.setup-actions .preset-create{margin-top:0}
+.setup-actions button{min-height:46px}
+.setup-actions .preset-link-panel{grid-column:1/-1;margin-top:2px}
+.home-preview-below{margin-top:20px}
+
+@media(max-width:900px){
+  .home-setup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .setup-actions{grid-template-columns:minmax(0,1fr) minmax(170px,220px)}
+  .setup-actions #createPreset{grid-column:2}
+}
+@media(max-width:680px){
+  .home-page:has(#setup:not([hidden])) header{height:70px}
+  .home-page:has(#setup:not([hidden])) main{padding-top:22px}
+  .home-setup{padding:20px}
+  .home-setup-grid{grid-template-columns:1fr;gap:20px}
+  .setup-counts,.setup-actions{grid-column:auto}
+  .home-setup #listCounts{grid-template-columns:1fr;max-height:300px}
+  .setup-actions{grid-template-columns:1fr}
+  .setup-actions #createPreset{grid-column:auto}
+  .home-preview-below{margin-top:16px}
+}
