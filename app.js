@@ -3,7 +3,7 @@ const libraries=V.createRegistry();let catalogReady=null,activeLibrary=null,load
 const V3_ID=H.SOURCE_ID;
 const teacherMode=document.body.dataset.teacher==='true';
 $('linkType')?.addEventListener('change',updateSelection);
-function ensureCatalog(){return catalogReady||(catalogReady=libraries.loadManifest('data/catalog.json').catch(e=>{catalogReady=null;throw e}))}
+function ensureCatalog(){return catalogReady||(catalogReady=libraries.loadManifest(new URL('data/catalog.json',document.baseURI).href).catch(e=>{catalogReady=null;throw e}))}
 let words=[],queue=[],answers=[],index=0,hints=0,graded=false,mode='full',scope='',currentSense='',isDemo=false,active=false,loadVersion=0,presetSession=null,timeLimit=0,hintsAllowed=true,timerId=null,timerDeadline=0,sourceKind='spelling';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const namedGroups=()=>activeLibrary?.selectionMode==='named';
