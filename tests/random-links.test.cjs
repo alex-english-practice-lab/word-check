@@ -26,3 +26,14 @@ test('separate opens invoke the sampler again',()=>{
  const first=P.sampleRandom(recipe,words,core),second=P.sampleRandom(recipe,words,core);
  assert.notDeepEqual(first,second);assert.equal(calls,2);
 });
+
+test('daily V3 fixed and random links round trip compactly',async()=>{
+ const fixed={v:P.DAILY_VERSION,l:'practice:daily-v3',lv:'3',m:'recognition',a:'fixed',g:'生活',q:[1,7,25]};
+ const decoded=await P.readToken(await P.createToken(fixed));assert.deepEqual(decoded,fixed);
+ const random={v:P.DAILY_VERSION,l:'practice:daily-v3',lv:'3',m:'synonym',a:'random',g:'',n:20};
+ assert.deepEqual(await P.readToken(await P.createToken(random)),random);
+});
+test('daily V3 links reject invalid modes, categories and oversized sets',()=>{
+ const base={v:P.DAILY_VERSION,l:'practice:daily-v3',lv:'3',m:'recognition',a:'random',g:'',n:20};
+ for(const payload of [{...base,m:'other'},{...base,n:101},{...base,a:'fixed',q:[]},{...base,a:'fixed',q:[1,1]},{...base,m:'synonym',g:'生活'}])assert.throws(()=>P.validate(payload));
+});

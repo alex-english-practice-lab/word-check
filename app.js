@@ -35,8 +35,8 @@ function setSourceKind(kind){
  $('spellingModeOptions').hidden=v3;$('v3ModeOptions').hidden=!v3;
  $('spellingAnswerSettings').hidden=v3;$('v3AnswerSettings').hidden=!v3;
  $('spellingSamplingSettings').hidden=v3;$('v3SamplingSettings').hidden=!v3;
- $('createPreset').hidden=v3||!teacherMode;$('presetHelp').hidden=v3||!teacherMode;
- if($('teacherLinkSettings'))$('teacherLinkSettings').hidden=v3;
+ $('createPreset').hidden=!teacherMode;$('presetHelp').hidden=!teacherMode;
+ if($('teacherLinkSettings'))$('teacherLinkSettings').hidden=false;
  $('start').textContent=v3?'开始练习':'开始检查';
  $('libraryHelp').textContent=v3?'在同一页面选择 Recognition 或 Synonym，再设置范围与题量。':'选择词库后，再设置检查范围与题量。';
  document.body.classList.toggle('v3-home',v3);clearPresetOutput();
@@ -91,24 +91,30 @@ $('createPreset').onclick=async()=>{
  const button=$('createPreset');
  try{
   if(!teacherMode)throw Error('请使用教师设置页生成链接。');
-  if(activeLibrary?.source.type!=='builtin')throw Error('临时导入的 TXT 无法生成学生链接。');
   button.disabled=true;button.textContent='正在生成…';
-  const quiz=configuredQuiz(),random=$('linkType').value==='random';
-  const payload={v:random?P.RANDOM_VERSION:P.VERSION,l:activeLibrary.id,lv:activeLibrary.version,m:quiz.mode,t:quiz.options.timeLimit,h:quiz.options.hintsAllowed};
-  if(random){
-   payload.a=$('sampling').value;payload.r=C.range($('range').value,words.map(w=>w.list));
-   if(payload.a==='per-list')payload.c=listPlan().map(row=>row.count);else payload.n=Number($('count').value);
-   P.sampleRandom(payload,words,C);
+  const random=$('linkType').value==='random';
+  let payload,questions,summary;
+  if(sourceKind==='v3'){
+   const built=H.buildPreset(random?'random':'fixed');payload=built.payload;questions=built.questions;
+   summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 道题 · '+(payload.m==='recognition'?'Recognition 四选一':'Synonym 多选')+(payload.g?' · '+payload.g:'')+(random?' · 刷新或再练会重新抽题，可能与上一轮重合':' · 学生每次打开时随机排列');
   }else{
-   const byId=new Map(words.map((word,i)=>[word.id,i]));payload.w=quiz.pool.map(word=>byId.get(word.id));
+   if(activeLibrary?.source.type!=='builtin')throw Error('临时导入的 TXT 无法生成学生链接。');
+   const quiz=configuredQuiz();payload={v:random?P.RANDOM_VERSION:P.VERSION,l:activeLibrary.id,lv:activeLibrary.version,m:quiz.mode,t:quiz.options.timeLimit,h:quiz.options.hintsAllowed};
+   if(random){
+    payload.a=$('sampling').value;payload.r=C.range($('range').value,words.map(w=>w.list));
+    if(payload.a==='per-list')payload.c=listPlan().map(row=>row.count);else payload.n=Number($('count').value);
+    P.sampleRandom(payload,words,C);
+   }else{
+    const byId=new Map(words.map((word,i)=>[word.id,i]));payload.w=quiz.pool.map(word=>byId.get(word.id));
+   }
+   questions=quiz.pool.length;
+   summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 个单词 · '+(quiz.options.timeLimit?'每题 '+quiz.options.timeLimit+' 秒':'不限时')+' · '+(quiz.options.hintsAllowed?'允许提示':'不提供提示')+(random?' · 刷新或再练会重新抽词，可能与上一轮重合':' · 学生每次打开时随机排列');
   }
   const url=await P.createUrl(payload,new URL('./',document.baseURI).href);
-  if(url.length>2000)throw Error('链接过长，请减少题量或选择的 List。');
-  $('presetLink').value=url;
-  $('presetSummary').textContent=(random?'每次按设置重新抽取':'已固定')+' '+quiz.pool.length+' 个单词 · '+(quiz.options.timeLimit?'每题 '+quiz.options.timeLimit+' 秒':'不限时')+' · '+(quiz.options.hintsAllowed?'允许提示':'不提供提示')+(random?' · 刷新或再练会重新抽词，可能与上一轮重合':' · 学生每次打开时随机排列');
-  $('presetLinkPanel').hidden=false;$('presetLink').focus();$('presetLink').select();
+  if(url.length>2000)throw Error('链接过长，请减少题量或选择范围。');
+  $('presetLink').value=url;$('presetSummary').textContent=summary;$('presetLinkPanel').hidden=false;$('presetLink').focus();$('presetLink').select();
  }catch(e){$('setupError').textContent=e.message}
- finally{button.textContent='生成学生练习链接';button.disabled=$('start').disabled||activeLibrary?.source.type!=='builtin'}
+ finally{button.textContent='生成学生练习链接';button.disabled=$('start').disabled||(sourceKind==='spelling'&&activeLibrary?.source.type!=='builtin')}
 };
 $('copyPreset').onclick=async()=>{try{await navigator.clipboard.writeText($('presetLink').value)}catch{$('presetLink').select();document.execCommand('copy')}$('copyPreset').textContent='已复制'};
 function renderQuestion(){const w=queue[index];hints=0;graded=false;currentSense=w.senses[Math.floor(Math.random()*w.senses.length)];$('quizMode').textContent=mode==='full'?'音标 + 释义':'单个释义';$('progressText').textContent=`${index+1} / ${queue.length}`;$('progressBar').style.width=`${index/queue.length*100}%`;$('questionList').textContent=namedGroups()?listName(w.list):`LIST ${String(w.list).padStart(2,'0')}`;$('phonetic').hidden=mode==='single';$('phonetic').textContent=w.phonetic||'未提供音标';$('meaning').textContent=mode==='single'?currentSense:w.senses.join('；');$('pos').textContent=mode==='full'?w.pos:'';$('pos').hidden=mode==='single';$('answer').value='';$('answer').disabled=false;$('hintDisplay').textContent='';$('feedback').textContent='';$('feedback').className='';$('hint').hidden=!hintsAllowed;$('hint').disabled=!hintsAllowed;$('submit').hidden=false;$('skip').hidden=false;$('next').hidden=true;$('answer').focus();startTimer()}
@@ -124,7 +130,9 @@ async function initialize(){
  if(!location.hash.startsWith('#preset=')){loadDefault();return}
  show('presetLoading');document.body.classList.add('preset-mode');document.title='Word Check · 学生练习';
  try{
-  const preset=await P.readHash();await ensureCatalog();
+  const preset=await P.readHash();
+  if(preset.v===P.DAILY_VERSION){setSourceKind('v3');await H.startPreset(preset);return}
+  await ensureCatalog();
   if(!libraries.list().some(entry=>entry.id===preset.l))throw Error('这份练习使用的词库目前不可用。');
   await loadLibrary(preset.l);
   if(activeLibrary?.id!==preset.l)throw Error('无法加载这份练习使用的词库。');

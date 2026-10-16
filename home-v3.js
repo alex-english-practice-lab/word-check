@@ -3,10 +3,12 @@
   'use strict';
   const SOURCE_ID = 'practice:daily-v3';
   const C = root.WordCheckPracticeCore;
+  const P = root.WordPresetLinks;
+  const VERSION = '3';
   const byId = id => document.getElementById(id);
   const state = { recognition: [], synonym: [], entries: [], queue: [], answers: [], index: 0,
     active: false, graded: false, selected: new Set(), mode: 'recognition', sourceLabel: '',
-    startedAt: '', attemptId: '', lastMisses: [] };
+    startedAt: '', attemptId: '', lastMisses: [], preset: null };
   let loadPromise = null;
 
   function text(id, value) { byId(id).textContent = String(value); }
@@ -15,7 +17,7 @@
   function modeLabel() { return state.mode === 'recognition' ? '词义四选一' : '同义词多选'; }
   function practiceType() { return state.mode === 'recognition' ? C.TYPES.recognition : C.TYPES.synonym; }
   function currentPool() { return state[state.mode]; }
-  async function fetchJson(path) { const response = await fetch(path, { cache: 'no-cache' }); if (!response.ok) throw new Error(path + ' HTTP ' + response.status); return response.json(); }
+  async function fetchJson(path) { const response = await fetch(new URL(path, document.baseURI), { cache: 'no-cache' }); if (!response.ok) throw new Error(path + ' HTTP ' + response.status); return response.json(); }
 
   async function ensureLoaded() {
     if (state.entries.length) return;
@@ -75,6 +77,11 @@
     text('selection', `可用 ${available} 题 · 本轮 ${actual} 题 · 题目与选项顺序随机`);
     text('setupError', !valid ? '请输入 0 或正整数题量。' : available ? '' : (state.entries.length ? '当前范围没有可用题目，请修改条件。' : '词库正在加载…'));
     byId('start').disabled = !valid || available === 0;
+    if (document.body.dataset.teacher === 'true') {
+      const reviewOnly = byId('v3ReviewOnly').checked, shareable = valid && available > 0 && actual > 0 && actual <= 100 && !reviewOnly;
+      byId('createPreset').disabled = !shareable;
+      byId('presetHelp').textContent = reviewOnly ? '本机错题记录无法放进学生链接，请关闭“仅练本机错题”。' : actual > 100 ? '学生链接最多支持 100 题，请减少题量。' : '链接会保留题型、分类和题量；固定测试保持同一批题目，随机练习每次重新抽题。';
+    }
   }
 
   async function activate() {
@@ -89,13 +96,51 @@
       const category = state.mode === 'recognition' ? byId('v3Category').value : '';
       const due = byId('v3ReviewOnly').checked ? C.dueKeys(C.readStore(root.localStorage)) : null;
       const pool = C.pickQuestions(currentPool(), byId('v3QuestionCount').value, category, due);
-      begin(pool, `${category || (state.mode === 'recognition' ? '全部分类' : '近义词词库')}${due ? ' · 本机错题' : ''}`);
+      state.preset = null; begin(pool, `${category || (state.mode === 'recognition' ? '全部分类' : '近义词词库')}${due ? ' · 本机错题' : ''}`);
     } catch (error) { text('setupError', error.message); }
+  }
+
+  function presetLabel(preset) { return preset.m === 'recognition' ? (preset.g || '全部分类') : '近义词词库'; }
+  function questionsForPreset(preset) {
+    state.mode = preset.m;
+    const all = currentPool(), eligible = preset.m === 'recognition' && preset.g ? all.filter(question => question.category === preset.g) : all;
+    if (!eligible.length) throw new Error('学生链接指定的题目范围目前不可用。');
+    let pool;
+    if (preset.a === 'fixed') {
+      pool = preset.q.map(index => all[index]);
+      if (pool.some(question => !question) || preset.g && pool.some(question => question.category !== preset.g)) throw new Error('部分固定题目已不在当前题库中，请老师重新生成链接。');
+    } else pool = C.pickQuestions(all, preset.n, preset.g || '');
+    if (!pool.length || pool.length > 100) throw new Error('学生链接的实际题量需在 1–100 之间。');
+    return pool;
+  }
+  function buildPreset(kind) {
+    updateSetup();
+    if (byId('v3ReviewOnly').checked) throw new Error('本机错题记录无法放进学生链接，请关闭“仅练本机错题”。');
+    const category = state.mode === 'recognition' ? byId('v3Category').value : '';
+    const requested = Number(byId('v3QuestionCount').value), questions = C.pickQuestions(currentPool(), requested, category);
+    if (!questions.length || questions.length > 100) throw new Error('学生链接的实际题量需在 1–100 之间。');
+    const payload = { v: P.DAILY_VERSION, l: SOURCE_ID, lv: VERSION, m: state.mode, a: kind, g: category };
+    if (kind === 'fixed') {
+      const indexes = new Map(currentPool().map((question, index) => [question.id, index]));
+      payload.q = questions.map(question => indexes.get(question.id));
+    } else payload.n = requested;
+    P.validate(payload);
+    return { payload, questions: questions.length, label: presetLabel(payload) };
+  }
+  async function startPreset(preset) {
+    if (preset.l !== SOURCE_ID || preset.lv !== VERSION) throw new Error('这份练习使用的日常词汇版本目前不可用。');
+    await ensureLoaded(); renderPreview();
+    const pool = questionsForPreset(preset);
+    state.preset = preset;
+    document.querySelector(`input[name=v3PracticeMode][value="${preset.m}"]`).checked = true;
+    byId('v3Restart').textContent = preset.a === 'random' ? '按相同设置再练一组' : '重新练习本组题目';
+    begin(pool, presetLabel(preset));
+    return { questions: pool.length, mode: preset.m };
   }
 
   function begin(questions, label) {
     if (!questions.length) { text('setupError', '没有可用题目'); return; }
-    state.queue = questions.map(question => ({ question, orderedOptions: C.shuffle(question.options) }));
+    state.queue = C.shuffle(questions).map(question => ({ question, orderedOptions: C.shuffle(question.options) }));
     state.answers = []; state.index = 0; state.graded = false; state.selected.clear(); state.active = true;
     state.startedAt = new Date().toISOString(); state.attemptId = crypto.randomUUID ? crypto.randomUUID() : 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2);
     state.sourceLabel = label; shell().show('v3Quiz'); renderQuestion();
@@ -143,7 +188,7 @@
   function next() { if (!state.graded) return; if (++state.index >= state.queue.length) finish(); else renderQuestion(); }
   function finish() {
     if (!state.active) return; state.active = false;
-    const attempt = { id: state.attemptId, library_id: state.mode === 'recognition' ? 'daily-common-v3' : 'synonym-core-v3', source: 'free_practice', question_type: practiceType(), started_at: state.startedAt, completed_at: new Date().toISOString(), finished: state.answers.length === state.queue.length, planned_question_ids: state.queue.map(row => row.question.id), answers: state.answers.slice() };
+    const attempt = { id: state.attemptId, library_id: state.mode === 'recognition' ? 'daily-common-v3' : 'synonym-core-v3', source: state.preset ? 'assignment' : 'free_practice', question_type: practiceType(), started_at: state.startedAt, completed_at: new Date().toISOString(), finished: state.answers.length === state.queue.length, planned_question_ids: state.queue.map(row => row.question.id), answers: state.answers.slice() };
     let saved = true; if (attempt.answers.length) saved = C.saveAttempt(root.localStorage, attempt);
     const correct = state.answers.filter(answer => answer.correct).length;
     text('v3ResultTitle', attempt.finished ? '本轮练习完成' : '本轮已结束'); text('v3ResultSummary', `${modeLabel()} · ${state.sourceLabel} · 已作答 ${state.answers.length} / ${state.queue.length} 题`); text('v3CorrectCount', correct); text('v3WrongCount', state.answers.length - correct);
@@ -158,7 +203,10 @@
   byId('v3Category').addEventListener('change', updateSetup); byId('v3QuestionCount').addEventListener('input', updateSetup); byId('v3ReviewOnly').addEventListener('change', updateSetup);
   byId('v3Submit').addEventListener('click', () => grade(false)); byId('v3Skip').addEventListener('click', () => grade(true)); byId('v3Next').addEventListener('click', next);
   byId('v3Exit').addEventListener('click', () => { if (root.confirm('结束本轮并查看已答题目的结果？')) finish(); });
-  byId('v3Restart').addEventListener('click', () => { shell().show('setup'); updateSetup(); }); byId('v3RetryWrong').addEventListener('click', () => begin(C.shuffle(state.lastMisses), '本轮错题重练'));
+  byId('v3Restart').addEventListener('click', () => {
+    if (state.preset) begin(questionsForPreset(state.preset), presetLabel(state.preset));
+    else { shell().show('setup'); updateSetup(); }
+  }); byId('v3RetryWrong').addEventListener('click', () => begin(C.shuffle(state.lastMisses), '本轮错题重练'));
   root.addEventListener('beforeunload', event => { if (state.active) { event.preventDefault(); event.returnValue = ''; } });
-  root.WordCheckHomeV3 = { SOURCE_ID, NAME: '日常词汇 V3', activate, updateSetup, start, get active() { return state.active; }, get loaded() { return !!state.entries.length; } };
+  root.WordCheckHomeV3 = { SOURCE_ID, VERSION, NAME: '日常词汇 V3', activate, updateSetup, start, buildPreset, startPreset, get active() { return state.active; }, get loaded() { return !!state.entries.length; } };
 })(window);
