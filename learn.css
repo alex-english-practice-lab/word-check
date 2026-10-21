@@ -1,0 +1,20 @@
+.student-paths{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0 48px}
+.student-path{padding:32px;text-align:left;display:flex;flex-direction:column;gap:12px;white-space:normal;min-height:220px;color:var(--ink,#202b45);background:white;border:1px solid var(--line);border-radius:18px}
+.student-path:hover{border-color:var(--blue);box-shadow:0 6px 24px #2c49dc12}
+.student-path strong{font-size:27px}.student-path span:last-child{color:var(--blue);margin-top:auto}
+.home-setup #checkHome{margin-left:auto;padding:0;font-size:13px;line-height:1.4}
+.learn-setup{padding:28px}.learn-setup .section-heading{flex-wrap:wrap}.learn-setup .section-heading button{margin-left:auto}
+.learn-settings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:22px 0}
+.learn-settings>div{min-width:0}.learn-settings input,.learn-settings select{width:100%}
+.learn-check-settings{margin:20px 0}.learn-check-settings .learn-settings{grid-template-columns:minmax(150px,260px) 1fr}
+.learn-workspace{max-width:760px;margin:0 auto}.learn-pack-name{font-size:18px;margin:18px 0;color:var(--muted)}
+.flashcard{width:100%;min-height:340px;padding:32px 24px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;white-space:normal;text-align:center;color:var(--ink,#202b45);background:white;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 32px #20306006}
+.flashcard:hover{border-color:var(--blue)}.flashcard[aria-pressed=true]{background:#f5f7ff;border-color:#9aaaff}
+.flashcard #cardMain{font-size:clamp(24px,4vw,38px);line-height:1.5;overflow-wrap:anywhere;font-weight:700}
+.flashcard #cardMeaning{font-size:20px;line-height:1.7}.flashcard #cardPhonetic{color:var(--muted)}
+.flashcard span:empty{display:none}.flashcard:focus-visible,.student-path:focus-visible{outline:3px solid #8e9dff;outline-offset:4px}
+.learn-actions{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}.learn-actions button{min-height:50px}
+.learn-storage{max-width:1000px;margin:24px auto;color:var(--muted)}
+.learn-summary .result-actions{flex-wrap:wrap}.learn-summary .result-actions button{white-space:normal}
+@media(max-width:680px){.student-paths{grid-template-columns:1fr;gap:14px}.student-path{min-height:170px;padding:24px}.learn-settings{grid-template-columns:1fr 1fr;gap:14px}.learn-setup{padding:20px}.learn-check-settings .learn-settings{grid-template-columns:1fr}.flashcard{min-height:300px;padding:24px 18px}.learn-actions{gap:10px}.learn-actions button{font-size:15px;padding:12px 8px}.learn-summary{padding:24px 18px}}
+@media(prefers-reduced-motion:reduce){.flashcard{transition:none}}
