@@ -1,5 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto');
 const C=require('../core'),V=require('../vocabulary'),ielts=require('../data/ielts.v1.json'),second=require('./fixtures/second-library.json');
+const writingSource=require('../data/writing-survival-100.source.json'),writing=require('../data/writing-survival-100.v1.json');
 const clone=x=>JSON.parse(JSON.stringify(x));
 const legacyFields=w=>({word:w.word,phonetic:w.phonetic,pos:w.pos,senses:w.senses,list:w.list,...(w.variants?{variants:w.variants}:{})});
 test('A: all original TXT bytes and 3610 parsed entries, variants, warnings survive',()=>{
@@ -59,6 +60,16 @@ test('TXT adapter retains parser behavior but creates new IDs, with no upper Lis
  assert.deepEqual(V.toPracticeWords(a).map(legacyFields),parsed.words.map(legacyFields));
  assert.deepEqual(C.range('29,61',V.toPracticeWords(a).map(w=>w.list)),[29,61]);
  assert.equal(C.sampleByList(V.toPracticeWords(a),[{list:61,count:1}])[0].word,'exact');
+});
+test('Writing Survival source converts deterministically and the catalog-ready library retains all 100 entries',()=>{
+ const rebuilt=V.fromSource(writingSource,{id:'lib:writing-survival-100',idFactory:(_kind,sourceId)=>sourceId});
+ assert.deepEqual(rebuilt,writing);assert.equal(writing.lists.length,10);
+ const words=V.toPracticeWords(writing);assert.equal(words.length,100);assert.equal(new Set(words.map(word=>word.id)).size,100);
+ assert.equal(words[0].id,'lib:writing-survival-100/word/writing-survival-001-improve');
+ assert.equal(words[0].word,'improve');assert.deepEqual(words[0].senses,['改善','提高']);
+ assert.equal(words.at(-1).id,'lib:writing-survival-100/word/writing-survival-100-together');
+ const entry=require('../data/catalog.json').libraries.find(item=>item.id===writing.id);
+ assert.deepEqual(entry,{id:writing.id,name:writing.name,version:writing.version,url:'writing-survival-100.v1.json'});
 });
 test('sampling and normalization keep original edge cases and never mutate input',()=>{
  const words=V.toPracticeWords(ielts),before=words.map(w=>w.id);
