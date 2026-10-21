@@ -36,7 +36,7 @@ function toPracticeWords(library){
  validate(library);
  return ordered(library.lists).flatMap(list=>ordered(list.words).map(w=>({
   id:w.id,libraryId:library.id,libraryVersion:library.version,listId:list.id,wordRevision:w.revision,
-  word:w.text,phonetic:w.phonetic,pos:w.pos,senses:[...w.senses],list:list.number,
+  word:w.text,phonetic:w.phonetic,pos:w.pos,senses:[...w.senses],list:list.number,order:w.order,
   ...(w.acceptedAnswers.some(x=>x!==w.text)?{variants:w.acceptedAnswers.filter(x=>x!==w.text)}:{})
  })));
 }

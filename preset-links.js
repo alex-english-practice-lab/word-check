@@ -99,7 +99,25 @@ function sampleRandom(input,words,core){
  return pool;
 }
 
-function validate(input){return input?.v===DAILY_VERSION?compactDaily(input):input?.v===RANDOM_VERSION?validateRandom(input):input?.v===VERSION?compact(input):validateLegacy(input)}
+const SCOPED_RANDOM_VERSION=6;
+// v6 stores one named group's canonical prefix plus a total random question count.
+function validateScopedRandom(input){
+ if(!input||input.v!==SCOPED_RANDOM_VERSION||!nonempty(input.l)||!nonempty(input.lv)||!['full','single'].includes(input.m))throw Error('限定范围随机练习设置不完整。');
+ if(!Number.isSafeInteger(input.r)||input.r<1)throw Error('难度分组编号无效。');
+ if(!Number.isSafeInteger(input.p)||input.p<1||input.p>10000)throw Error('前 N 个词中的 N 必须为 1–10000 的整数。');
+ if(!Number.isSafeInteger(input.n)||input.n<0||input.n>100)throw Error('学生链接最多支持 100 题；0 表示限定范围全部。');
+ return{v:SCOPED_RANDOM_VERSION,l:input.l,lv:input.lv,m:input.m,r:input.r,p:input.p,n:input.n,...settings(input)};
+}
+function sampleScopedRandom(input,words,core){
+ const recipe=validateScopedRandom(input),eligible=core.prefixPool(words,recipe.r,recipe.p);
+ if(new Set(eligible.map(word=>word.id)).size!==eligible.length)throw Error('限定范围中存在重复单词编号。');
+ const pool=core.sampleMixed(eligible,recipe.n);
+ if(!pool.length||pool.length>100)throw Error('学生链接的实际题量需在 1–100 之间。');
+ if(new Set(pool.map(word=>word.id)).size!==pool.length)throw Error('随机抽题结果包含重复单词。');
+ return pool;
+}
+
+function validate(input){return input?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(input):input?.v===DAILY_VERSION?compactDaily(input):input?.v===RANDOM_VERSION?validateRandom(input):input?.v===VERSION?compact(input):validateLegacy(input)}
 async function createToken(input){
  const payload=validate(input),encoded=encodeBytes(encoder.encode(JSON.stringify(payload)));
  return encoded+'.'+await fingerprint(encoded);
@@ -108,7 +126,7 @@ async function readToken(token){
  const parts=String(token).split('.');if(parts.length!==2||!parts[0]||!parts[1])throw Error('作业链接格式无效。');
  const expected=await fingerprint(parts[0]);if(expected!==parts[1])throw Error('作业链接已损坏或被修改。');
  let parsed;try{parsed=JSON.parse(decoder.decode(decodeBytes(parts[0])))}catch{throw Error('作业链接内容无法读取。')}
- return parsed?.v===DAILY_VERSION?expandDaily(parsed):parsed?.v===RANDOM_VERSION?validateRandom(parsed):parsed?.v===VERSION?expand(parsed):validateLegacy(parsed);
+ return parsed?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(parsed):parsed?.v===DAILY_VERSION?expandDaily(parsed):parsed?.v===RANDOM_VERSION?validateRandom(parsed):parsed?.v===VERSION?expand(parsed):validateLegacy(parsed);
 }
 async function createUrl(input,href=root.location?.href){
  const url=new URL(href);url.search='';url.hash='preset='+await createToken(input);return url.href;
@@ -116,6 +134,6 @@ async function createUrl(input,href=root.location?.href){
 async function readHash(hash=root.location?.hash||''){
  const value=new URLSearchParams(String(hash).replace(/^#/, '')).get('preset');if(!value)throw Error('没有找到作业设置。');return readToken(value);
 }
-const api={VERSION,RANDOM_VERSION,DAILY_VERSION,validateRandom,sampleRandom,compactDaily,expandDaily,validate,createToken,readToken,createUrl,readHash};
+const api={VERSION,RANDOM_VERSION,DAILY_VERSION,SCOPED_RANDOM_VERSION,validateRandom,sampleRandom,validateScopedRandom,sampleScopedRandom,compactDaily,expandDaily,validate,createToken,readToken,createUrl,readHash};
 if(typeof module!=='undefined')module.exports=api;else root.WordPresetLinks=api;
 })(typeof window!=='undefined'?window:globalThis);

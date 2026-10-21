@@ -22,6 +22,16 @@ and question count. Both shuffle question and option order. Local wrong-answer f
 cannot be shared and disables link generation. V3 currently has no spelling timer or
 letter-hint controls, so those settings are not part of V3 links.
 
+SCOPED_RANDOM_VERSION=6 is limited to DET spelling practice with one selected
+difficulty group. It stores the library/version, the group's internal `list.number`,
+the canonical prefix size, total question count (0 = the full prefix), spelling
+mode, time limit, and hint policy. The student client reconstructs the eligible
+pool by sorting that group on the canonical word `order`, slicing the prefix, and
+then sampling without replacement. It never treats the displayed difficulty name
+(for example, "难度 100") as the internal list number. Fixed scoped assignments
+continue to use v3 and store the already-sampled word indexes. Existing v4 recipes
+have no prefix field and continue to sample from their complete selected lists.
+
 Validation: node --test tests/*.test.cjs
 tests/browser.cjs sharing scenarios start at /teacher/; public homepage is
 checked separately for absence of sharing controls.

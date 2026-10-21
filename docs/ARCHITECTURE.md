@@ -57,7 +57,7 @@ Library 嵌套 Lists，List 嵌套 Words，同时显式保存外键，便于未�
 | --- | --- |
 | `validate(library)` | 校验后返回原对象；错误抛出；不修改数据 |
 | `fromLegacy(parsed, options)` | parsed 为原 parse 结果；options 包括 name、id、version、source、idFactory；生成规范新 Library |
-| `toPracticeWords(library)` | 按 order 排序并生成独立练习数组；旧 word/phonetic/pos/senses/list/variants 加稳定 id/libraryId/libraryVersion/listId/wordRevision |
+| `toPracticeWords(library)` | 按 order 排序并生成独立练习数组；旧 word/phonetic/pos/senses/list/variants 加稳定 id/libraryId/libraryVersion/listId/wordRevision/order |
 | `createRegistry({fetcher})` | fetcher 可注入，便于静态 URL、本地测试或未来其他来源 |
 | `registry.register({id, url, version?})` | 注册远程 JSON；与 data 二选一；拒绝重复 Library ID |
 | `registry.register({id, data, version?})` | 注册内存 JSON 副本；测试与未来用户库使用 |

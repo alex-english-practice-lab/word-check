@@ -1,6 +1,7 @@
 const $=id=>document.getElementById(id),C=window.WordCore,V=window.WordVocabulary,P=window.WordPresetLinks,H=window.WordCheckHomeV3;
-const libraries=V.createRegistry();let catalogReady=null,activeLibrary=null,loading=false,pendingLibraryId=null;
+const libraries=V.createRegistry();let catalogReady=null,activeLibrary=null,loading=false,pendingLibraryId=null,libraryLoadFailed=false;
 const V3_ID=H.SOURCE_ID;
+const DET_ID='lib:difficulty-100-120';
 const teacherMode=document.body.dataset.teacher==='true';
 $('linkType')?.addEventListener('change',updateSelection);
 function ensureCatalog(){return catalogReady||(catalogReady=libraries.loadManifest(new URL('data/catalog.json',document.baseURI).href).catch(e=>{catalogReady=null;throw e}))}
@@ -8,6 +9,31 @@ let words=[],queue=[],answers=[],index=0,hints=0,graded=false,mode='full',scope=
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const namedGroups=()=>activeLibrary?.selectionMode==='named';
 const listName=number=>activeLibrary?.lists.find(list=>list.number===number)?.name||'List '+number;
+const selectedGroups=()=>C.range($('range').value,words.map(w=>w.list));
+function selectedGroupsSafe(){try{return selectedGroups()}catch{return[]}}
+function updateScopeControls(){
+ const det=sourceKind==='spelling'&&activeLibrary?.id===DET_ID,groups=det?selectedGroupsSafe():[];
+ if(!det){$('detScopeSettings').hidden=true;$('vocabularyScope').value='all';$('prefixScopeInput').hidden=true;return}
+ const single=groups.length===1;
+ $('detScopeSettings').hidden=!single;
+ if(!single){$('vocabularyScope').value='all';$('prefixScopeInput').hidden=true;return}
+ $('vocabularyScope').disabled=false;$('prefixScopeInput').hidden=$('vocabularyScope').value!=='prefix';
+ $('detScopeNotice').textContent='按该难度组的词库原顺序限定抽查范围。';
+ if(single){const available=words.filter(word=>word.list===groups[0]).length;$('prefixCount').max=available;$('prefixScopeHelp').textContent=`该难度共 ${available} 个词；范围与本次题量分别设置。`}
+}
+function selectionContext(){
+ if(namedGroups()&&!$('range').value.trim())throw Error('请至少选择一个难度分组。');
+ const lists=selectedGroups(),available=new Set(words.map(w=>w.list)),missing=lists.filter(n=>!available.has(n));
+ if(missing.length)throw Error('词表中没有 List '+missing.join('、')+'，请调整范围或导入完整词表。');
+ let pool=words.filter(word=>lists.includes(word.list)),scope={type:'all',lists};
+ if(activeLibrary?.id===DET_ID&&$('vocabularyScope').value==='prefix'){
+  if(lists.length!==1)throw Error('First N Words 需要且只能选择一个难度组。');
+  const raw=$('prefixCount').value.trim(),count=Number(raw);
+  if(!/^\d+$/.test(raw)||!Number.isSafeInteger(count)||count<1)throw Error('前 N 个词中的 N 必须为正整数。');
+  pool=C.prefixPool(words,lists[0],count);scope={type:'prefix',list:lists[0],prefixCount:count};
+ }
+ return{pool,scope};
+}
 function compactScope(pool){const lists=[...new Set(pool.map(word=>word.list))].sort((a,b)=>a-b);return namedGroups()?lists.map(listName).join('、'):'List '+lists.join(',')}
 function renderLibraryPicker(){
  const registered=libraries.list(),options=registered.map(e=>({id:e.id,name:e.name||e.data?.name||e.id}));
@@ -25,9 +51,10 @@ function renderGroupChoices(){
  $('sampling').options[0].textContent=named?'按难度分别设置数量':'按 List 分别设置数量';
  $('sampling').options[1].textContent=named?'从所选难度混合抽取':'从所选 List 混合抽取';
  $('samplingHelp').textContent=named?'每个难度随机抽取，不重复；填 0 可跳过。':'每个 List 随机抽取，不重复；填 0 可跳过。';
+ updateScopeControls();
 }
 $('librarySelect').addEventListener('change',()=>{const id=$('librarySelect').value;return id===V3_ID?activateV3():loadLibrary(id)});
-$('groupChoices').addEventListener('change',()=>{$('range').value=[...$('groupChoices').querySelectorAll('input:checked')].map(input=>input.dataset.group).join(',');renderListCounts();updateSelection()});
+$('groupChoices').addEventListener('change',()=>{$('range').value=[...$('groupChoices').querySelectorAll('input:checked')].map(input=>input.dataset.group).join(',');updateScopeControls();renderListCounts();updateSelection()});
 function show(id){for(const x of ['setup','quiz','results','presetError','presetLoading','v3Quiz','v3Results'])$(x).hidden=x!==id;window.scrollTo(0,0)}
 function setSourceKind(kind){
  sourceKind=kind==='v3'?'v3':'spelling';const v3=sourceKind==='v3';
@@ -35,6 +62,7 @@ function setSourceKind(kind){
  $('spellingModeOptions').hidden=v3;$('v3ModeOptions').hidden=!v3;
  $('spellingAnswerSettings').hidden=v3;$('v3AnswerSettings').hidden=!v3;
  $('spellingSamplingSettings').hidden=v3;$('v3SamplingSettings').hidden=!v3;
+ $('detScopeSettings').hidden=v3||activeLibrary?.id!==DET_ID;
  $('createPreset').hidden=!teacherMode;$('presetHelp').hidden=!teacherMode;
  if($('teacherLinkSettings'))$('teacherLinkSettings').hidden=false;
  $('start').textContent=v3?'开始练习':'开始检查';
@@ -48,15 +76,28 @@ async function activateV3(){
  catch(e){if(version===loadVersion){$('loadErrorDetail').textContent=e.message;$('loadError').hidden=false}}
  finally{if(version===loadVersion){loading=false;renderLibraryPicker();H.updateSetup()}}
 }
-function selection(){try{if(namedGroups()&&!$('range').value.trim())throw Error('请至少选择一个难度分组。');const r=C.range($('range').value,words.map(w=>w.list)),available=new Set(words.map(w=>w.list)),missing=r.filter(n=>!available.has(n));if(missing.length)throw Error('词表中没有 List '+missing.join('、')+'，请调整范围或导入完整词表。');return words.filter(w=>r.includes(w.list))}catch(e){throw e}}
+function selection(){return selectionContext().pool}
 const listCounts=new Map();
 function listPlan(){return C.range($('range').value,words.map(w=>w.list)).map(list=>({list,count:listCounts.get(list)===''?NaN:Number(listCounts.get(list))}))}
-function renderListCounts(){let lists=[];try{lists=C.range($('range').value,words.map(w=>w.list))}catch{}$('listCounts').innerHTML=lists.map(list=>{const available=words.filter(w=>w.list===list).length;if(!listCounts.has(list))listCounts.set(list,String(Math.min(10,available)));return `<div class="count-row"><label for="list-count-${list}">${esc(listName(list))}<small>共 ${available} 个词</small></label><input id="list-count-${list}" data-count-list="${list}" type="number" min="0" max="${available}" step="1" value="${esc(listCounts.get(list))}" aria-label="${esc(listName(list))} 抽取数量"><span>个</span></div>`}).join('')}
+function renderListCounts(){let lists=[],eligible=words;try{lists=selectedGroups();eligible=selection()}catch{}$('listCounts').innerHTML=lists.map(list=>{const available=eligible.filter(w=>w.list===list).length;if(!listCounts.has(list))listCounts.set(list,String(Math.min(10,available)));return `<div class="count-row"><label for="list-count-${list}">${esc(listName(list))}<small>当前范围 ${available} 个词</small></label><input id="list-count-${list}" data-count-list="${list}" type="number" min="0" max="${available}" step="1" value="${esc(listCounts.get(list))}" aria-label="${esc(listName(list))} 抽取数量"><span>个</span></div>`}).join('')}
 function clearPresetOutput(){$('presetLinkPanel').hidden=true;$('presetLink').value='';$('copyPreset').textContent='复制链接'}
 function answerOptions(){const raw=$('questionTime').value.trim(),seconds=Number(raw);if(!/^\d+$/.test(raw)||!Number.isSafeInteger(seconds)||seconds<0||seconds>600)throw Error('每题限时需为 0–600 的整数秒；0 表示不限时。');return{timeLimit:seconds,hintsAllowed:$('allowHints').checked}}
-function updateSelection(){if(sourceKind==='v3'){clearPresetOutput();H.updateSetup();return}clearPresetOutput();const perList=$('sampling').value==='per-list';$('perListSettings').hidden=!perList;$('totalSettings').hidden=perList;const linkable=activeLibrary?.source.type==='builtin';$('presetHelp').textContent=linkable?'链接保留限时和提示设置；学生打开后直接练习。固定测试保持同一批单词，随机练习每次重新抽词。':'临时导入的 TXT 只存在于当前设备，不能生成学生链接。';try{let selected=selection(),total=perList?0:C.totalCount($('count').value,selected.length),options=answerOptions();$('count').max=selected.length;if(perList){const plan=listPlan();total=0;for(const row of plan){const available=selected.filter(w=>w.list===row.list).length;if(!Number.isInteger(row.count)||row.count<0)throw Error(listName(row.list)+' 的抽取数量需为 0 或正整数。');if(row.count>available)throw Error(listName(row.list)+' 只有 '+available+' 个词，请减少抽取数量。');total+=row.count}if(!total)throw Error('请至少抽取 1 个单词。')}$('selection').textContent=`已选 ${selected.length} 个词 · 本轮 ${total} 题${options.timeLimit?` · 每题 ${options.timeLimit} 秒`:''}${options.hintsAllowed?'':' · 不提供提示'}`;$('setupError').textContent='';$('start').disabled=loading||!selected.length;$('createPreset').disabled=$('start').disabled||!linkable}catch(e){$('selection').textContent='';$('setupError').textContent=e.message;$('start').disabled=true;$('createPreset').disabled=true}let r=[];try{r=C.range($('range').value,words.map(w=>w.list))}catch{}document.querySelectorAll('.chip').forEach(el=>el.classList.toggle('selected',r.includes(+el.dataset.list)))}
+function totalQuestionCount(value,available,scope){try{return C.totalCount(value,available)}catch(e){const n=Number(String(value).trim());if(scope.type==='prefix'&&Number.isSafeInteger(n)&&n>available)throw Error(`当前前 ${scope.prefixCount} 个词范围只有 ${available} 个词，请减少总题量。`);throw e}}
+function updateSelection(){
+ if(sourceKind==='v3'){clearPresetOutput();H.updateSetup();return}
+ clearPresetOutput();updateScopeControls();const perList=$('sampling').value==='per-list';$('perListSettings').hidden=!perList;$('totalSettings').hidden=perList;
+ const linkable=activeLibrary?.source.type==='builtin';$('presetHelp').textContent=linkable?'链接保留限时和提示设置；学生打开后直接练习。固定测试保持同一批单词，随机练习每次重新抽词。':'临时导入的 TXT 只存在于当前设备，不能生成学生链接。';
+ try{
+  const context=selectionContext(),selected=context.pool,options=answerOptions();let total=perList?0:totalQuestionCount($('count').value,selected.length,context.scope);$('count').max=selected.length;
+  $('countHelp').textContent=context.scope.type==='prefix'?'填 0 检查当前前 N 个词范围内的全部单词。':'填 0 检查所选单元全部单词。';
+  if(perList){const plan=listPlan();for(const row of plan){const available=selected.filter(w=>w.list===row.list).length;if(!Number.isInteger(row.count)||row.count<0)throw Error(listName(row.list)+' 的抽取数量需为 0 或正整数。');if(row.count>available)throw Error((context.scope.type==='prefix'?`当前前 ${context.scope.prefixCount} 个词范围只有 ${available} 个词，`:`${listName(row.list)} 只有 ${available} 个词，`)+'请减少抽取数量。');total+=row.count}if(!total)throw Error('请至少抽取 1 个单词。')}
+  const scopeText=context.scope.type==='prefix'?`${listName(context.scope.list)} · 第 1–${context.scope.prefixCount} 个词 · 随机抽查 ${total} 题`:`已选 ${selected.length} 个词 · 本轮 ${total} 题`;
+  $('selection').textContent=scopeText+(options.timeLimit?` · 每题 ${options.timeLimit} 秒`:'')+(options.hintsAllowed?'':' · 不提供提示');$('setupError').textContent=libraryLoadFailed?'词库加载失败，请重试或重新选择词库后再生成链接。':'';$('start').disabled=loading||!selected.length;$('createPreset').disabled=$('start').disabled||!linkable||libraryLoadFailed;
+ }catch(e){$('selection').textContent='';$('setupError').textContent=e.message;$('start').disabled=true;$('createPreset').disabled=true}
+ let r=[];try{r=selectedGroups()}catch{}document.querySelectorAll('.chip').forEach(el=>el.classList.toggle('selected',r.includes(+el.dataset.list)));
+}
 function renderPreview(){let lists=[...new Set(words.map(w=>w.list))].sort((a,b)=>a-b);$('wordCount').textContent=words.length+' 个词';$('lists').innerHTML=lists.map(l=>`<span class="chip" data-list="${l}">${esc(listName(l))} <strong>${words.filter(w=>w.list===l).length}</strong></span>`).join('');$('preview').innerHTML=words.map(w=>`<tr><td><strong>${esc(w.word)}</strong><small>${esc(w.phonetic||'未提供音标')}</small></td><td><span class="word-pos">${esc(w.pos)}</span>${esc(w.senses.join('；'))}</td><td><span class="pill">${namedGroups()?esc(listName(w.list)):w.list}</span></td></tr>`).join('');$('previewBottom').innerHTML='正式检查时隐藏英文答案。<span>每轮随机排序</span>';renderListCounts();updateSelection()}
-$('range').addEventListener('input',()=>{renderListCounts();updateSelection()});$('count').addEventListener('input',updateSelection);$('sampling').addEventListener('change',updateSelection);$('questionTime').addEventListener('input',updateSelection);$('allowHints').addEventListener('change',updateSelection);$('listCounts').addEventListener('input',e=>{if(e.target.dataset.countList){listCounts.set(+e.target.dataset.countList,e.target.value);updateSelection()}});document.querySelectorAll('[name=mode]').forEach(input=>input.addEventListener('change',updateSelection));
+$('range').addEventListener('input',()=>{updateScopeControls();renderListCounts();updateSelection()});$('count').addEventListener('input',updateSelection);$('sampling').addEventListener('change',updateSelection);$('vocabularyScope').addEventListener('change',()=>{updateScopeControls();renderListCounts();updateSelection()});$('prefixCount').addEventListener('input',()=>{renderListCounts();updateSelection()});$('questionTime').addEventListener('input',updateSelection);$('allowHints').addEventListener('change',updateSelection);$('listCounts').addEventListener('input',e=>{if(e.target.dataset.countList){listCounts.set(+e.target.dataset.countList,e.target.value);updateSelection()}});document.querySelectorAll('[name=mode]').forEach(input=>input.addEventListener('change',updateSelection));
 function useWordList(text,name,isDefault=false,encoding='UTF-8'){
  const parsed=C.parse(text);if(!parsed.words.length)throw Error('没有识别到词条，请检查词表格式。');
  return useLibrary(V.fromLegacy(parsed,{name}),isDefault,encoding);
@@ -64,7 +105,7 @@ function useWordList(text,name,isDefault=false,encoding='UTF-8'){
 function useLibrary(library,isDefault=false,encoding='UTF-8'){
  const nextWords=V.toPracticeWords(library);if(!nextWords.length)throw Error('没有识别到词条，请检查词表格式。');
  const name=library.name,parsed={warnings:library.importDiagnostics||[]};
- setSourceKind('spelling');activeLibrary=library;words=nextWords;listCounts.clear();const lists=[...new Set(words.map(w=>w.list))].sort((a,b)=>a-b);
+ setSourceKind('spelling');activeLibrary=library;words=nextWords;libraryLoadFailed=false;listCounts.clear();$('vocabularyScope').value='all';$('prefixCount').value='60';const lists=[...new Set(words.map(w=>w.list))].sort((a,b)=>a-b);
  if(!isDefault)$('range').value=lists.join(',');else{try{C.range($('range').value,lists)}catch{$('range').value=String(lists[0])}}
  $('sourceBadge').textContent=name;$('defaultNotice').hidden=!isDefault;$('defaultNotice').innerHTML='<strong>IELTS 默认词库</strong><p>List 1–48 · 打开即用，选择检查范围与题量即可开始。</p>';$('restoreDefault').hidden=isDefault;$('loadError').hidden=true;
  $('importNotice').className='';$('importNotice').innerHTML=`<p class="small">${isDefault?'默认词库已就绪':library.source.type==='builtin'?'词库已就绪':'已临时导入'} · ${words.length.toLocaleString()} 个词条 · ${lists.length} 个${namedGroups()?'难度分组':' List'}${library.source.type==='user'?' · '+encoding:''}</p>`;
@@ -73,7 +114,7 @@ function useLibrary(library,isDefault=false,encoding='UTF-8'){
  renderGroupChoices();renderLibraryPicker();renderPreview();
 }
 async function loadLibrary(libraryId){if(active||H.active)throw Error('请先结束当前检查。');setSourceKind('spelling');const version=++loadVersion;pendingLibraryId=libraryId||null;loading=true;$('sourceBadge').textContent='正在加载词库…';$('start').disabled=true;$('createPreset').disabled=true;$('loadError').hidden=true;
- try{await ensureCatalog();if(version!==loadVersion)return;renderLibraryPicker();const library=await libraries.load(libraryId||libraries.defaultId);if(version!==loadVersion)return;useLibrary(library,library.id===libraries.defaultId);return library.id}catch(e){if(version!==loadVersion)return;$('sourceBadge').textContent=words.length?'保留当前词表':'词库未加载';$('loadErrorDetail').textContent=e.message;$('loadError').hidden=false}
+ try{await ensureCatalog();if(version!==loadVersion)return;renderLibraryPicker();const library=await libraries.load(libraryId||libraries.defaultId);if(version!==loadVersion)return;useLibrary(library,library.id===libraries.defaultId);return library.id}catch(e){if(version!==loadVersion)return;libraryLoadFailed=true;$('sourceBadge').textContent=words.length?'保留当前词表':'词库未加载';$('loadErrorDetail').textContent=e.message;$('loadError').hidden=false}
  finally{if(version===loadVersion){loading=false;renderLibraryPicker();if(words.length)updateSelection();else $('start').disabled=true}}
 }
 function loadDefault(){return loadLibrary()}
@@ -85,12 +126,14 @@ function stopTimer(hide=true){if(timerId!==null){clearInterval(timerId);timerId=
 function updateTimer(){if(!active||graded||!timeLimit)return;const remaining=Math.max(0,Math.ceil((timerDeadline-Date.now())/1000));$('timer').textContent=remaining+' 秒';$('timer').classList.toggle('timer-low',remaining<=5);if(remaining===0){stopTimer(false);grade(true,'timeout')}}
 function startTimer(){stopTimer();if(!timeLimit)return;timerDeadline=Date.now()+timeLimit*1000;$('timer').hidden=false;updateTimer();timerId=setInterval(updateTimer,250)}
 function begin(pool,chosenMode,chosenScope,options={}){if(loading)throw Error('词库正在加载，请稍候。');if(!pool.length)throw Error('没有可用词条。');stopTimer();queue=C.shuffle(pool);answers=[];index=0;mode=chosenMode;scope=chosenScope;timeLimit=options.timeLimit??0;hintsAllowed=options.hintsAllowed??true;active=true;show('quiz');renderQuestion();return{questions:queue.length,mode,scope,timeLimit,hintsAllowed}}
-function configuredQuiz(){const selected=selection(),perList=$('sampling').value==='per-list',plan=perList?listPlan():null,count=$('count').value,pool=perList?C.sampleByList(selected,plan):C.sampleMixed(selected,count);const label=perList?plan.filter(p=>p.count>0).map(p=>`${listName(p.list)} 抽 ${p.count} 个`).join(' · '):namedGroups()?C.range($('range').value,words.map(w=>w.list)).map(listName).join('、'):'List '+$('range').value;return{pool,mode:document.querySelector('[name=mode]:checked').value,label,options:answerOptions()}}
+function configuredQuiz(){const context=selectionContext(),selected=context.pool,perList=$('sampling').value==='per-list',plan=perList?listPlan():null,count=$('count').value,pool=perList?C.sampleByList(selected,plan):C.sampleMixed(selected,count);const label=context.scope.type==='prefix'?`${listName(context.scope.list)} · 第 1–${context.scope.prefixCount} 个词 · 随机抽查 ${pool.length} 题`:perList?plan.filter(p=>p.count>0).map(p=>`${listName(p.list)} 抽 ${p.count} 个`).join(' · '):namedGroups()?selectedGroups().map(listName).join('、'):'List '+$('range').value;return{pool,scope:context.scope,mode:document.querySelector('[name=mode]:checked').value,label,options:answerOptions()}}
 $('start').onclick=()=>{if(sourceKind==='v3'){H.start();return}try{const quiz=configuredQuiz();begin(quiz.pool,quiz.mode,quiz.label,quiz.options)}catch(e){$('setupError').textContent=e.message}};
 $('createPreset').onclick=async()=>{
  const button=$('createPreset');
  try{
   if(!teacherMode)throw Error('请使用教师设置页生成链接。');
+  if(loading)throw Error('词库正在加载，请稍候。');
+  if(sourceKind==='spelling'&&libraryLoadFailed)throw Error('词库加载失败，请重试或重新选择词库后再生成链接。');
   button.disabled=true;button.textContent='正在生成…';
   const random=$('linkType').value==='random';
   let payload,questions,summary;
@@ -99,22 +142,24 @@ $('createPreset').onclick=async()=>{
    summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 道题 · '+(payload.m==='recognition'?'Recognition 四选一':'Synonym 多选')+(payload.g?' · '+payload.g:'')+(random?' · 刷新或再练会重新抽题，可能与上一轮重合':' · 学生每次打开时随机排列');
   }else{
    if(activeLibrary?.source.type!=='builtin')throw Error('临时导入的 TXT 无法生成学生链接。');
-   const quiz=configuredQuiz();payload={v:random?P.RANDOM_VERSION:P.VERSION,l:activeLibrary.id,lv:activeLibrary.version,m:quiz.mode,t:quiz.options.timeLimit,h:quiz.options.hintsAllowed};
+   const quiz=configuredQuiz();payload={v:random?(quiz.scope.type==='prefix'?P.SCOPED_RANDOM_VERSION:P.RANDOM_VERSION):P.VERSION,l:activeLibrary.id,lv:activeLibrary.version,m:quiz.mode,t:quiz.options.timeLimit,h:quiz.options.hintsAllowed};
    if(random){
-    payload.a=$('sampling').value;payload.r=C.range($('range').value,words.map(w=>w.list));
-    if(payload.a==='per-list')payload.c=listPlan().map(row=>row.count);else payload.n=Number($('count').value);
-    P.sampleRandom(payload,words,C);
+    if(quiz.scope.type==='prefix'){
+     payload.r=quiz.scope.list;payload.p=quiz.scope.prefixCount;payload.n=$('sampling').value==='per-list'?listPlan()[0].count:Number($('count').value);P.sampleScopedRandom(payload,words,C);
+    }else{
+     payload.a=$('sampling').value;payload.r=selectedGroups();if(payload.a==='per-list')payload.c=listPlan().map(row=>row.count);else payload.n=Number($('count').value);P.sampleRandom(payload,words,C);
+    }
    }else{
     const byId=new Map(words.map((word,i)=>[word.id,i]));payload.w=quiz.pool.map(word=>byId.get(word.id));
    }
    questions=quiz.pool.length;
-   summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 个单词 · '+(quiz.options.timeLimit?'每题 '+quiz.options.timeLimit+' 秒':'不限时')+' · '+(quiz.options.hintsAllowed?'允许提示':'不提供提示')+(random?' · 刷新或再练会重新抽词，可能与上一轮重合':' · 学生每次打开时随机排列');
+   summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 个单词 · '+quiz.label+' · '+(quiz.options.timeLimit?'每题 '+quiz.options.timeLimit+' 秒':'不限时')+' · '+(quiz.options.hintsAllowed?'允许提示':'不提供提示')+(random?' · 刷新或再练会重新抽词，可能与上一轮重合':' · 学生每次打开时随机排列');
   }
   const url=await P.createUrl(payload,new URL('./',document.baseURI).href);
   if(url.length>2000)throw Error('链接过长，请减少题量或选择范围。');
   $('presetLink').value=url;$('presetSummary').textContent=summary;$('presetLinkPanel').hidden=false;$('presetLink').focus();$('presetLink').select();
  }catch(e){$('setupError').textContent=e.message}
- finally{button.textContent='生成学生练习链接';button.disabled=$('start').disabled||(sourceKind==='spelling'&&activeLibrary?.source.type!=='builtin')}
+ finally{button.textContent='生成学生练习链接';button.disabled=$('start').disabled||(sourceKind==='spelling'&&(activeLibrary?.source.type!=='builtin'||libraryLoadFailed))}
 };
 $('copyPreset').onclick=async()=>{try{await navigator.clipboard.writeText($('presetLink').value)}catch{$('presetLink').select();document.execCommand('copy')}$('copyPreset').textContent='已复制'};
 function renderQuestion(){const w=queue[index];hints=0;graded=false;currentSense=w.senses[Math.floor(Math.random()*w.senses.length)];$('quizMode').textContent=mode==='full'?'音标 + 释义':'单个释义';$('progressText').textContent=`${index+1} / ${queue.length}`;$('progressBar').style.width=`${index/queue.length*100}%`;$('questionList').textContent=namedGroups()?listName(w.list):`LIST ${String(w.list).padStart(2,'0')}`;$('phonetic').hidden=mode==='single';$('phonetic').textContent=w.phonetic||'未提供音标';$('meaning').textContent=mode==='single'?currentSense:w.senses.join('；');$('pos').textContent=mode==='full'?w.pos:'';$('pos').hidden=mode==='single';$('answer').value='';$('answer').disabled=false;$('hintDisplay').textContent='';$('feedback').textContent='';$('feedback').className='';$('hint').hidden=!hintsAllowed;$('hint').disabled=!hintsAllowed;$('submit').hidden=false;$('skip').hidden=false;$('next').hidden=true;$('answer').focus();startTimer()}
@@ -123,7 +168,7 @@ function grade(skip=false,reason=''){if(graded||!active)return;let typed=$('answ
 $('answer').oninput=()=>$('answer').setCustomValidity('');$('answerForm').onsubmit=e=>{e.preventDefault();grade()};$('skip').onclick=()=>grade(true,'skip');$('next').onclick=()=>{if(!graded)return;if(++index>=queue.length)finish();else renderQuestion()};
 $('exit').onclick=()=>{if(window.confirm('结束本轮并查看已完成题目的结果？'))finish()};
 function finish(){stopTimer();active=false;show('results');$('resultTitle').textContent=answers.length===queue.length?'本轮检查完成':'本轮已结束';$('resultScope').textContent=`${isDemo?'示例词表 · ':''}${scope} · ${mode==='full'?'音标 + 释义':'单个释义'}${timeLimit?` · 每题 ${timeLimit} 秒`:''}${hintsAllowed?'':' · 不提供提示'} · 已完成 ${answers.length} / ${queue.length} 题`;$('independent').textContent=answers.filter(a=>a.status==='correct').length;$('assisted').textContent=answers.filter(a=>a.status==='assisted').length;$('incorrect').textContent=answers.filter(a=>a.status==='wrong').length;$('review').innerHTML=answers.map(a=>`<tr><td><strong>${esc(a.entry.word)}</strong><small>${esc(listName(a.entry.list))}</small></td><td class="review-answer">${esc(a.typed||'未作答')}</td><td><span class="pill ${a.status}">${a.reason==='timeout'?'超时':{correct:'独立答对',assisted:'提示后答对',wrong:'待复习'}[a.status]}</span>${a.hints?'<small>提示 '+a.hints+' 个字母</small>':''}</td><td>${esc(a.entry.senses.join('；'))}</td></tr>`).join('')||'<tr><td colspan="4">本轮尚未完成任何题目。</td></tr>';$('retry').disabled=!answers.some(a=>a.status!=='correct')}
-$('restart').onclick=()=>{if(presetSession){const pool=presetSession.recipe?P.sampleRandom(presetSession.recipe,words,C):presetSession.pool;begin(pool,presetSession.mode,presetSession.scope,presetSession.options);}else{show('setup');updateSelection()}};$('retry').onclick=()=>begin(answers.filter(a=>a.status!=='correct').map(a=>a.entry),mode,scope+' · 巩固练习',{timeLimit,hintsAllowed});
+$('restart').onclick=()=>{if(presetSession){const pool=presetSession.recipe?(presetSession.recipe.v===P.SCOPED_RANDOM_VERSION?P.sampleScopedRandom(presetSession.recipe,words,C):P.sampleRandom(presetSession.recipe,words,C)):presetSession.pool;begin(pool,presetSession.mode,presetSession.scope,presetSession.options);}else{show('setup');updateSelection()}};$('retry').onclick=()=>begin(answers.filter(a=>a.status!=='correct').map(a=>a.entry),mode,scope+' · 巩固练习',{timeLimit,hintsAllowed});
 window.addEventListener('beforeunload',e=>{if(active){e.preventDefault();e.returnValue=''}});
 window.WordCheckHome={show,get sourceKind(){return sourceKind}};
 async function initialize(){
@@ -137,9 +182,9 @@ async function initialize(){
   await loadLibrary(preset.l);
   if(activeLibrary?.id!==preset.l)throw Error('无法加载这份练习使用的词库。');
   if(activeLibrary.version!==preset.lv)throw Error('词库版本已经更新，请老师重新生成练习链接。');
-  let pool;if(preset.v===P.RANDOM_VERSION)pool=P.sampleRandom(preset,words,C);else if(preset.v===P.VERSION)pool=preset.w.map(position=>words[position]);else{const byId=new Map(words.map(word=>[word.id,word]));pool=preset.w.map(id=>byId.get(id))}
+  let pool;if(preset.v===P.SCOPED_RANDOM_VERSION)pool=P.sampleScopedRandom(preset,words,C);else if(preset.v===P.RANDOM_VERSION)pool=P.sampleRandom(preset,words,C);else if(preset.v===P.VERSION)pool=preset.w.map(position=>words[position]);else{const byId=new Map(words.map(word=>[word.id,word]));pool=preset.w.map(id=>byId.get(id))}
   if(pool.some(word=>!word))throw Error('部分练习单词已不在当前词库中，请老师重新生成链接。');
-  const options={timeLimit:preset.t??0,hintsAllowed:preset.h??true},presetScope=preset.s||compactScope(pool);presetSession={pool,mode:preset.m,scope:presetScope,options,recipe:preset.v===P.RANDOM_VERSION?preset:null};$('restart').textContent=presetSession.recipe?'按相同设置再练一组':'重新练习本组单词';
+  const options={timeLimit:preset.t??0,hintsAllowed:preset.h??true},presetScope=preset.s||(preset.v===P.SCOPED_RANDOM_VERSION?`${listName(preset.r)} · 第 1–${preset.p} 个词 · 随机抽查 ${pool.length} 题`:compactScope(pool));presetSession={pool,mode:preset.m,scope:presetScope,options,recipe:[P.RANDOM_VERSION,P.SCOPED_RANDOM_VERSION].includes(preset.v)?preset:null};$('restart').textContent=presetSession.recipe?'按相同设置再练一组':'重新练习本组单词';
   begin(pool,preset.m,presetScope,options);
  }catch(e){active=false;$('presetErrorMessage').textContent=e.message;show('presetError')}
 }

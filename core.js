@@ -51,5 +51,14 @@ const normalize=x=>x.trim().toLowerCase().replace(/[‘’]/g,"'").replace(/\s+/
 function accepts(entry,typed){return [entry.word,...(entry.variants||[])].some(word=>normalize(word)===normalize(typed))}
 function shuffle(array){const out=[...array];for(let i=out.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out}
 function sampleByList(words,plan){const seen=new Set(),result=[];for(const {list,count} of plan){if(!Number.isInteger(list)||!Number.isSafeInteger(list)||list<1||seen.has(list))throw Error('请检查 List 编号，不能重复。');seen.add(list);const pool=words.filter(w=>w.list===list);if(!pool.length)throw Error('词表中没有 List '+list+'。');if(!Number.isInteger(count)||count<0)throw Error('List '+list+' 的抽取数量需为 0 或正整数。');if(count>pool.length)throw Error('List '+list+' 只有 '+pool.length+' 个词，请减少抽取数量。');result.push(...shuffle(pool).slice(0,count))}if(!result.length)throw Error('请至少抽取 1 个单词。');return shuffle(result)}
-const api={parse,range,meanings,normalize,accepts,shuffle,sampleByList,totalCount,sampleMixed};if(typeof module!=='undefined')module.exports=api;else root.WordCore=api;
+function prefixPool(words,list,count){
+ if(!Number.isSafeInteger(list)||list<1)throw Error('难度分组编号无效。');
+ if(!Number.isSafeInteger(count)||count<1)throw Error('前 N 个词中的 N 必须为正整数。');
+ const group=words.filter(word=>word.list===list).sort((a,b)=>a.order-b.order||String(a.id).localeCompare(String(b.id)));
+ if(!group.length)throw Error('词库中缺少指定难度分组。');
+ if(group.some(word=>!Number.isFinite(word.order)))throw Error('词库缺少稳定的组内排序信息。');
+ if(count>group.length)throw Error('该难度只有 '+group.length+' 个词，前 N 个词不能超过实际词数。');
+ return group.slice(0,count);
+}
+const api={parse,range,meanings,normalize,accepts,shuffle,sampleByList,totalCount,sampleMixed,prefixPool};if(typeof module!=='undefined')module.exports=api;else root.WordCore=api;
 })(typeof window!=='undefined'?window:globalThis);
