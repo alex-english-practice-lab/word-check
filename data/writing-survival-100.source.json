@@ -1,0 +1,1997 @@
+{
+  "schemaVersion": "1.0",
+  "source": {
+    "id": "writing-survival-100",
+    "title": "Writing Survival 100",
+    "description": "基础写作与表达高频词，按原始顺序每 10 词分为一组。",
+    "version": "1.0.0",
+    "language": "en",
+    "definitionLanguage": "zh-CN",
+    "generatedAt": "2026-10-21",
+    "listCount": 10,
+    "entryCount": 100,
+    "sourceDocuments": [
+      "用户提供的基础写作词表（2026-10-21）"
+    ]
+  },
+  "lists": [
+    {
+      "id": "writing-survival-01",
+      "title": "List 1",
+      "order": 1,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-001-improve",
+          "word": "improve",
+          "phonetic": "ɪmˈpruːv",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "改善",
+            "提高"
+          ],
+          "meaning": "v.改善；提高",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "改善",
+                "提高"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-002-reduce",
+          "word": "reduce",
+          "phonetic": "rɪˈduːs",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "减少",
+            "降低"
+          ],
+          "meaning": "v.减少；降低",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "减少",
+                "降低"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-003-increase",
+          "word": "increase",
+          "phonetic": "ɪnˈkriːs",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "增加",
+            "增长"
+          ],
+          "meaning": "v.增加；增长",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "增加",
+                "增长"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-004-provide",
+          "word": "provide",
+          "phonetic": "prəˈvaɪd",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "提供"
+          ],
+          "meaning": "v.提供",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "提供"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-005-require",
+          "word": "require",
+          "phonetic": "rɪˈkwaɪər",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "需要",
+            "要求"
+          ],
+          "meaning": "v.需要；要求",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "需要",
+                "要求"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-006-prepare",
+          "word": "prepare",
+          "phonetic": "prɪˈper",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "准备"
+          ],
+          "meaning": "v.准备",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "准备"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-007-protect",
+          "word": "protect",
+          "phonetic": "prəˈtekt",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "保护"
+          ],
+          "meaning": "v.保护",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "保护"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-008-support",
+          "word": "support",
+          "phonetic": "səˈpɔːrt",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "支持"
+          ],
+          "meaning": "v.支持",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "支持"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-009-develop",
+          "word": "develop",
+          "phonetic": "dɪˈveləp",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "发展",
+            "培养"
+          ],
+          "meaning": "v.发展；培养",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "发展",
+                "培养"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-010-solve",
+          "word": "solve",
+          "phonetic": "sɑːlv",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "解决"
+          ],
+          "meaning": "v.解决",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "解决"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-02",
+      "title": "List 2",
+      "order": 2,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-011-choose",
+          "word": "choose",
+          "phonetic": "tʃuːz",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "选择"
+          ],
+          "meaning": "v.选择",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "选择"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-012-decide",
+          "word": "decide",
+          "phonetic": "dɪˈsaɪd",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "决定"
+          ],
+          "meaning": "v.决定",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "决定"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-013-explain",
+          "word": "explain",
+          "phonetic": "ɪkˈspleɪn",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "解释",
+            "说明"
+          ],
+          "meaning": "v.解释；说明",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "解释",
+                "说明"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-014-describe",
+          "word": "describe",
+          "phonetic": "dɪˈskraɪb",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "描述"
+          ],
+          "meaning": "v.描述",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "描述"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-015-compare",
+          "word": "compare",
+          "phonetic": "kəmˈper",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "比较"
+          ],
+          "meaning": "v.比较",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "比较"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-016-suggest",
+          "word": "suggest",
+          "phonetic": "səˈdʒest",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "建议"
+          ],
+          "meaning": "v.建议",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "建议"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-017-avoid",
+          "word": "avoid",
+          "phonetic": "əˈvɔɪd",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "避免"
+          ],
+          "meaning": "v.避免",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "避免"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-018-allow",
+          "word": "allow",
+          "phonetic": "əˈlaʊ",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "允许"
+          ],
+          "meaning": "v.允许",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "允许"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-019-continue",
+          "word": "continue",
+          "phonetic": "kənˈtɪnjuː",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "继续"
+          ],
+          "meaning": "v.继续",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "继续"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-020-complete",
+          "word": "complete",
+          "phonetic": "kəmˈpliːt",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "完成"
+          ],
+          "meaning": "v.完成",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "完成"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-03",
+      "title": "List 3",
+      "order": 3,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-021-reason",
+          "word": "reason",
+          "phonetic": "ˈriːzən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "原因",
+            "理由"
+          ],
+          "meaning": "n.原因；理由",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "原因",
+                "理由"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-022-result",
+          "word": "result",
+          "phonetic": "rɪˈzʌlt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "结果"
+          ],
+          "meaning": "n.结果",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "结果"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-023-example",
+          "word": "example",
+          "phonetic": "ɪɡˈzæmpəl",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "例子"
+          ],
+          "meaning": "n.例子",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "例子"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-024-problem",
+          "word": "problem",
+          "phonetic": "ˈprɑːbləm",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "问题",
+            "难题"
+          ],
+          "meaning": "n.问题；难题",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "问题",
+                "难题"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-025-solution",
+          "word": "solution",
+          "phonetic": "səˈluːʃən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "解决方法"
+          ],
+          "meaning": "n.解决方法",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "解决方法"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-026-idea",
+          "word": "idea",
+          "phonetic": "aɪˈdiːə",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "想法",
+            "主意"
+          ],
+          "meaning": "n.想法；主意",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "想法",
+                "主意"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-027-information",
+          "word": "information",
+          "phonetic": "ˌɪnfərˈmeɪʃən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "信息",
+            "资料"
+          ],
+          "meaning": "n.信息；资料",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "信息",
+                "资料"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-028-advice",
+          "word": "advice",
+          "phonetic": "ədˈvaɪs",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "建议",
+            "忠告"
+          ],
+          "meaning": "n.建议；忠告",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "建议",
+                "忠告"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-029-opinion",
+          "word": "opinion",
+          "phonetic": "əˈpɪnjən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "观点",
+            "意见"
+          ],
+          "meaning": "n.观点；意见",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "观点",
+                "意见"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-030-decision",
+          "word": "decision",
+          "phonetic": "dɪˈsɪʒən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "决定"
+          ],
+          "meaning": "n.决定",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "决定"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-04",
+      "title": "List 4",
+      "order": 4,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-031-skill",
+          "word": "skill",
+          "phonetic": "skɪl",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "技能",
+            "技巧"
+          ],
+          "meaning": "n.技能；技巧",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "技能",
+                "技巧"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-032-knowledge",
+          "word": "knowledge",
+          "phonetic": "ˈnɑːlɪdʒ",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "知识"
+          ],
+          "meaning": "n.知识",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "知识"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-033-experience",
+          "word": "experience",
+          "phonetic": "ɪkˈspɪriəns",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "经验",
+            "经历"
+          ],
+          "meaning": "n.经验；经历",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "经验",
+                "经历"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-034-opportunity",
+          "word": "opportunity",
+          "phonetic": "ˌɑːpərˈtuːnəti",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "机会"
+          ],
+          "meaning": "n.机会",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "机会"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-035-responsibility",
+          "word": "responsibility",
+          "phonetic": "rɪˌspɑːnsəˈbɪləti",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "责任"
+          ],
+          "meaning": "n.责任",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "责任"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-036-activity",
+          "word": "activity",
+          "phonetic": "ækˈtɪvəti",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "活动"
+          ],
+          "meaning": "n.活动",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "活动"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-037-task",
+          "word": "task",
+          "phonetic": "tæsk",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "任务"
+          ],
+          "meaning": "n.任务",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "任务"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-038-goal",
+          "word": "goal",
+          "phonetic": "ɡoʊl",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "目标"
+          ],
+          "meaning": "n.目标",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "目标"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-039-effort",
+          "word": "effort",
+          "phonetic": "ˈefərt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "努力"
+          ],
+          "meaning": "n.努力",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "努力"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-040-progress",
+          "word": "progress",
+          "phonetic": "ˈprɑːɡres",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "进步",
+            "进展"
+          ],
+          "meaning": "n.进步；进展",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "进步",
+                "进展"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-05",
+      "title": "List 5",
+      "order": 5,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-041-important",
+          "word": "important",
+          "phonetic": "ɪmˈpɔːrtənt",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "重要的"
+          ],
+          "meaning": "adj.重要的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "重要的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-042-useful",
+          "word": "useful",
+          "phonetic": "ˈjuːsfəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "有用的"
+          ],
+          "meaning": "adj.有用的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "有用的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-043-necessary",
+          "word": "necessary",
+          "phonetic": "ˈnesəseri",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "必要的"
+          ],
+          "meaning": "adj.必要的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "必要的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-044-possible",
+          "word": "possible",
+          "phonetic": "ˈpɑːsəbəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "可能的"
+          ],
+          "meaning": "adj.可能的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "可能的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-045-different",
+          "word": "different",
+          "phonetic": "ˈdɪfərənt",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "不同的"
+          ],
+          "meaning": "adj.不同的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "不同的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-046-similar",
+          "word": "similar",
+          "phonetic": "ˈsɪmələr",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "相似的"
+          ],
+          "meaning": "adj.相似的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "相似的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-047-common",
+          "word": "common",
+          "phonetic": "ˈkɑːmən",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "常见的",
+            "普遍的"
+          ],
+          "meaning": "adj.常见的；普遍的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "常见的",
+                "普遍的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-048-simple",
+          "word": "simple",
+          "phonetic": "ˈsɪmpəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "简单的"
+          ],
+          "meaning": "adj.简单的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "简单的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-049-effective",
+          "word": "effective",
+          "phonetic": "ɪˈfektɪv",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "有效的"
+          ],
+          "meaning": "adj.有效的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "有效的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-050-convenient",
+          "word": "convenient",
+          "phonetic": "kənˈviːniənt",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "方便的"
+          ],
+          "meaning": "adj.方便的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "方便的"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-06",
+      "title": "List 6",
+      "order": 6,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-051-difficult",
+          "word": "difficult",
+          "phonetic": "ˈdɪfɪkəlt",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "困难的"
+          ],
+          "meaning": "adj.困难的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "困难的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-052-easy",
+          "word": "easy",
+          "phonetic": "ˈiːzi",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "容易的"
+          ],
+          "meaning": "adj.容易的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "容易的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-053-available",
+          "word": "available",
+          "phonetic": "əˈveɪləbəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "可获得的",
+            "可用的"
+          ],
+          "meaning": "adj.可获得的；可用的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "可获得的",
+                "可用的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-054-responsible",
+          "word": "responsible",
+          "phonetic": "rɪˈspɑːnsəbəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "负责的",
+            "有责任心的"
+          ],
+          "meaning": "adj.负责的；有责任心的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "负责的",
+                "有责任心的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-055-successful",
+          "word": "successful",
+          "phonetic": "səkˈsesfəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "成功的"
+          ],
+          "meaning": "adj.成功的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "成功的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-056-healthy",
+          "word": "healthy",
+          "phonetic": "ˈhelθi",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "健康的"
+          ],
+          "meaning": "adj.健康的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "健康的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-057-safe",
+          "word": "safe",
+          "phonetic": "seɪf",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "安全的"
+          ],
+          "meaning": "adj.安全的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "安全的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-058-comfortable",
+          "word": "comfortable",
+          "phonetic": "ˈkʌmftərbəl",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "舒适的"
+          ],
+          "meaning": "adj.舒适的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "舒适的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-059-serious",
+          "word": "serious",
+          "phonetic": "ˈsɪriəs",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "严重的",
+            "认真的"
+          ],
+          "meaning": "adj.严重的；认真的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "严重的",
+                "认真的"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-060-regular",
+          "word": "regular",
+          "phonetic": "ˈreɡjələr",
+          "partOfSpeech": "adj.",
+          "definitions": [
+            "规律的",
+            "定期的"
+          ],
+          "meaning": "adj.规律的；定期的",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "规律的",
+                "定期的"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-07",
+      "title": "List 7",
+      "order": 7,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-061-improvement",
+          "word": "improvement",
+          "phonetic": "ɪmˈpruːvmənt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "改进",
+            "提高"
+          ],
+          "meaning": "n.改进；提高",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "改进",
+                "提高"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-062-difference",
+          "word": "difference",
+          "phonetic": "ˈdɪfərəns",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "差别",
+            "不同"
+          ],
+          "meaning": "n.差别；不同",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "差别",
+                "不同"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-063-success",
+          "word": "success",
+          "phonetic": "səkˈses",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "成功"
+          ],
+          "meaning": "n.成功",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "成功"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-064-preparation",
+          "word": "preparation",
+          "phonetic": "ˌprepəˈreɪʃən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "准备",
+            "准备工作"
+          ],
+          "meaning": "n.准备；准备工作",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "准备",
+                "准备工作"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-065-communication",
+          "word": "communication",
+          "phonetic": "kəˌmjuːnɪˈkeɪʃən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "交流",
+            "沟通"
+          ],
+          "meaning": "n.交流；沟通",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "交流",
+                "沟通"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-066-environment",
+          "word": "environment",
+          "phonetic": "ɪnˈvaɪrənmənt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "环境"
+          ],
+          "meaning": "n.环境",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "环境"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-067-community",
+          "word": "community",
+          "phonetic": "kəˈmjuːnəti",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "社区",
+            "群体"
+          ],
+          "meaning": "n.社区；群体",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "社区",
+                "群体"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-068-health",
+          "word": "health",
+          "phonetic": "helθ",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "健康"
+          ],
+          "meaning": "n.健康",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "健康"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-069-attention",
+          "word": "attention",
+          "phonetic": "əˈtenʃən",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "注意",
+            "注意力"
+          ],
+          "meaning": "n.注意；注意力",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "注意",
+                "注意力"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-070-choice",
+          "word": "choice",
+          "phonetic": "tʃɔɪs",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "选择"
+          ],
+          "meaning": "n.选择",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "选择"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-08",
+      "title": "List 8",
+      "order": 8,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-071-ability",
+          "word": "ability",
+          "phonetic": "əˈbɪləti",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "能力"
+          ],
+          "meaning": "n.能力",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "能力"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-072-chance",
+          "word": "chance",
+          "phonetic": "tʃæns",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "机会",
+            "可能性"
+          ],
+          "meaning": "n.机会；可能性",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "机会",
+                "可能性"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-073-method",
+          "word": "method",
+          "phonetic": "ˈmeθəd",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "方法"
+          ],
+          "meaning": "n.方法",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "方法"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-074-plan",
+          "word": "plan",
+          "phonetic": "plæn",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "计划"
+          ],
+          "meaning": "n.计划",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "计划"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-075-schedule",
+          "word": "schedule",
+          "phonetic": "ˈskedʒuːl",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "日程安排",
+            "时间表"
+          ],
+          "meaning": "n.日程安排；时间表",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "日程安排",
+                "时间表"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-076-habit",
+          "word": "habit",
+          "phonetic": "ˈhæbɪt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "习惯"
+          ],
+          "meaning": "n.习惯",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "习惯"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-077-benefit",
+          "word": "benefit",
+          "phonetic": "ˈbenəfɪt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "好处",
+            "益处"
+          ],
+          "meaning": "n.好处；益处",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "好处",
+                "益处"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-078-advantage",
+          "word": "advantage",
+          "phonetic": "ədˈvæntɪdʒ",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "优点",
+            "优势"
+          ],
+          "meaning": "n.优点；优势",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "优点",
+                "优势"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-079-disadvantage",
+          "word": "disadvantage",
+          "phonetic": "ˌdɪsədˈvæntɪdʒ",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "缺点",
+            "劣势"
+          ],
+          "meaning": "n.缺点；劣势",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "缺点",
+                "劣势"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-080-effect",
+          "word": "effect",
+          "phonetic": "ɪˈfekt",
+          "partOfSpeech": "n.",
+          "definitions": [
+            "影响",
+            "效果"
+          ],
+          "meaning": "n.影响；效果",
+          "senses": [
+            {
+              "partOfSpeech": "n.",
+              "definitions": [
+                "影响",
+                "效果"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-09",
+      "title": "List 9",
+      "order": 9,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-081-affect",
+          "word": "affect",
+          "phonetic": "əˈfekt",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "影响"
+          ],
+          "meaning": "v.影响",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "影响"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-082-depend",
+          "word": "depend",
+          "phonetic": "dɪˈpend",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "依赖",
+            "取决于"
+          ],
+          "meaning": "v.依赖；取决于",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "依赖",
+                "取决于"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-083-include",
+          "word": "include",
+          "phonetic": "ɪnˈkluːd",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "包括",
+            "包含"
+          ],
+          "meaning": "v.包括；包含",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "包括",
+                "包含"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-084-communicate",
+          "word": "communicate",
+          "phonetic": "kəˈmjuːnɪkeɪt",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "交流",
+            "沟通"
+          ],
+          "meaning": "v.交流；沟通",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "交流",
+                "沟通"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-085-create",
+          "word": "create",
+          "phonetic": "kriˈeɪt",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "创造",
+            "创建"
+          ],
+          "meaning": "v.创造；创建",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "创造",
+                "创建"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-086-encourage",
+          "word": "encourage",
+          "phonetic": "ɪnˈkɜːrɪdʒ",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "鼓励"
+          ],
+          "meaning": "v.鼓励",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "鼓励"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-087-manage",
+          "word": "manage",
+          "phonetic": "ˈmænɪdʒ",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "管理",
+            "处理"
+          ],
+          "meaning": "v.管理；处理",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "管理",
+                "处理"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-088-focus",
+          "word": "focus",
+          "phonetic": "ˈfoʊkəs",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "集中注意力",
+            "专注"
+          ],
+          "meaning": "v.集中注意力；专注",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "集中注意力",
+                "专注"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-089-achieve",
+          "word": "achieve",
+          "phonetic": "əˈtʃiːv",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "实现",
+            "取得"
+          ],
+          "meaning": "v.实现；取得",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "实现",
+                "取得"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-090-organize",
+          "word": "organize",
+          "phonetic": "ˈɔːrɡənaɪz",
+          "partOfSpeech": "v.",
+          "definitions": [
+            "组织",
+            "整理"
+          ],
+          "meaning": "v.组织；整理",
+          "senses": [
+            {
+              "partOfSpeech": "v.",
+              "definitions": [
+                "组织",
+                "整理"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "writing-survival-10",
+      "title": "List 10",
+      "order": 10,
+      "entryCount": 10,
+      "entries": [
+        {
+          "id": "writing-survival-091-usually",
+          "word": "usually",
+          "phonetic": "ˈjuːʒuəli",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "通常"
+          ],
+          "meaning": "adv.通常",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "通常"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-092-often",
+          "word": "often",
+          "phonetic": "ˈɔːfən",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "经常"
+          ],
+          "meaning": "adv.经常",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "经常"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-093-sometimes",
+          "word": "sometimes",
+          "phonetic": "ˈsʌmtaɪmz",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "有时"
+          ],
+          "meaning": "adv.有时",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "有时"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-094-especially",
+          "word": "especially",
+          "phonetic": "ɪˈspeʃəli",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "尤其",
+            "特别"
+          ],
+          "meaning": "adv.尤其；特别",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "尤其",
+                "特别"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-095-successfully",
+          "word": "successfully",
+          "phonetic": "səkˈsesfəli",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "成功地"
+          ],
+          "meaning": "adv.成功地",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "成功地"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-096-probably",
+          "word": "probably",
+          "phonetic": "ˈprɑːbəbli",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "很可能",
+            "大概"
+          ],
+          "meaning": "adv.很可能；大概",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "很可能",
+                "大概"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-097-clearly",
+          "word": "clearly",
+          "phonetic": "ˈklɪrli",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "清楚地",
+            "明确地"
+          ],
+          "meaning": "adv.清楚地；明确地",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "清楚地",
+                "明确地"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-098-carefully",
+          "word": "carefully",
+          "phonetic": "ˈkerfəli",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "仔细地",
+            "小心地"
+          ],
+          "meaning": "adv.仔细地；小心地",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "仔细地",
+                "小心地"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-099-enough",
+          "word": "enough",
+          "phonetic": "ɪˈnʌf",
+          "partOfSpeech": "adj. / adv.",
+          "definitions": [
+            "足够的",
+            "足够地"
+          ],
+          "meaning": "adj./adv.足够的；足够地",
+          "senses": [
+            {
+              "partOfSpeech": "adj.",
+              "definitions": [
+                "足够的"
+              ]
+            },
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "足够地"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "writing-survival-100-together",
+          "word": "together",
+          "phonetic": "təˈɡeðər",
+          "partOfSpeech": "adv.",
+          "definitions": [
+            "一起",
+            "共同"
+          ],
+          "meaning": "adv.一起；共同",
+          "senses": [
+            {
+              "partOfSpeech": "adv.",
+              "definitions": [
+                "一起",
+                "共同"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
