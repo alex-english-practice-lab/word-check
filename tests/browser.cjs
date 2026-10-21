@@ -17,7 +17,7 @@ const server=http.createServer((req,res)=>{
 });
 function log(message){console.log('PASS '+message)}
 async function screenshot(page,name){return page.screenshot({path:path.join(artifacts,name+'.png'),fullPage:true,animations:'disabled'})}
-async function ready(page){await page.waitForFunction(()=>document.querySelectorAll('#preview tr').length===3610&& !document.getElementById('start').disabled)}
+async function ready(page){await page.waitForFunction(()=>document.querySelectorAll('#preview tr').length===3610&& !document.getElementById('start').disabled);if(await page.locator('#goCheck').isVisible())await page.locator('#goCheck').click()}
 async function typeCorrect(page){const word=await page.evaluate(()=>queue[index].word);await page.locator('#answer').fill('  '+word.toUpperCase()+'  ');await page.locator('#submit').click()}
 async function scenario(browser,url,prefix){
  const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];
@@ -100,7 +100,7 @@ async function main(){
   assert.match(await page.locator('#preview').innerText(),/银行/);log('GB18030 fallback and 2 MB import limit preserved');
   await page.close();
   const failed=await browser.newPage();await failed.route('**/data/catalog.json',route=>route.fulfill({status:503,body:'offline'}));
-  await failed.goto(origin+'/word-check/');await failed.locator('#loadError').waitFor({state:'visible'});assert.ok(await failed.locator('#start').isDisabled());
+  await failed.goto(origin+'/word-check/');await failed.locator('#goCheck').click();await failed.locator('#loadError').waitFor({state:'visible'});assert.ok(await failed.locator('#start').isDisabled());
   await failed.unroute('**/data/catalog.json');await failed.locator('#retryLoad').click();await ready(failed);await failed.close();log('initial manifest failure recovers on retry');
   const teacher=await browser.newPage();await teacher.goto(origin+'/word-check/teacher/');await ready(teacher);
   await teacher.locator('#range').fill('1-2');await teacher.locator('#sampling').selectOption('total');await teacher.locator('#count').fill('8');await teacher.locator('#questionTime').fill('601');assert.ok(await teacher.locator('#createPreset').isDisabled());await teacher.locator('#questionTime').fill('3');await teacher.locator('#allowHints').uncheck();await teacher.locator('#createPreset').click();
