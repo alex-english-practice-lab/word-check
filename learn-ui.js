@@ -18,7 +18,7 @@ sections.innerHTML=`
   <div><label class="field-label" for="learnFilter">学习内容</label><select id="learnFilter"><option value="new">新词 · 尚未首次学习</option><option value="old">旧词 · 主动回忆</option><option value="again">还不会 · 再复习</option><option value="all">当前范围全部词</option></select></div>
   <div><label class="field-label" for="learnCount">本次词数</label><input id="learnCount" type="number" min="1" step="1" value="8" inputmode="numeric"></div>
  </div>
- <details class="learn-check-settings"><summary>正式检查设置</summary><div class="learn-settings"><div><label class="field-label" for="learnTime">每题秒数 · 0 不限时</label><input id="learnTime" type="number" min="0" max="600" step="1" value="0" inputmode="numeric"></div><label class="toggle-setting"><input id="learnHints" type="checkbox"><span>正式检查允许字母提示</span></label></div></details>
+ <details class="learn-check-settings"><summary>正式检查设置</summary><div class="learn-settings"><div><label class="field-label" for="learnTime">每题秒数 · 0 不限时</label><input id="learnTime" type="number" min="0" max="600" step="1" value="0" inputmode="numeric"></div><div><span class="field-label">提示设置</span><label class="learn-toggle-control"><input id="learnHints" type="checkbox"><span>允许提示字母</span></label></div></div></details>
  <p id="learnAvailable" class="small"></p><p id="learnSetupError" class="error" role="alert"></p>
  <button id="learnStart" class="primary" disabled>开始学习</button><button id="learnReload" class="text-button" hidden>重新加载词库</button>
  <p class="small">默认每次 8 词，可自由修改。新词先看英文；已学习的词直接进入中文回忆。Daily 四选一 / 多选目前请使用 Check。</p>

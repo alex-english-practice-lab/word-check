@@ -65,13 +65,13 @@ function fromSource(document,{id='lib:'+mintId(),idFactory=mintId}={}){
  for(const input of document.lists){
   requireValue(nonempty(input.id)&&!listIds.has(input.id)&&nonempty(input.title)&&Array.isArray(input.entries),'invalid source list');listIds.add(input.id);
   requireValue(Number.isFinite(input.order)&&input.entryCount===input.entries.length,'source list count/order mismatch');
-  const list={id:id+'/list/'+idFactory(),libraryId:id,name:input.title,number:library.lists.length+1,order:input.order,sourceListId:input.id,words:[]};
+  const list={id:id+'/list/'+idFactory('list',input.id),libraryId:id,name:input.title,number:library.lists.length+1,order:input.order,sourceListId:input.id,words:[]};
   for(const e of input.entries){
    requireValue(nonempty(e.id)&&!sourceIds.has(e.id),'duplicate/missing source entry ID');sourceIds.add(e.id);
    requireValue(nonempty(e.word)&&typeof e.phonetic==='string'&&typeof e.partOfSpeech==='string'&&typeof e.meaning==='string','invalid source entry');
    requireValue(Array.isArray(e.definitions)&&e.definitions.length>0&&e.definitions.every(nonempty),'source definitions required');
    requireValue(Array.isArray(e.senses)&&e.senses.every(s=>typeof s.partOfSpeech==='string'&&Array.isArray(s.definitions)&&s.definitions.every(nonempty)),'invalid source sense groups');
-   list.words.push({id:id+'/word/'+idFactory(),libraryId:id,listId:list.id,revision:1,order:list.words.length,
+   list.words.push({id:id+'/word/'+idFactory('word',e.id),libraryId:id,listId:list.id,revision:1,order:list.words.length,
     text:e.word,phonetic:e.phonetic,pos:e.partOfSpeech,senses:[...e.definitions],acceptedAnswers:[e.word],
     sourceEntryId:e.id,sourceMeaning:e.meaning,senseGroups:copy(e.senses)});
   }
