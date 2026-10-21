@@ -49,6 +49,8 @@ export interface PracticeWord {
   pos: string;
   senses: string[];
   list: number;
+  /** Stable order inside the canonical List; used before applying prefix scopes. */
+  order: number;
   variants?: string[];
 }
 export interface Identity {

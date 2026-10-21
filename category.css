@@ -31,6 +31,10 @@
 .home-setup #countHelp{margin:7px 0 0}
 .home-setup #groupChoices{gap:6px}
 .home-setup .group-choice{padding:8px 10px}
+.det-scope{border-bottom:1px solid var(--line);margin-bottom:14px;padding-bottom:14px}
+.det-scope>.field-label,.det-scope #prefixScopeInput>.field-label{margin-bottom:7px}
+.det-scope #prefixScopeInput{margin-top:10px}
+.det-scope .small{margin:6px 0 0}
 .setup-counts{margin-top:14px;min-width:0}
 .setup-counts>#samplingHelp{margin:0 0 7px}
 .home-setup #listCounts{display:grid;grid-template-columns:1fr;gap:0;max-height:276px;overflow:auto;padding:0 3px 0 0}
@@ -38,6 +42,7 @@
 .home-setup #v3SamplingSettings>.small{margin:7px 0 0}
 .v3-home .home-setup input:not([type=radio]):not([type=checkbox]),.v3-home .home-setup select{min-height:48px}
 .v3-home #v3ModeOptions .mode{min-height:82px;margin:8px 0}
+.v3-home #v3ModeOptions .mode:first-of-type{margin-top:0}
 .v3-home #v3AnswerSettings .v3-review-setting{min-height:58px;padding:10px 0;margin-top:10px}
 .setup-actions{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,220px) minmax(200px,250px);gap:12px 14px;align-items:center;border-top:1px solid var(--line);padding-top:14px}
 .setup-status{min-width:0}
