@@ -1,4 +1,4 @@
-/* Phase A student learning controller. Teacher assignments remain in Check. */
+/* Student learning controller; teacher links pin fixed Word IDs. */
 (function(root){
 'use strict';
 if(document.body.dataset.teacher==='true')return;
@@ -6,7 +6,7 @@ const L=root.WordLearnCore,V=root.WordVocabulary,R=root.WordPracticeRecords,C=ro
 const repo=root.WordLearnStore.createRepository(()=>root.localStorage),registry=V.createRegistry();
 const $=id=>document.getElementById(id),text=(id,value)=>$(id).textContent=value;
 const WHOLE_LIST_LIBRARIES=new Set(['lib:ielts','lib:writing-survival-100']);
-let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,checkAttached=false,loading=false,request=0,manualCount='8';
+let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,checkAttached=false,loading=false,request=0,manualCount='8',assignment=false;
 const sections=document.createElement('div');
 sections.innerHTML=`
 <section id="learnSetup" hidden class="panel learn-setup">
@@ -37,8 +37,9 @@ sections.innerHTML=`
  <span class="eyebrow">LEARN → REVIEW → CHECK</span><h1 id="learnSummaryTitle"></h1><p id="learnSummaryText"></p>
  <div class="stats p-two-stats" id="learnReviewStats" hidden><div><strong id="reviewKnownCount"></strong><span>自评记住</span></div><div><strong id="reviewPendingCount"></strong><span>仍需复习</span></div></div>
  <p id="learnSummaryNote" class="muted"></p><p id="learnActionError" class="error" role="alert"></p>
- <div class="result-actions"><button id="learnContinue" class="secondary">继续复习</button><button id="learnCheck" class="primary">开始正式检查</button><button id="learnBack" class="text-button">返回学习设置</button></div>
+ <div class="result-actions"><button id="learnContinue" class="secondary">继续复习</button><button id="learnCheck" class="primary">开始正式检查</button><button id="learnFinish" class="primary" hidden>完成学习任务</button><button id="learnBack" class="text-button">返回学习设置</button></div>
 </section>
+<section id="learnPaused" hidden class="panel results learn-summary"><h1>学习已暂停</h1><p>当前进度保存在本浏览器。再次打开同一链接也可继续。</p><button id="learnPausedResume" class="primary">继续学习</button></section>
 <p id="learnStorageNotice" class="small learn-storage" role="status" hidden></p>`;
 document.querySelector('footer').before(sections);
 const returnButton=document.createElement('button');returnButton.id='returnToLearn';returnButton.className='secondary';returnButton.textContent='返回学习包';returnButton.hidden=true;$('results').querySelector('.result-actions').append(returnButton);
@@ -91,12 +92,12 @@ function render(){
   $('learnCardActions').hidden=!learn;$('reviewCardActions').hidden=learn;$('reviewEnd').hidden=learn;$('learnPrevious').disabled=s.index===0;$('learnNext').disabled=!s.seenIds.includes(s.currentCardId);text('learnNext',s.index===queue.length-1?'完成首次学习':'下一张');
   $('reviewAgain').disabled=!s.flipped;$('reviewKnow').disabled=!s.flipped;text('learnCardHelp',learn?'每张卡至少翻看一次；看过不代表已经掌握。':'先尝试回忆拼写，再翻面自评。Know 不计入正式正确率。');
  }else{
-  show('learnSummary');const learned=s.currentStage==='learn_complete',completed=s.currentStage==='completed',interrupted=s.currentStage==='check';
-  text('learnSummaryTitle',learned?`已接触 ${s.learnQueue.length} 个新词`:completed?'本组正式检查已完成':interrupted?'正式检查尚未完成':'本轮复习完成');
+  show('learnSummary');$('learnSummary').querySelector('.eyebrow').textContent=p.settings.includeFinalCheck===false?'LEARN → REVIEW':'LEARN → REVIEW → CHECK';const learned=s.currentStage==='learn_complete',completed=s.currentStage==='completed',interrupted=s.currentStage==='check';
+  text('learnSummaryTitle',learned?`已接触 ${s.learnQueue.length} 个新词`:completed?p.settings.includeFinalCheck===false?'学习任务已完成':'本组正式检查已完成':interrupted?'正式检查尚未完成':'本轮复习完成');
   text('learnSummaryText',p.name+' · '+p.wordIds.length+' 个词');$('learnReviewStats').hidden=learned||interrupted;
   text('reviewKnownCount',p.wordIds.length-s.pendingIds.length);text('reviewPendingCount',s.pendingIds.length);
-  text('learnSummaryNote',learned?'接下来用中文主动回忆英文。首次翻卡完成不代表已掌握。':interrupted?'已提交的检查答案与学习进度保留。继续将从同一组单词开始一次新检查，不将未答题标为完成。':`这里是复习自评，不是考试成绩。${s.pendingIds.length?'仍有 '+s.pendingIds.length+' 个词需要加强，可继续复习或开始检查。':'可通过实际拼写验证掌握情况。'}`);
-  $('learnContinue').hidden=interrupted;$('learnContinue').disabled=!learned&&!completed&&!s.pendingIds.length;text('learnContinue',learned?'开始主动回忆':completed?'再次复习这组词':'继续复习不会的词');$('learnCheck').hidden=learned;text('learnCheck',interrupted?'重新开始本组检查':completed?'再次检查本组单词':'开始正式检查');
+  text('learnSummaryNote',learned?'接下来用中文主动回忆英文。首次翻卡完成不代表已掌握。':interrupted?'已提交的检查答案与学习进度保留。继续将从同一组单词开始一次新检查，不将未答题标为完成。':p.settings.includeFinalCheck===false?completed?'本次仅学习与复习，没有正式检查成绩；需要时可再复习同一组词。':'这里是复习自评，不是考试成绩；可继续复习或结束学习任务。':`这里是复习自评，不是考试成绩。${s.pendingIds.length?'仍有 '+s.pendingIds.length+' 个词需要加强，可继续复习或开始检查。':'可通过实际拼写验证掌握情况。'}`);
+  $('learnContinue').hidden=interrupted;$('learnContinue').disabled=!learned&&!completed&&!s.pendingIds.length;text('learnContinue',learned?'开始主动回忆':completed?'再次复习这组词':'继续复习不会的词');$('learnCheck').hidden=learned||p.settings.includeFinalCheck===false;$('learnFinish').hidden=p.settings.includeFinalCheck!==false||learned||completed||interrupted;text('learnCheck',interrupted?'重新开始本组检查':completed?'再次检查本组单词':'开始正式检查');$('learnBack').hidden=assignment;
  }
 }
 function act(action){try{bundle.session=L.transition(bundle.session,bundle.pack,action);save();render();if(['flip','previous','next','know','again'].includes(action))$('flashcard').focus({preventScroll:true})}catch(e){text('learnCardHelp',e.message)}}
@@ -110,7 +111,7 @@ function start(){try{
  const pool=available(),count=usesWholeList()?pool.length:integer('learnCount',1,pool.length),timeLimit=integer('learnTime',0,600),state=states();
  const selected=C.sampleMixed(pool,count),name=library.name+' · '+$('learnGroup').selectedOptions[0].textContent+' · '+count+' 词学习包';
  const pack=L.createPack({library,words:selected,name,profileId:repo.identity.profileId,settings:{timeLimit,hintsAllowed:$('learnHints').checked}});
- bundle={pack,session:L.createSession(pack,repo.identity.profileId,[...state.keys()])};checkAttached=false;save();render();
+ bundle={pack,session:L.createSession(pack,repo.identity.profileId,[...state.keys()])};assignment=false;checkAttached=false;save();render();
  }catch(e){text('learnSetupError',e.message)}}
 async function startCheck(){
  const continueDisabled=$('learnContinue').disabled;$('learnContinue').disabled=true;$('learnBack').disabled=true;
@@ -118,13 +119,24 @@ async function startCheck(){
   checkAttached=true;$('learnCheck').disabled=true;await root.WordCheckHome.startLearnCheck(bundle.pack);returnButton.hidden=false;
  }catch(e){checkAttached=false;show('learnSummary');text('learnActionError',e.message)}finally{$('learnCheck').disabled=false;$('learnContinue').disabled=continueDisabled;$('learnBack').disabled=false}
 }
+function startAssignment(preset,loaded,practiceWords,hash){
+ const ids=new Set(preset.w),selected=preset.w.map(id=>practiceWords.find(w=>w.id===id));
+ if(selected.some(w=>!w)||new Set(selected.map(w=>w.id)).size!==ids.size)throw Error('指定词条不在当前词库中，请老师重新生成学习链接。');
+ const assignmentId=hash.split('.')[1];if(!assignmentId)throw Error('学习作业编号无效。');
+ const pack=L.createTeacherPack({library:loaded,words:selected,name:preset.name,assignmentId,settings:{mode:preset.m,timeLimit:preset.t,hintsAllowed:preset.h,assistanceMode:preset.u??(preset.h?'both':'none'),includeFinalCheck:preset.f}});
+ L.resolvePack(pack,loaded,practiceWords);
+ library=loaded;words=practiceWords;assignment=true;checkAttached=false;returnButton.hidden=true;
+ const prior=repo.sessions().filter(b=>b.pack.id===pack.id&&b.session.status==='in_progress').sort((a,b)=>b.session.updatedAt.localeCompare(a.session.updatedAt))[0];
+ bundle=prior||{pack,session:L.createSession(pack,repo.identity.profileId,[])};
+ save();render();return bundle;
+}
 function onCheckStart({queue,library:loaded,mode}){
  if(!checkAttached)return;
  L.resolvePack(bundle.pack,loaded,V.toPracticeWords(loaded));if(queue.some(w=>!bundle.pack.wordIds.includes(w.id)))throw Error('检查词条不属于当前学习包');
  // A reload/restart begins a new attempt; never silently complete the interrupted one.
  for(const prior of repo.checks().filter(b=>b.sessionId===bundle.session.id&&b.attempt.status==='in_progress')){prior.attempt=R.closeAttempt(prior.attempt,prior.answers,{status:'abandoned'});repo.saveCheck(prior)}
  const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
- const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:'preset',id:bundle.pack.id}});
+ const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:bundle.pack.source.type==='teacher'?'assignment':'preset',id:bundle.pack.id}});
  checkBundle={sessionId:bundle.session.id,attempt,answers:[]};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
 }
 function onCheckAnswer({index,typed,hints,spellingChecks,skip,reason}){
@@ -140,12 +152,12 @@ function onCheckFinish(){
  const whole=complete&&new Set(checkBundle.answers.map(a=>a.wordId)).size===bundle.pack.wordIds.length;
  bundle.session.currentStage=whole?'completed':'review_complete';bundle.session.status=whole?'completed':'in_progress';bundle.session.updatedAt=new Date().toISOString();save();returnButton.hidden=false;
 }
-$('learnHome').onclick=()=>{show('studentHome');$('learnStorageNotice').hidden=true};$('learnBack').onclick=openSetup;$('learnPause').onclick=openSetup;
+$('learnHome').onclick=()=>{show('studentHome');$('learnStorageNotice').hidden=true};$('learnBack').onclick=openSetup;$('learnPause').onclick=()=>{if(assignment){save();show('learnPaused')}else openSetup()};$('learnPausedResume').onclick=render;
 $('learnLibrary').onchange=()=>loadLibrary($('learnLibrary').value);$('learnReload').onclick=()=>loadLibrary($('learnLibrary').value||null);
 for(const id of ['learnGroup','learnFilter','learnTime'])$(id).addEventListener(id==='learnTime'?'input':'change',updateSetup);
 for(const id of ['learnScope','learnPrefix'])$(id).addEventListener(id==='learnPrefix'?'input':'change',updateSetup);
 $('learnCount').addEventListener('input',()=>{manualCount=$('learnCount').value;updateSetup()});
-$('learnResume').onclick=resume;$('learnStart').onclick=start;$('flashcard').onclick=()=>act('flip');$('learnPrevious').onclick=()=>act('previous');$('learnNext').onclick=()=>act('next');$('reviewKnow').onclick=()=>act('know');$('reviewAgain').onclick=()=>act('again');$('reviewEnd').onclick=()=>act('end-review');$('learnContinue').onclick=()=>act('review');$('learnCheck').onclick=startCheck;
+$('learnResume').onclick=resume;$('learnStart').onclick=start;$('flashcard').onclick=()=>act('flip');$('learnPrevious').onclick=()=>act('previous');$('learnNext').onclick=()=>act('next');$('reviewKnow').onclick=()=>act('know');$('reviewAgain').onclick=()=>act('again');$('reviewEnd').onclick=()=>act('end-review');$('learnContinue').onclick=()=>act('review');$('learnFinish').onclick=()=>act('finish');$('learnCheck').onclick=startCheck;
 returnButton.onclick=()=>{checkAttached=false;render()};
-root.WordCheckLearning={openSetup,onCheckStart,onCheckAnswer,onCheckFinish,get isChecking(){return checkAttached},getCheckPrompt:index=>checkAttached&&checkBundle?checkBundle.attempt.questions[index].prompt.meaning:null,restartCheck(){if(!checkAttached)return false;startCheck();return true},get activeSession(){return bundle?JSON.parse(JSON.stringify(bundle)):null}};
+root.WordCheckLearning={openSetup,startAssignment,onCheckStart,onCheckAnswer,onCheckFinish,get isChecking(){return checkAttached},get isAssignment(){return assignment},getCheckPrompt:index=>checkAttached&&checkBundle?checkBundle.attempt.questions[index].prompt.meaning:null,restartCheck(){if(!checkAttached)return false;startCheck();return true},get activeSession(){return bundle?JSON.parse(JSON.stringify(bundle)):null}};
 })(window);

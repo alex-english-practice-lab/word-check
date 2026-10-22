@@ -14,12 +14,19 @@ function validatePack(p){
  requireValue(p.source&&['user','teacher'].includes(p.source.type),'创建来源无效');
  requireValue(p.settings?.learnDirection==='en-zh'&&p.settings.reviewDirection==='zh-en','学习方向无效');
  const f=p.settings.finalCheck;
- requireValue(f&&f.type==='spelling'&&f.mode==='single'&&Number.isSafeInteger(f.timeLimit)&&f.timeLimit>=0&&f.timeLimit<=600&&typeof f.hintsAllowed==='boolean','正式检查设置无效');
+ requireValue(f&&f.type==='spelling'&&['full','single'].includes(f.mode)&&Number.isSafeInteger(f.timeLimit)&&f.timeLimit>=0&&f.timeLimit<=600&&typeof f.hintsAllowed==='boolean','正式检查设置无效');
+ requireValue(p.settings.includeFinalCheck===undefined||typeof p.settings.includeFinalCheck==='boolean','是否包含正式检查的设置无效');
+ requireValue(f.assistanceMode===undefined||['none','check','both'].includes(f.assistanceMode)&&f.hintsAllowed===(f.assistanceMode!=='none'),'提示权限设置无效');
  return p;
 }
 function createPack({library,words,name,profileId,settings={}}){
  const ids=words.map(w=>w.id);
  return validatePack({schemaVersion:1,id:uuid(),name:name||library.name+' · 学习包',libraryId:library.id,libraryVersion:library.version,wordIds:ids,order:[...ids],source:{type:'user',profileId},settings:{learnDirection:'en-zh',reviewDirection:'zh-en',finalCheck:{type:'spelling',mode:'single',timeLimit:settings.timeLimit??0,hintsAllowed:settings.hintsAllowed??false}}});
+}
+function createTeacherPack({library,words,name,assignmentId,settings}){
+ requireValue(text(assignmentId),'缺少学习作业编号');
+ const ids=words.map(w=>w.id);
+ return validatePack({schemaVersion:1,id:'assignment:'+assignmentId,name,libraryId:library.id,libraryVersion:library.version,wordIds:ids,order:[...ids],source:{type:'teacher',assignmentId},settings:{learnDirection:'en-zh',reviewDirection:'zh-en',finalCheck:{type:'spelling',mode:settings.mode,timeLimit:settings.timeLimit,hintsAllowed:settings.hintsAllowed,...(settings.assistanceMode?{assistanceMode:settings.assistanceMode}:{})},includeFinalCheck:settings.includeFinalCheck}});
 }
 function resolvePack(pack,library,words){
  validatePack(pack);requireValue(library.id===pack.libraryId&&library.version===pack.libraryVersion,'词库版本已改变，请创建新学习包；旧进度仍保留');
@@ -78,6 +85,8 @@ function transition(session,pack,action){
   s.pendingIds=[...new Set([...s.pendingIds,...s.reviewQueue.slice(s.index)])];s.currentStage='review_complete';s.index=0;s.flipped=false;
  }else if(action==='check'){
   requireValue(['review_complete','completed'].includes(stage),'请先进入复习');s.currentStage='check';s.status='in_progress';s.index=0;s.flipped=false;
+ }else if(action==='finish'){
+  requireValue(stage==='review_complete'&&pack.settings.includeFinalCheck===false,'当前学习包尚未完成复习');s.currentStage='completed';s.status='completed';s.index=0;s.flipped=false;
  }else throw Error('未知学习操作');
  return validateSession(syncCard(s),pack);
 }
@@ -93,6 +102,6 @@ function studyStates(bundles,checks,libraryId,libraryVersion){
  }
  return states;
 }
-const api={validatePack,createPack,resolvePack,createSession,validateSession,transition,studyStates};
+const api={validatePack,createPack,createTeacherPack,resolvePack,createSession,validateSession,transition,studyStates};
 if(typeof module!=='undefined')module.exports=api;else root.WordLearnCore=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -9,6 +9,27 @@ html.student-link #setup{display:none!important}
 </style><script>if(location.hash.startsWith('#preset='))document.documentElement.classList.add('student-link');</script></head>
 <body class="home-page" data-teacher="true"><header><a class="brand" href="./"><span class="logo">W</span> Word Check <span class="brand-cn">单词检查</span></a><span class="header-note">课堂词汇检测</span></header>
 <main><div class="page-heading"><div><span class="eyebrow">VOCABULARY CHECK</span><h1>教师练习设置</h1></div><span class="small" id="sourceBadge">正在加载默认词库…</span></div>
+<div class="teacher-assignment-switch"><label class="field-label" for="assignmentType">作业类型</label><select id="assignmentType"><option value="checking">Checking Assignment · 检查作业</option><option value="learning">Learning Assignment · 学习作业</option></select></div>
+<section id="teacherLearnSetup" class="panel teacher-learn" hidden aria-label="学习作业设置">
+ <div class="section-heading"><span class="step">L</span><h2>设置学习作业</h2></div><p class="small">固定同一组词：Learn 英文初识 → Review 中文回忆 → 可选正式拼写检查。学习自评不计入考试成绩。Recognition / Synonym 特殊题库暂无 Flashcard 词条，只能在检查作业中使用。</p>
+ <div class="teacher-learn-grid">
+  <label>词库<select id="tlLibrary" disabled></select></label><label>List / 难度<select id="tlGroup" disabled></select></label>
+  <label>选词方式<select id="tlSelection"><option value="list">整个 List</option><option value="range">当前范围随机抽词</option><option value="manual">手动勾选具体单词</option></select></label>
+  <label id="tlScopeWrap" hidden>DET 选词范围<select id="tlScope"><option value="all">全部单词</option><option value="prefix">First N Words · 前 N 个词</option></select></label>
+  <label id="tlPrefixWrap" hidden>前 N 个词<input id="tlPrefix" type="number" min="1" step="1" value="60" inputmode="numeric"></label>
+  <label id="tlCountWrap" hidden>随机抽取词数<input id="tlCount" type="number" min="1" step="1" value="8" inputmode="numeric"></label>
+ </div>
+ <div id="tlManualWrap" hidden><label class="field-label" for="tlSearch">搜索英文单词或中文释义</label><input id="tlSearch" type="search" placeholder="输入关键词筛选，再勾选词条"><p id="tlManualCount" class="small"></p><div id="tlWordChoices" class="teacher-word-choices" role="group" aria-label="手动选择词条"></div></div>
+ <details open><summary>学习与正式检查设置</summary><div class="teacher-learn-grid">
+  <label>学习包名称<input id="tlName" maxlength="80" value="今日学习包"></label>
+  <label>正式拼写检查模式<select id="tlMode"><option value="single">单个释义</option><option value="full">音标 + 全部释义</option></select></label>
+  <label>每题限时（秒；0 为不限时）<input id="tlTime" type="number" min="0" max="600" step="1" value="0" inputmode="numeric"></label>
+  <label>提示权限<select id="tlAssistance"><option value="none">No Assistance</option><option value="check">Spelling Check Only</option><option value="both">Spelling Check + Next Letter</option></select></label>
+ </div><label class="teacher-check-toggle"><input id="tlFinal" type="checkbox" checked>包含 Final Check · 正式拼写检查</label></details>
+ <p id="tlSummary" class="small"></p><p id="tlError" class="error" role="alert"></p>
+ <button id="tlGenerate" class="primary" disabled>生成学习作业链接</button>
+ <div id="tlLinkPanel" class="preset-link-panel" hidden><label class="field-label" for="tlLink">学生学习链接</label><input id="tlLink" readonly><p id="tlLinkSummary" class="small"></p><button id="tlCopy" class="secondary">复制链接</button></div>
+</section>
 <section id="setup" class="workspace home-workspace">
   <aside class="panel setup-panel home-setup">
     <div class="section-heading"><span class="step">01</span><h2>设置本次检查</h2></div>
@@ -47,4 +68,4 @@ lack* /læk/ n./vt. 缺乏，不足，没有</pre><p class="small">每词一行�
   <div class="question-card panel p-quiz"><div class="question-meta"><span id="v3QuestionCategory"></span><span id="v3QuestionInstruction"></span></div><div class="question-content p-question"><h2 id="v3Headword"></h2><p id="v3Context" class="p-context"></p></div><div id="v3Options" class="p-options" role="group" aria-label="答案选项"></div><div class="p-feedback-slot" tabindex="0" role="region" aria-label="答案反馈"><div id="v3Feedback" role="status" aria-live="polite"></div></div><div class="next-row"><div><button type="button" id="v3Skip" class="text-button">不会 / 跳过</button></div><div><button type="button" id="v3Submit" class="primary" disabled>检查答案</button><button type="button" id="v3Next" class="primary" hidden>下一题</button></div></div></div><p class="quiz-footnote">Synonym 多选必须选出全部正确项才算完全正确 · 可随时结束并查看已答题目</p>
 </section>
 <section id="v3Results" hidden class="panel results" aria-label="选择题练习结果"><span class="eyebrow">SESSION REVIEW</span><h1 id="v3ResultTitle">本轮练习完成</h1><p class="muted" id="v3ResultSummary"></p><div class="stats p-two-stats"><div><strong id="v3CorrectCount">0</strong><span>完全正确</span></div><div><strong id="v3WrongCount">0</strong><span>答错 / 跳过</span></div></div><div class="table-scroll"><table><thead><tr><th>题目</th><th>你的选择</th><th>结果</th><th>正确答案</th></tr></thead><tbody id="v3ResultRows"></tbody></table></div><p class="small" id="v3StorageMessage"></p><div class="result-actions"><button type="button" class="primary" id="v3Restart">重新设置</button><button type="button" class="secondary" id="v3RetryWrong">重练本轮错题</button></div></section>
-<footer><span>WORD CHECK</span><span>记住单词，也看清还需要练习的地方。</span></footer></main><script src="core.js?v=20261022spelling1"></script><script src="vocabulary.js?v=20261020detscope1"></script><script src="preset-links.js?v=20261022spelling1"></script><script src="practice-core.js?v=20261015e"></script><script src="home-v3.js?v=20261016v3links1"></script><script src="app.js?v=20261022spelling1"></script></body></html>
+<footer><span>WORD CHECK</span><span>记住单词，也看清还需要练习的地方。</span></footer></main><script src="core.js?v=20261022spelling1"></script><script src="vocabulary.js?v=20261020detscope1"></script><script src="preset-links.js?v=20261022learning2"></script><script src="practice-core.js?v=20261015e"></script><script src="home-v3.js?v=20261016v3links1"></script><script src="app.js?v=20261022learning2"></script><script src="teacher-learning.js?v=20261022learning2"></script><link rel="stylesheet" href="teacher-learning.css?v=20261022learning2"></body></html>

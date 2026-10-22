@@ -117,7 +117,37 @@ function sampleScopedRandom(input,words,core){
  return pool;
 }
 
-function validate(input){return input?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(input):input?.v===DAILY_VERSION?compactDaily(input):input?.v===RANDOM_VERSION?validateRandom(input):input?.v===VERSION?compact(input):validateLegacy(input)}
+const LEARNING_VERSION=7;
+// Store ordered, stable Word ID suffixes. UUIDs use 16 bytes rather than 36 characters.
+function encodeWordId(id,libraryId){
+ const suffix=id.slice((libraryId+'/word/').length),uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ if(uuid.test(suffix))return 'u'+encodeBytes(Uint8Array.from(suffix.replace(/-/g,'').match(/../g).map(n=>parseInt(n,16))));
+ return 's'+encodeBytes(encoder.encode(suffix));
+}
+function decodeWordId(encoded,libraryId){
+ if(!/^[us][A-Za-z0-9_-]+$/.test(encoded))throw Error('学习作业词条编号无效。');
+ const bytes=decodeBytes(encoded.slice(1));let suffix;
+ if(encoded[0]==='u'){
+  if(bytes.length!==16)throw Error('学习作业词条编号无效。');
+  const h=[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('');suffix=[h.slice(0,8),h.slice(8,12),h.slice(12,16),h.slice(16,20),h.slice(20)].join('-');
+ }else{suffix=decoder.decode(bytes);if(!suffix||suffix.includes('/')||encodeWordId(libraryId+'/word/'+suffix,libraryId)!==encoded)throw Error('学习作业词条编号无效。')}
+ return libraryId+'/word/'+suffix;
+}
+function validateLearning(input){
+ if(!input||input.v!==LEARNING_VERSION||!nonempty(input.l)||!nonempty(input.lv)||!Array.isArray(input.w)||!input.w.length||input.w.length>100||!['full','single'].includes(input.m)||typeof input.f!=='boolean'||!nonempty(input.name?.trim())||input.name.length>80)throw Error('学习作业设置不完整；最多支持 100 个词。');
+ const seen=new Set();for(const id of input.w){if(!nonempty(id)||!id.startsWith(input.l+'/word/')||id.length>180||id.slice((input.l+'/word/').length).includes('/')||seen.has(id))throw Error('学习作业词条编号无效或重复。');seen.add(id)}
+ return{v:LEARNING_VERSION,l:input.l,lv:input.lv,w:[...input.w],m:input.m,f:input.f,name:input.name,...settings(input)};
+}
+function compactLearning(input){
+ const p=validateLearning(input);return{v:LEARNING_VERSION,l:p.l,x:p.lv,w:p.w.map(id=>encodeWordId(id,p.l)).join('.'),m:p.m==='full'?0:1,f:p.f?1:0,n:p.name,t:p.t,h:p.h?1:0,...(p.u?{u:p.u}:{})};
+}
+function expandLearning(input){
+ if(!input||input.v!==LEARNING_VERSION||!nonempty(input.l)||!nonempty(input.x)||!nonempty(input.w)||![0,1].includes(input.m)||![0,1].includes(input.f)||!nonempty(input.n)||!Number.isSafeInteger(input.t)||![0,1].includes(input.h))throw Error('学习作业设置不完整。');
+ if(input.w.split('.').length>100)throw Error('学习作业最多支持 100 个词。');
+ return validateLearning({v:LEARNING_VERSION,l:input.l,lv:input.x,w:input.w.split('.').map(id=>decodeWordId(id,input.l)),m:input.m?'single':'full',f:Boolean(input.f),name:input.n,t:input.t,h:Boolean(input.h),...(input.u?{u:input.u}:{})});
+}
+
+function validate(input){return input?.v===LEARNING_VERSION?compactLearning(input):input?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(input):input?.v===DAILY_VERSION?compactDaily(input):input?.v===RANDOM_VERSION?validateRandom(input):input?.v===VERSION?compact(input):validateLegacy(input)}
 async function createToken(input){
  const payload=validate(input),encoded=encodeBytes(encoder.encode(JSON.stringify(payload)));
  return encoded+'.'+await fingerprint(encoded);
@@ -126,7 +156,7 @@ async function readToken(token){
  const parts=String(token).split('.');if(parts.length!==2||!parts[0]||!parts[1])throw Error('作业链接格式无效。');
  const expected=await fingerprint(parts[0]);if(expected!==parts[1])throw Error('作业链接已损坏或被修改。');
  let parsed;try{parsed=JSON.parse(decoder.decode(decodeBytes(parts[0])))}catch{throw Error('作业链接内容无法读取。')}
- return parsed?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(parsed):parsed?.v===DAILY_VERSION?expandDaily(parsed):parsed?.v===RANDOM_VERSION?validateRandom(parsed):parsed?.v===VERSION?expand(parsed):validateLegacy(parsed);
+ return parsed?.v===LEARNING_VERSION?expandLearning(parsed):parsed?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(parsed):parsed?.v===DAILY_VERSION?expandDaily(parsed):parsed?.v===RANDOM_VERSION?validateRandom(parsed):parsed?.v===VERSION?expand(parsed):validateLegacy(parsed);
 }
 async function createUrl(input,href=root.location?.href){
  const url=new URL(href);url.search='';url.hash='preset='+await createToken(input);return url.href;
@@ -134,6 +164,6 @@ async function createUrl(input,href=root.location?.href){
 async function readHash(hash=root.location?.hash||''){
  const value=new URLSearchParams(String(hash).replace(/^#/, '')).get('preset');if(!value)throw Error('没有找到作业设置。');return readToken(value);
 }
-const api={VERSION,RANDOM_VERSION,DAILY_VERSION,SCOPED_RANDOM_VERSION,validateRandom,sampleRandom,validateScopedRandom,sampleScopedRandom,compactDaily,expandDaily,validate,createToken,readToken,createUrl,readHash};
+const api={VERSION,RANDOM_VERSION,DAILY_VERSION,SCOPED_RANDOM_VERSION,LEARNING_VERSION,validateLearning,compactLearning,expandLearning,validateRandom,sampleRandom,validateScopedRandom,sampleScopedRandom,compactDaily,expandDaily,validate,createToken,readToken,createUrl,readHash};
 if(typeof module!=='undefined')module.exports=api;else root.WordPresetLinks=api;
 })(typeof window!=='undefined'?window:globalThis);
