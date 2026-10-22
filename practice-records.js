@@ -57,7 +57,9 @@ function createAttempt({library,identity,questions,listIds,source={type:'free',i
 function grading(question,response){
  const normalizedAnswer=C.normalize(response.text),acceptedAnswers=question.snapshot.acceptedAnswers.map(C.normalize);
  const isCorrect=!response.skipped&&acceptedAnswers.includes(normalizedAnswer);
- return {isCorrect,outcome:isCorrect?(response.hintCount?'assisted':'correct'):'wrong',grading:{algorithm:'legacy-spelling-v1',normalizedAnswer,acceptedAnswers}};
+ const modern=response.spellingChecks!==undefined;
+ const outcome=isCorrect?(response.hintCount?(modern?'letter_assisted':'assisted'):response.spellingChecks?'checked':'correct'):'wrong';
+ return {isCorrect,outcome,grading:{algorithm:modern?'spelling-assistance-v2':'legacy-spelling-v1',normalizedAnswer,acceptedAnswers,...(modern?{assistance:{spellingChecks:response.spellingChecks,letterHints:response.hintCount}}:{})}};
 }
 function validateAnswer(answer,attempt){
  validateAttempt(attempt);
@@ -66,16 +68,18 @@ function validateAnswer(answer,attempt){
  check(answer.wordId===q.wordId&&answer.mode===q.mode,'answer word/mode mismatch');
  const r=answer.response;
  check(r&&typeof r.text==='string'&&typeof r.skipped==='boolean'&&Number.isSafeInteger(r.hintCount)&&r.hintCount>=0,'invalid response');
+ if(r.spellingChecks!==undefined)check(Number.isSafeInteger(r.spellingChecks)&&r.spellingChecks>=0,'invalid spelling check count');
  check(r.skipped||r.text.trim().length>0,'empty answer must be explicitly skipped');
  check(time(answer.answeredAt)&&answer.answeredAt>=attempt.startedAt&&(attempt.completedAt===null||answer.answeredAt<=attempt.completedAt),'answer outside attempt time');
  check(answer.durationMs===null||Number.isSafeInteger(answer.durationMs)&&answer.durationMs>=0,'invalid answer duration');
  check(stable(answer.result)===stable(grading(q,r)),'grading trace mismatch');
  return answer;
 }
-function createAnswer({attempt,questionId,text='',skipped=false,hintCount=0,answeredAt=new Date().toISOString(),durationMs=null}){
+function createAnswer({attempt,questionId,text='',skipped=false,hintCount=0,spellingChecks,answeredAt=new Date().toISOString(),durationMs=null}){
  validateAttempt(attempt);check(attempt.status==='in_progress','attempt already closed');
  const q=attempt.questions.find(q=>q.id===questionId);check(q,'unknown question');
  const response={text,skipped,hintCount};
+ if(spellingChecks!==undefined)response.spellingChecks=spellingChecks;
  return validateAnswer({schemaVersion:1,id:attempt.id+'/answer/'+q.id,attemptId:attempt.id,questionId:q.id,wordId:q.wordId,mode:q.mode,response,result:grading(q,response),answeredAt,durationMs},attempt);
 }
 function mergeAnswers(...batches){
@@ -118,7 +122,7 @@ function deriveProgress(attempts,answers){
   const key=stable([attempt.identity.profileId,answer.wordId,answer.mode]);
   let state=progress.get(key);
   if(!state){state={schemaVersion:1,profileId:attempt.identity.profileId,wordId:answer.wordId,libraryId:attempt.libraryId,mode:answer.mode,practiceCount:0,wrongCount:0,assistedCount:0,independentCorrectCount:0,lastAnsweredAt:null,lastAnswerId:null,lastResult:null,review:{status:'unseen',dueAt:null,algorithm:null}};progress.set(key,state)}
-  state.practiceCount++;state.wrongCount+=answer.result.isCorrect?0:1;state.assistedCount+=answer.result.outcome==='assisted'?1:0;state.independentCorrectCount+=answer.result.outcome==='correct'?1:0;
+  state.practiceCount++;state.wrongCount+=answer.result.isCorrect?0:1;state.assistedCount+=['assisted','checked','letter_assisted'].includes(answer.result.outcome)?1:0;state.independentCorrectCount+=answer.result.outcome==='correct'?1:0;
   state.lastAnsweredAt=answer.answeredAt;state.lastAnswerId=answer.id;state.lastResult=copy(answer.result);
   state.review.status=answer.result.outcome==='correct'?'ready':'needs_review';
  }

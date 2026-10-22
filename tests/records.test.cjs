@@ -63,3 +63,12 @@ test('historical progress survives a new library revision of the same word ID',(
  assert.equal(a.questions[0].snapshot.senses[0],'皇帝');assert.equal(b.questions[0].snapshot.senses[0],'君主');
  assert.equal(a.questions[0].wordRevision,1);assert.equal(b.questions[0].wordRevision,2);
 });
+test('new assistance categories retain both tool counts and validate legacy answers unchanged',()=>{
+ const a=attempt(),independent=answer(a,0,'emperor',{spellingChecks:0}),checked=answer(a,1,'emperor',{spellingChecks:2}),letter=answer(a,2,'emperor',{spellingChecks:1,hintCount:1});
+ assert.deepEqual([independent.result.outcome,checked.result.outcome,letter.result.outcome],['correct','checked','letter_assisted']);
+ assert.equal(letter.response.spellingChecks,1);assert.equal(letter.response.hintCount,1);
+ assert.equal(answer(a,2,'emperor',{hintCount:1}).result.outcome,'assisted');
+ const closed=R.closeAttempt(a,[independent,checked,letter],{completedAt}),progress=R.deriveProgress([closed],[independent,checked,letter]);
+ assert.equal(progress.find(p=>p.mode==='full').assistedCount,1);
+ const changed=structuredClone(letter);changed.response.spellingChecks=0;assert.throws(()=>R.validateAnswer(changed,a),/grading trace/);
+});
