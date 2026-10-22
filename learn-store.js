@@ -16,7 +16,7 @@ function createRepository(getStorage){
  }
  function validBundle(bundle){L.validateSession(bundle.session,bundle.pack);if(bundle.session.profileId!==identity.profileId)throw Error('本地身份不匹配');return bundle}
  function loadSession(id){const b=parse('session.'+id);if(!b)return null;try{return validBundle(b)}catch{warning='部分本地学习记录已损坏，无法恢复；可以开始新学习包。';return null}}
- function saveSession(bundle){validBundle(bundle);const saved=write('session.'+bundle.session.id,JSON.stringify(bundle));write('active',JSON.stringify(bundle.session.id));return saved}
+ function saveSession(bundle){validBundle(bundle);const saved=write('session.'+bundle.session.id,JSON.stringify(bundle));const activeSaved=write('active',JSON.stringify(bundle.session.id));return saved&&activeSaved}
  function loadActive(){const id=parse('active');return typeof id==='string'?loadSession(id):null}
  function keys(part){const result=new Set([...memory.keys()].filter(k=>k.startsWith(part)));try{const s=getStorage();for(let i=0;i<s.length;i++){const k=s.key(i);if(k?.startsWith(PREFIX+part))result.add(k.slice(PREFIX.length))}}catch{fail()}return [...result]}
  function sessions(){return keys('session.').map(k=>loadSession(k.slice(8))).filter(Boolean)}

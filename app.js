@@ -61,7 +61,7 @@ function renderGroupChoices(){
 }
 $('librarySelect').addEventListener('change',()=>{const id=$('librarySelect').value;return id===V3_ID?activateV3():loadLibrary(id)});
 $('groupChoices').addEventListener('change',()=>{$('range').value=[...$('groupChoices').querySelectorAll('input:checked')].map(input=>input.dataset.group).join(',');updateScopeControls();renderListCounts();updateSelection()});
-function show(id){document.querySelector('.page-heading').hidden=id.startsWith('learn');for(const x of ['studentHome','learnSetup','learnCards','learnSummary','learnPaused','setup','quiz','results','presetError','presetLoading','v3Quiz','v3Results'])if($(x))$(x).hidden=x!==id;if($('learnStorageNotice'))$('learnStorageNotice').hidden=!(id.startsWith('learn')||['quiz','results'].includes(id)&&window.WordCheckLearning?.isChecking);window.scrollTo(0,0)}
+function show(id){document.querySelector('.page-heading').hidden=id.startsWith('learn');for(const x of ['studentHome','learnSetup','learnCards','learnSummary','learnPaused','setup','quiz','results','presetError','presetLoading','v3Quiz','v3Results'])if($(x))$(x).hidden=x!==id;if($('learnStorageNotice'))$('learnStorageNotice').hidden=!(id.startsWith('learn')||['quiz','results'].includes(id)&&(window.WordCheckLearning?.isChecking||window.WordCheckLearning?.warning));window.scrollTo(0,0)}
 function setSourceKind(kind){
  sourceKind=kind==='v3'?'v3':'spelling';const v3=sourceKind==='v3';
  $('numberedLists').hidden=v3||namedGroups();$('namedLists').hidden=v3||!namedGroups();

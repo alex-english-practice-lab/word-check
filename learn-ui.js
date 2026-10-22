@@ -2,21 +2,25 @@
 (function(root){
 'use strict';
 if(document.body.dataset.teacher==='true')return;
-const L=root.WordLearnCore,V=root.WordVocabulary,R=root.WordPracticeRecords,C=root.WordCore;
+const L=root.WordLearnCore,V=root.WordVocabulary,R=root.WordPracticeRecords,C=root.WordCore,D=root.WordCheckPracticeCore,G=root.WordVocabularyProgress;
 const repo=root.WordLearnStore.createRepository(()=>root.localStorage),registry=V.createRegistry();
 const $=id=>document.getElementById(id),text=(id,value)=>$(id).textContent=value;
 const WHOLE_LIST_LIBRARIES=new Set(['lib:ielts','lib:writing-survival-100']);
-let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,checkAttached=false,loading=false,request=0,manualCount='8',assignment=false;
+let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,practiceBundle=null,checkAttached=false,loading=false,request=0,manualCount='8',assignment=false;
 const sections=document.createElement('div');
 sections.innerHTML=`
 <section id="learnSetup" hidden class="panel learn-setup">
  <div class="section-heading"><span class="step">L</span><h2>背单词 · Learn Vocabulary</h2><button id="learnHome" class="text-button">返回首页</button></div>
  <p class="muted">先认识新词，再用中文回忆英文，最后实际拼写检查。</p>
  <div id="learnResumePanel" class="notice" hidden><strong id="learnResumeName"></strong><p id="learnResumeDetail"></p><button id="learnResume" class="secondary">继续上次学习</button></div>
+ <section class="learn-dashboard" aria-label="My Vocabulary"><div class="section-heading"><h3>My Vocabulary · 我的词汇</h3><button type="button" id="learnExport" class="text-button">导出 JSON 备份</button></div>
+  <div class="learn-metrics"><div><strong id="metricSeen">0</strong><span>已接触</span></div><div><strong id="metricChecked">0</strong><span>已正式检查</span></div><div><strong id="metricDue">0</strong><span>待复习</span></div><div><strong id="metricFrequent">0</strong><span>经常答错</span></div></div>
+  <p id="metricLast" class="small"></p><h4>Today's Vocabulary · 今日学习</h4><div class="learn-today"><button type="button" id="todayNew" class="secondary"></button><button type="button" id="todayDue" class="secondary"></button><button type="button" id="todayNeeds" class="secondary"></button></div><p id="learnHistoryNote" class="small"></p>
+ </section>
  <div class="learn-settings">
   <div><label class="field-label" for="learnLibrary">词库</label><select id="learnLibrary" disabled></select></div>
   <div><label class="field-label" for="learnGroup">List / 难度</label><select id="learnGroup" disabled></select></div>
-  <div><label class="field-label" for="learnFilter">学习内容</label><select id="learnFilter"><option value="new">新词 · 尚未首次学习</option><option value="old">旧词 · 主动回忆</option><option value="again">还不会 · 再复习</option><option value="all">当前范围全部词</option></select></div>
+  <div><label class="field-label" for="learnFilter">学习内容</label><select id="learnFilter"><option value="new">新词 · 尚未首次学习</option><option value="due">到期复习</option><option value="old">旧词 · 主动回忆</option><option value="again">还不会 · 再复习</option><option value="all">当前范围全部词</option></select></div>
   <div id="learnCountField"><label class="field-label" for="learnCount">本次词数</label><input id="learnCount" type="number" min="1" step="1" value="8" inputmode="numeric"></div>
  </div>
  <div id="learnScopeField" class="learn-scope" hidden><label class="field-label" for="learnScope">Vocabulary Scope · 选词范围</label><select id="learnScope"><option value="all">All Words · 全部单词</option><option value="prefix">First N Words · 前 N 个词</option></select><div id="learnPrefixField" hidden><label class="field-label" for="learnPrefix">前多少个词？</label><input id="learnPrefix" type="number" min="1" step="1" value="60" inputmode="numeric"></div></div>
@@ -44,12 +48,22 @@ sections.innerHTML=`
 document.querySelector('footer').before(sections);
 const returnButton=document.createElement('button');returnButton.id='returnToLearn';returnButton.className='secondary';returnButton.textContent='返回学习包';returnButton.hidden=true;$('results').querySelector('.result-actions').append(returnButton);
 function show(id){root.WordCheckHome.show(id);$('learnStorageNotice').hidden=false;storageNotice()}
-function storageNotice(){text('learnStorageNotice',repo.warning||'学习进度仅保存在当前浏览器；清理浏览器数据会丢失记录。自评不计入正式成绩。')}
-function save(){repo.saveSession(bundle);storageNotice()}
+function dailyData(){try{return D.readStoreDetailed(root.localStorage)}catch{return {store:{attempts:[]},warning:'本浏览器无法读取日常词汇记录。'}}}
+function progress(){return G.derive({sessions:repo.sessions(),checks:repo.checks(),daily:dailyData().store,profileId:repo.identity.profileId})}
+function storageNotice(){const warning=[repo.warning,dailyData().warning].filter(Boolean).join(' ');text('learnStorageNotice',warning||'学习记录只保存在当前浏览器；清理浏览器数据会丢失记录。自评不计入正式成绩。');if(warning)$('learnStorageNotice').hidden=false}
+function refreshDashboard(){const data=progress(),current=data.words.filter(w=>w.libraryId===library?.id),byId=new Map(current.map(w=>[w.wordId,w]));
+ text('metricSeen',data.summary.seen);text('metricChecked',data.summary.checked);text('metricDue',data.summary.due);text('metricFrequent',data.summary.frequent);text('metricLast',data.summary.lastAt?'最近学习：'+new Date(data.summary.lastAt).toLocaleString('zh-CN'):'最近学习：暂无记录');
+ const group=$('learnGroup').value;let range=words.filter(w=>!group||w.listId===group);
+ if(library?.id==='lib:difficulty-100-120'&&$('learnScope').value==='prefix'){
+  const selected=library.lists.find(l=>l.id===group),raw=$('learnPrefix').value.trim(),n=Number(raw);
+  if(selected&&/^\d+$/.test(raw)&&Number.isSafeInteger(n)&&n>0&&n<=range.length)range=C.prefixPool(words,selected.number,n);
+ }
+ text('todayNew',`New Words · ${range.filter(w=>!byId.get(w.id)?.seen).length}`);text('todayDue',`Due for Review · ${range.filter(w=>byId.get(w.id)?.due).length}`);text('todayNeeds',`Needs More Practice · ${range.filter(w=>byId.get(w.id)?.needsPractice).length}`);
+ text('learnHistoryNote',dailyData().warning||'今日任务仅作建议；可自行选择其他词库、List 和学习内容。旧版日常词汇最多保留 100 轮历史，已删除的旧记录无法恢复。');storageNotice();return byId}
+function save(){repo.saveSession(bundle);storageNotice();refreshDashboard()}
 function catalog(){return catalogPromise||(catalogPromise=registry.loadManifest(new URL('data/catalog.json',document.baseURI).href).catch(error=>{catalogPromise=null;throw error}))}
-function states(){return L.studyStates(repo.sessions(),repo.checks(),library.id,library.version)}
 function available(){
- if(!library)throw Error('词库尚未加载。');const state=states(),group=$('learnGroup').value,filter=$('learnFilter').value;
+ if(!library)throw Error('词库尚未加载。');const state=refreshDashboard(),group=$('learnGroup').value,filter=$('learnFilter').value;
  let pool=words.filter(w=>!group||w.listId===group);
  if(library.id==='lib:difficulty-100-120'&&$('learnScope').value==='prefix'){
   const selected=library.lists.find(list=>list.id===group),raw=$('learnPrefix').value.trim(),n=Number(raw);
@@ -57,7 +71,7 @@ function available(){
   if(!/^\d+$/.test(raw)||!Number.isSafeInteger(n)||n<1)throw Error('前 N 个词中的 N 必须为正整数。');
   pool=C.prefixPool(words,selected.number,n);
  }
- return pool.filter(w=>filter==='all'||filter==='new'&&!state.has(w.id)||filter==='old'&&state.has(w.id)||filter==='again'&&state.get(w.id)?.needsReview);
+ return pool.filter(w=>{const s=state.get(w.id);return filter==='all'||filter==='new'&&!s?.seen||filter==='old'&&s?.seen||filter==='again'&&s?.needsPractice||filter==='due'&&s?.due});
 }
 function usesWholeList(){return Boolean(library&&WHOLE_LIST_LIBRARIES.has(library.id))}
 function integer(id,min,max){const raw=$(id).value.trim(),n=Number(raw);if(!/^\d+$/.test(raw)||!Number.isSafeInteger(n)||n<min||n>max)throw Error(id==='learnTime'?'每题限时需为 0–600 的整数秒。':`本次词数需为 1–${max} 的整数；不能超过当前可用词数。`);return n}
@@ -80,7 +94,7 @@ async function loadLibrary(id){
  }catch(e){if(ticket!==request)return;text('learnSetupError','加载失败：'+e.message);$('learnReload').hidden=false}
  finally{if(ticket===request){loading=false;if(library)updateSetup();storageNotice()}}
 }
-async function openSetup(){checkAttached=false;returnButton.hidden=true;show('learnSetup');resumePanel();if(!library)await loadLibrary($('learnLibrary').value||null);else updateSetup()}
+async function openSetup(){checkAttached=false;returnButton.hidden=true;show('learnSetup');resumePanel();refreshDashboard();if(!library)await loadLibrary($('learnLibrary').value||null);else updateSetup()}
 function render(){
  const s=bundle.session,p=bundle.pack;L.validateSession(s,p);text('learnActionError','');
  if(s.currentStage==='learn'||s.currentStage==='review'){
@@ -108,10 +122,10 @@ async function resume(){
 }
 function start(){try{
  if(loading)throw Error('词库正在加载，请稍候。');
- const pool=available(),count=usesWholeList()?pool.length:integer('learnCount',1,pool.length),timeLimit=integer('learnTime',0,600),state=states();
+ const pool=available(),count=usesWholeList()?pool.length:integer('learnCount',1,pool.length),timeLimit=integer('learnTime',0,600),state=refreshDashboard();
  const selected=C.sampleMixed(pool,count),name=library.name+' · '+$('learnGroup').selectedOptions[0].textContent+' · '+count+' 词学习包';
  const pack=L.createPack({library,words:selected,name,profileId:repo.identity.profileId,settings:{timeLimit,hintsAllowed:$('learnHints').checked}});
- bundle={pack,session:L.createSession(pack,repo.identity.profileId,[...state.keys()])};assignment=false;checkAttached=false;save();render();
+ bundle={pack,session:L.createSession(pack,repo.identity.profileId,[...state.values()].filter(s=>s.seen).map(s=>s.wordId))};assignment=false;checkAttached=false;save();render();
  }catch(e){text('learnSetupError',e.message)}}
 async function startCheck(){
  const continueDisabled=$('learnContinue').disabled;$('learnContinue').disabled=true;$('learnBack').disabled=true;
@@ -131,7 +145,12 @@ function startAssignment(preset,loaded,practiceWords,hash){
  save();render();return bundle;
 }
 function onCheckStart({queue,library:loaded,mode}){
- if(!checkAttached)return;
+ if(!checkAttached){
+  if(practiceBundle?.attempt.status==='in_progress'){practiceBundle.attempt=R.closeAttempt(practiceBundle.attempt,practiceBundle.answers,{status:'abandoned'});repo.saveCheck(practiceBundle)}
+  const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
+  const linked=root.location.hash.startsWith('#preset=');const source=linked?{type:'assignment',id:root.location.hash.slice(0,100)}:{type:'free',id:null};
+  practiceBundle={attempt:R.createAttempt({library:loaded,identity:repo.identity,questions,source}),answers:[]};repo.saveCheck(practiceBundle);storageNotice();return;
+ }
  L.resolvePack(bundle.pack,loaded,V.toPracticeWords(loaded));if(queue.some(w=>!bundle.pack.wordIds.includes(w.id)))throw Error('检查词条不属于当前学习包');
  // A reload/restart begins a new attempt; never silently complete the interrupted one.
  for(const prior of repo.checks().filter(b=>b.sessionId===bundle.session.id&&b.attempt.status==='in_progress')){prior.attempt=R.closeAttempt(prior.attempt,prior.answers,{status:'abandoned'});repo.saveCheck(prior)}
@@ -140,13 +159,14 @@ function onCheckStart({queue,library:loaded,mode}){
  checkBundle={sessionId:bundle.session.id,attempt,answers:[]};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
 }
 function onCheckAnswer({index,typed,hints,spellingChecks,skip,reason}){
- if(!checkAttached||!checkBundle)return;
- const answer=R.createAnswer({attempt:checkBundle.attempt,questionId:checkBundle.attempt.questions[index].id,text:typed,hintCount:hints,spellingChecks,skipped:skip});
+ const target=checkAttached?checkBundle:practiceBundle;if(!target)return;
+ const answer=R.createAnswer({attempt:target.attempt,questionId:target.attempt.questions[index].id,text:typed,hintCount:hints,spellingChecks,skipped:skip});
  // Supplemental timeout/skip reason; canonical grade remains unchanged.
- checkBundle.answers.push({...answer,reason:reason||null});repo.saveCheck(checkBundle);storageNotice();
+ target.answers.push({...answer,reason:reason||null});repo.saveCheck(target);storageNotice();
 }
 function onCheckFinish(){
- if(!checkAttached||!checkBundle)return;
+ if(!checkAttached){if(!practiceBundle)return;const complete=practiceBundle.answers.length===practiceBundle.attempt.questionCount;practiceBundle.attempt=R.closeAttempt(practiceBundle.attempt,practiceBundle.answers,{status:complete?'completed':'abandoned'});repo.saveCheck(practiceBundle);practiceBundle=null;storageNotice();return}
+ if(!checkBundle)return;
  const complete=checkBundle.answers.length===checkBundle.attempt.questionCount;
  checkBundle.attempt=R.closeAttempt(checkBundle.attempt,checkBundle.answers,{status:complete?'completed':'abandoned'});repo.saveCheck(checkBundle);
  const whole=complete&&new Set(checkBundle.answers.map(a=>a.wordId)).size===bundle.pack.wordIds.length;
@@ -159,5 +179,8 @@ for(const id of ['learnScope','learnPrefix'])$(id).addEventListener(id==='learnP
 $('learnCount').addEventListener('input',()=>{manualCount=$('learnCount').value;updateSetup()});
 $('learnResume').onclick=resume;$('learnStart').onclick=start;$('flashcard').onclick=()=>act('flip');$('learnPrevious').onclick=()=>act('previous');$('learnNext').onclick=()=>act('next');$('reviewKnow').onclick=()=>act('know');$('reviewAgain').onclick=()=>act('again');$('reviewEnd').onclick=()=>act('end-review');$('learnContinue').onclick=()=>act('review');$('learnFinish').onclick=()=>act('finish');$('learnCheck').onclick=startCheck;
 returnButton.onclick=()=>{checkAttached=false;render()};
-root.WordCheckLearning={openSetup,startAssignment,onCheckStart,onCheckAnswer,onCheckFinish,get isChecking(){return checkAttached},get isAssignment(){return assignment},getCheckPrompt:index=>checkAttached&&checkBundle?checkBundle.attempt.questions[index].prompt.meaning:null,restartCheck(){if(!checkAttached)return false;startCheck();return true},get activeSession(){return bundle?JSON.parse(JSON.stringify(bundle)):null}};
+function chooseToday(filter){$('learnFilter').value=filter;updateSetup();$('learnFilter').focus()}
+$('todayNew').onclick=()=>chooseToday('new');$('todayDue').onclick=()=>chooseToday('due');$('todayNeeds').onclick=()=>chooseToday('again');
+$('learnExport').onclick=()=>{try{const daily=dailyData(),backup={schemaVersion:1,exportedAt:new Date().toISOString(),identity:repo.identity,sessions:repo.sessions(),checks:repo.checks(),daily:daily.store,...(daily.raw?{damagedDailyRaw:daily.raw}:{})};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='word-check-backup-'+new Date().toISOString().slice(0,10)+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch(e){text('learnHistoryNote','导出失败：'+e.message)}};
+root.WordCheckLearning={openSetup,startAssignment,onCheckStart,onCheckAnswer,onCheckFinish,get isChecking(){return checkAttached},get warning(){return repo.warning},get isAssignment(){return assignment},getCheckPrompt:index=>(checkAttached?checkBundle:practiceBundle)?.attempt.questions[index]?.prompt.meaning??null,restartCheck(){if(!checkAttached)return false;startCheck();return true},get activeSession(){return bundle?JSON.parse(JSON.stringify(bundle)):null}};
 })(window);

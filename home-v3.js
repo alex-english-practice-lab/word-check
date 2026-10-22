@@ -67,9 +67,9 @@
     byId('v3CategoryWrap').hidden = state.mode !== 'recognition';
     const category = state.mode === 'recognition' ? byId('v3Category').value : '';
     const eligible = currentPool().filter(question => !category || question.category === category);
-    const due = C.dueKeys(C.readStore(root.localStorage));
+    const stored = C.readStoreDetailed(root.localStorage), due = C.dueKeys(stored.store);
     const review = eligible.filter(question => due.has(question.question_type + ':' + question.id));
-    text('v3ReviewCount', `当前范围待复习 ${review.length} 题（仅本机）`);
+    text('v3ReviewCount', stored.warning || `当前范围待复习 ${review.length} 题（仅本机）`);
     const available = byId('v3ReviewOnly').checked ? review.length : eligible.length;
     const raw = byId('v3QuestionCount').value.trim(), requested = Number(raw);
     const valid = raw !== '' && Number.isSafeInteger(requested) && requested >= 0;
