@@ -92,11 +92,11 @@ function render(){
   $('learnCardActions').hidden=!learn;$('reviewCardActions').hidden=learn;$('reviewEnd').hidden=learn;$('learnPrevious').disabled=s.index===0;$('learnNext').disabled=!s.seenIds.includes(s.currentCardId);text('learnNext',s.index===queue.length-1?'完成首次学习':'下一张');
   $('reviewAgain').disabled=!s.flipped;$('reviewKnow').disabled=!s.flipped;text('learnCardHelp',learn?'每张卡至少翻看一次；看过不代表已经掌握。':'先尝试回忆拼写，再翻面自评。Know 不计入正式正确率。');
  }else{
-  show('learnSummary');const learned=s.currentStage==='learn_complete',completed=s.currentStage==='completed',interrupted=s.currentStage==='check';
+  show('learnSummary');$('learnSummary').querySelector('.eyebrow').textContent=p.settings.includeFinalCheck===false?'LEARN → REVIEW':'LEARN → REVIEW → CHECK';const learned=s.currentStage==='learn_complete',completed=s.currentStage==='completed',interrupted=s.currentStage==='check';
   text('learnSummaryTitle',learned?`已接触 ${s.learnQueue.length} 个新词`:completed?p.settings.includeFinalCheck===false?'学习任务已完成':'本组正式检查已完成':interrupted?'正式检查尚未完成':'本轮复习完成');
   text('learnSummaryText',p.name+' · '+p.wordIds.length+' 个词');$('learnReviewStats').hidden=learned||interrupted;
   text('reviewKnownCount',p.wordIds.length-s.pendingIds.length);text('reviewPendingCount',s.pendingIds.length);
-  text('learnSummaryNote',learned?'接下来用中文主动回忆英文。首次翻卡完成不代表已掌握。':interrupted?'已提交的检查答案与学习进度保留。继续将从同一组单词开始一次新检查，不将未答题标为完成。':p.settings.includeFinalCheck===false?'这里是复习自评，不是考试成绩；可继续复习或结束学习任务。':`这里是复习自评，不是考试成绩。${s.pendingIds.length?'仍有 '+s.pendingIds.length+' 个词需要加强，可继续复习或开始检查。':'可通过实际拼写验证掌握情况。'}`);
+  text('learnSummaryNote',learned?'接下来用中文主动回忆英文。首次翻卡完成不代表已掌握。':interrupted?'已提交的检查答案与学习进度保留。继续将从同一组单词开始一次新检查，不将未答题标为完成。':p.settings.includeFinalCheck===false?completed?'本次仅学习与复习，没有正式检查成绩；需要时可再复习同一组词。':'这里是复习自评，不是考试成绩；可继续复习或结束学习任务。':`这里是复习自评，不是考试成绩。${s.pendingIds.length?'仍有 '+s.pendingIds.length+' 个词需要加强，可继续复习或开始检查。':'可通过实际拼写验证掌握情况。'}`);
   $('learnContinue').hidden=interrupted;$('learnContinue').disabled=!learned&&!completed&&!s.pendingIds.length;text('learnContinue',learned?'开始主动回忆':completed?'再次复习这组词':'继续复习不会的词');$('learnCheck').hidden=learned||p.settings.includeFinalCheck===false;$('learnFinish').hidden=p.settings.includeFinalCheck!==false||learned||completed||interrupted;text('learnCheck',interrupted?'重新开始本组检查':completed?'再次检查本组单词':'开始正式检查');$('learnBack').hidden=assignment;
  }
 }
