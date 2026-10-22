@@ -39,7 +39,7 @@ test('a stable Word ID retains history across library revisions without merging 
 });
 test('Daily keeps all future facts, rejects corrupted store without overwriting and idempotently saves attempts',()=>{
  const s=storage();for(let i=0;i<102;i++)assert.equal(D.saveAttempt(s,{id:'attempt-'+i,answers:[]}),true);
- assert.equal(D.readStore(s).attempts.length,102);assert.equal(D.saveAttempt(s,{id:'attempt-0',answers:[]}),true);assert.equal(D.readStore(s).attempts.length,102);
+ assert.equal(D.readStore(s).attempts.length,102);assert.equal(D.saveAttempt(s,{id:'attempt-0',answers:[]}),true);assert.equal(D.saveAttempt(s,{id:'attempt-0',answers:[{correct:false}]}),false);assert.equal(D.readStore(s).attempts.length,102);
  s.setItem(D.KEY,'{bad');assert.match(D.readStoreDetailed(s).warning,/损坏/);assert.equal(D.saveAttempt(s,{id:'new',answers:[]}),false);assert.equal(s.getItem(D.KEY),'{bad');
 });
 test('saved check history survives refresh; invalid records are skipped with visible warning',()=>{

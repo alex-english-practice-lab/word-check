@@ -91,7 +91,8 @@
   function saveAttempt(storage, attempt) {
     const { store, warning } = readStoreDetailed(storage); if (warning) return false;
     // Idempotency for one browser session (no cloud-level guarantee).
-    if (store.attempts.some(a => a.id === attempt.id)) return true;
+    const prior = store.attempts.find(a => a.id === attempt.id);
+    if (prior) return JSON.stringify(prior) === JSON.stringify(attempt);
     store.attempts.unshift(attempt);
     // Keep the facts needed to reconstruct progress. Older installations may
     // already have lost attempts trimmed by previous releases.
