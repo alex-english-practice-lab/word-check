@@ -136,7 +136,7 @@ function onCheckStart({queue,library:loaded,mode}){
  // A reload/restart begins a new attempt; never silently complete the interrupted one.
  for(const prior of repo.checks().filter(b=>b.sessionId===bundle.session.id&&b.attempt.status==='in_progress')){prior.attempt=R.closeAttempt(prior.attempt,prior.answers,{status:'abandoned'});repo.saveCheck(prior)}
  const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
- const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:'preset',id:bundle.pack.id}});
+ const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:bundle.pack.source.type==='teacher'?'assignment':'preset',id:bundle.pack.id}});
  checkBundle={sessionId:bundle.session.id,attempt,answers:[]};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
 }
 function onCheckAnswer({index,typed,hints,spellingChecks,skip,reason}){

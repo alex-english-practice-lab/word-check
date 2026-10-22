@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict');
-const P=require('../preset-links.js'),L=require('../learn-core.js'),V=require('../vocabulary.js'),C=require('../core.js');
+const P=require('../preset-links.js'),L=require('../learn-core.js'),V=require('../vocabulary.js'),C=require('../core.js'),R=require('../practice-records.js');
 const det=require('../data/difficulty-100-120.v1.json'),ielts=require('../data/ielts.v1.json'),core100=require('../data/writing-survival-100.v1.json');
 const words=V.toPracticeWords(det),first=C.prefixPool(words,1,60);
 const payload={v:P.LEARNING_VERSION,l:det.id,lv:det.version,name:'Level 100 今日 8 词',w:first.slice(0,8).map(w=>w.id),m:'single',f:true,t:20,h:true,u:'check'};
@@ -13,6 +13,8 @@ test('v7 stores ordered stable Word IDs compactly, timer and assistance; same li
  const resolved=decoded.w.map(id=>words.find(w=>w.id===id));
  const pack=L.createTeacherPack({library:det,words:resolved,name:decoded.name,assignmentId:'fixed-token',settings:{mode:decoded.m,timeLimit:decoded.t,hintsAllowed:decoded.h,assistanceMode:decoded.u,includeFinalCheck:decoded.f}});
  assert.deepEqual(L.resolvePack(pack,det,words).map(w=>w.id),decoded.w);assert.equal(pack.source.type,'teacher');
+ const attempt=R.createAttempt({library:det,identity:{profileId:identity,deviceId:'device',userId:null},questions:resolved.map(w=>({wordId:w.id,mode:'single'})),source:{type:'assignment',id:pack.id}});
+ assert.equal(attempt.source.type,'assignment');assert.deepEqual(new Set(attempt.questions.map(q=>q.wordId)),new Set(pack.wordIds));
  let session=learnAll(L.createSession(pack,identity,[]),pack);assert.equal(session.seenIds.length,8);assert.equal(session.currentStage,'learn_complete');
  session=L.transition(session,pack,'review');while(session.currentStage==='review'){session=L.transition(session,pack,'flip');session=L.transition(session,pack,'know')}
  assert.equal(session.checkAttemptIds.length,0);assert.equal(session.pendingIds.length,0);session=L.transition(session,pack,'check');assert.equal(session.currentStage,'check');
