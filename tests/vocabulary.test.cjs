@@ -61,7 +61,7 @@ test('TXT adapter retains parser behavior but creates new IDs, with no upper Lis
  assert.deepEqual(C.range('29,61',V.toPracticeWords(a).map(w=>w.list)),[29,61]);
  assert.equal(C.sampleByList(V.toPracticeWords(a),[{list:61,count:1}])[0].word,'exact');
 });
-test('Writing Survival source converts deterministically and the catalog-ready library retains all 100 entries',()=>{
+test('DET Core 100 source converts deterministically and the catalog-ready library retains all 100 entries',()=>{
  const rebuilt=V.fromSource(writingSource,{id:'lib:writing-survival-100',idFactory:(_kind,sourceId)=>sourceId});
  assert.deepEqual(rebuilt,writing);assert.equal(writing.lists.length,10);
  const words=V.toPracticeWords(writing);assert.equal(words.length,100);assert.equal(new Set(words.map(word=>word.id)).size,100);
@@ -70,6 +70,7 @@ test('Writing Survival source converts deterministically and the catalog-ready l
  assert.equal(words.at(-1).id,'lib:writing-survival-100/word/writing-survival-100-together');
  const entry=require('../data/catalog.json').libraries.find(item=>item.id===writing.id);
  assert.deepEqual(entry,{id:writing.id,name:writing.name,version:writing.version,url:'writing-survival-100.v1.json'});
+ assert.equal(writing.name,'多邻国核心100');
 });
 test('sampling and normalization keep original edge cases and never mutate input',()=>{
  const words=V.toPracticeWords(ielts),before=words.map(w=>w.id);

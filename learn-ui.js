@@ -5,7 +5,8 @@ if(document.body.dataset.teacher==='true')return;
 const L=root.WordLearnCore,V=root.WordVocabulary,R=root.WordPracticeRecords,C=root.WordCore;
 const repo=root.WordLearnStore.createRepository(()=>root.localStorage),registry=V.createRegistry();
 const $=id=>document.getElementById(id),text=(id,value)=>$(id).textContent=value;
-let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,checkAttached=false,loading=false,request=0;
+const WHOLE_LIST_LIBRARIES=new Set(['lib:ielts','lib:writing-survival-100']);
+let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,checkAttached=false,loading=false,request=0,manualCount='8';
 const sections=document.createElement('div');
 sections.innerHTML=`
 <section id="learnSetup" hidden class="panel learn-setup">
@@ -16,12 +17,12 @@ sections.innerHTML=`
   <div><label class="field-label" for="learnLibrary">词库</label><select id="learnLibrary" disabled></select></div>
   <div><label class="field-label" for="learnGroup">List / 难度</label><select id="learnGroup" disabled></select></div>
   <div><label class="field-label" for="learnFilter">学习内容</label><select id="learnFilter"><option value="new">新词 · 尚未首次学习</option><option value="old">旧词 · 主动回忆</option><option value="again">还不会 · 再复习</option><option value="all">当前范围全部词</option></select></div>
-  <div><label class="field-label" for="learnCount">本次词数</label><input id="learnCount" type="number" min="1" step="1" value="8" inputmode="numeric"></div>
+  <div id="learnCountField"><label class="field-label" for="learnCount">本次词数</label><input id="learnCount" type="number" min="1" step="1" value="8" inputmode="numeric"></div>
  </div>
  <details class="learn-check-settings"><summary>正式检查设置</summary><div class="learn-settings"><div><label class="field-label" for="learnTime">每题秒数 · 0 不限时</label><input id="learnTime" type="number" min="0" max="600" step="1" value="0" inputmode="numeric"></div><div><span class="field-label">提示设置</span><label class="learn-toggle-control"><input id="learnHints" type="checkbox"><span>允许提示字母</span></label></div></div></details>
  <p id="learnAvailable" class="small"></p><p id="learnSetupError" class="error" role="alert"></p>
  <button id="learnStart" class="primary" disabled>开始学习</button><button id="learnReload" class="text-button" hidden>重新加载词库</button>
- <p class="small">默认每次 8 词，可自由修改。新词先看英文；已学习的词直接进入中文回忆。Daily 四选一 / 多选目前请使用 Check。</p>
+ <p class="small">雅思与多邻国核心100按所选 List 全量学习；多邻国难度词库默认每次 8 词，可自由修改。新词先看英文；已学习的词直接进入中文回忆。</p>
 </section>
 <section id="learnCards" hidden class="learn-workspace">
  <div class="quiz-top"><button id="learnPause" class="text-button">暂停并返回</button><span id="learnStage" class="pill"></span><span id="learnProgress"></span></div>
@@ -49,10 +50,11 @@ function available(){
  if(!library)throw Error('词库尚未加载。');const state=states(),group=$('learnGroup').value,filter=$('learnFilter').value;
  return words.filter(w=>(!group||w.listId===group)&&(filter==='all'||filter==='new'&&!state.has(w.id)||filter==='old'&&state.has(w.id)||filter==='again'&&state.get(w.id)?.needsReview));
 }
+function usesWholeList(){return Boolean(library&&WHOLE_LIST_LIBRARIES.has(library.id))}
 function integer(id,min,max){const raw=$(id).value.trim(),n=Number(raw);if(!/^\d+$/.test(raw)||!Number.isSafeInteger(n)||n<min||n>max)throw Error(id==='learnTime'?'每题限时需为 0–600 的整数秒。':`本次词数需为 1–${max} 的整数；不能超过当前可用词数。`);return n}
 function updateSetup(){
  $('learnStart').disabled=true;if(loading)return;
- try{const pool=available();text('learnAvailable',`当前范围可用 ${pool.length} 个词 · 随机组成固定学习包，学习与检查使用同一组词`);$('learnCount').max=pool.length;if(!pool.length)throw Error('当前范围没有这类词，请切换学习内容或 List / 难度。');integer('learnCount',1,pool.length);integer('learnTime',0,600);text('learnSetupError','');$('learnStart').disabled=false}catch(e){text('learnSetupError',e.message)}storageNotice();
+ try{const pool=available(),wholeList=usesWholeList();$('learnCountField').hidden=wholeList;$('learnCount').max=pool.length;$('learnCount').value=wholeList?pool.length:manualCount;text('learnAvailable',wholeList?`当前 List 符合条件的 ${pool.length} 个词将全部加入学习包，学习与检查使用同一组词`:`当前范围可用 ${pool.length} 个词 · 随机组成固定学习包，学习与检查使用同一组词`);if(!pool.length)throw Error('当前范围没有这类词，请切换学习内容或 List / 难度。');if(!wholeList)integer('learnCount',1,pool.length);integer('learnTime',0,600);text('learnSetupError','');$('learnStart').disabled=false}catch(e){text('learnSetupError',e.message)}storageNotice();
 }
 function resumePanel(){const saved=repo.loadActive();$('learnResumePanel').hidden=!saved;if(saved){text('learnResumeName',saved.pack.name);text('learnResumeDetail',`${saved.pack.wordIds.length} 个词 · ${saved.session.currentStage==='completed'?'已完成，可再次复习':'上次进度已保存'}`)}}
 function syncLibraryControls(){
@@ -95,7 +97,7 @@ async function resume(){
 }
 function start(){try{
  if(loading)throw Error('词库正在加载，请稍候。');
- const pool=available(),count=integer('learnCount',1,pool.length),timeLimit=integer('learnTime',0,600),state=states();
+ const pool=available(),count=usesWholeList()?pool.length:integer('learnCount',1,pool.length),timeLimit=integer('learnTime',0,600),state=states();
  const selected=C.sampleMixed(pool,count),name=library.name+' · '+$('learnGroup').selectedOptions[0].textContent+' · '+count+' 词学习包';
  const pack=L.createPack({library,words:selected,name,profileId:repo.identity.profileId,settings:{timeLimit,hintsAllowed:$('learnHints').checked}});
  bundle={pack,session:L.createSession(pack,repo.identity.profileId,[...state.keys()])};checkAttached=false;save();render();
@@ -130,7 +132,8 @@ function onCheckFinish(){
 }
 $('learnHome').onclick=()=>{show('studentHome');$('learnStorageNotice').hidden=true};$('learnBack').onclick=openSetup;$('learnPause').onclick=openSetup;
 $('learnLibrary').onchange=()=>loadLibrary($('learnLibrary').value);$('learnReload').onclick=()=>loadLibrary($('learnLibrary').value||null);
-for(const id of ['learnGroup','learnFilter','learnCount','learnTime'])$(id).addEventListener(id==='learnCount'||id==='learnTime'?'input':'change',updateSetup);
+for(const id of ['learnGroup','learnFilter','learnTime'])$(id).addEventListener(id==='learnTime'?'input':'change',updateSetup);
+$('learnCount').addEventListener('input',()=>{manualCount=$('learnCount').value;updateSetup()});
 $('learnResume').onclick=resume;$('learnStart').onclick=start;$('flashcard').onclick=()=>act('flip');$('learnPrevious').onclick=()=>act('previous');$('learnNext').onclick=()=>act('next');$('reviewKnow').onclick=()=>act('know');$('reviewAgain').onclick=()=>act('again');$('reviewEnd').onclick=()=>act('end-review');$('learnContinue').onclick=()=>act('review');$('learnCheck').onclick=startCheck;
 returnButton.onclick=()=>{checkAttached=false;render()};
 root.WordCheckLearning={openSetup,onCheckStart,onCheckAnswer,onCheckFinish,get isChecking(){return checkAttached},getCheckPrompt:index=>checkAttached&&checkBundle?checkBundle.attempt.questions[index].prompt.meaning:null,restartCheck(){if(!checkAttached)return false;startCheck();return true},get activeSession(){return bundle?JSON.parse(JSON.stringify(bundle)):null}};
