@@ -19,6 +19,7 @@ sections.innerHTML=`
   <div><label class="field-label" for="learnFilter">学习内容</label><select id="learnFilter"><option value="new">新词 · 尚未首次学习</option><option value="old">旧词 · 主动回忆</option><option value="again">还不会 · 再复习</option><option value="all">当前范围全部词</option></select></div>
   <div id="learnCountField"><label class="field-label" for="learnCount">本次词数</label><input id="learnCount" type="number" min="1" step="1" value="8" inputmode="numeric"></div>
  </div>
+ <div id="learnScopeField" class="learn-scope" hidden><label class="field-label" for="learnScope">Vocabulary Scope · 选词范围</label><select id="learnScope"><option value="all">All Words · 全部单词</option><option value="prefix">First N Words · 前 N 个词</option></select><div id="learnPrefixField" hidden><label class="field-label" for="learnPrefix">前多少个词？</label><input id="learnPrefix" type="number" min="1" step="1" value="60" inputmode="numeric"></div></div>
  <details class="learn-check-settings"><summary>正式检查设置</summary><div class="learn-settings"><div><label class="field-label" for="learnTime">每题秒数 · 0 不限时</label><input id="learnTime" type="number" min="0" max="600" step="1" value="0" inputmode="numeric"></div><div><span class="field-label">提示设置</span><label class="learn-toggle-control"><input id="learnHints" type="checkbox"><span>允许提示字母</span></label></div></div></details>
  <p id="learnAvailable" class="small"></p><p id="learnSetupError" class="error" role="alert"></p>
  <button id="learnStart" class="primary" disabled>开始学习</button><button id="learnReload" class="text-button" hidden>重新加载词库</button>
@@ -48,13 +49,22 @@ function catalog(){return catalogPromise||(catalogPromise=registry.loadManifest(
 function states(){return L.studyStates(repo.sessions(),repo.checks(),library.id,library.version)}
 function available(){
  if(!library)throw Error('词库尚未加载。');const state=states(),group=$('learnGroup').value,filter=$('learnFilter').value;
- return words.filter(w=>(!group||w.listId===group)&&(filter==='all'||filter==='new'&&!state.has(w.id)||filter==='old'&&state.has(w.id)||filter==='again'&&state.get(w.id)?.needsReview));
+ let pool=words.filter(w=>!group||w.listId===group);
+ if(library.id==='lib:difficulty-100-120'&&$('learnScope').value==='prefix'){
+  const selected=library.lists.find(list=>list.id===group),raw=$('learnPrefix').value.trim(),n=Number(raw);
+  if(!selected)throw Error('请先选择一个难度组。');
+  if(!/^\d+$/.test(raw)||!Number.isSafeInteger(n)||n<1)throw Error('前 N 个词中的 N 必须为正整数。');
+  pool=C.prefixPool(words,selected.number,n);
+ }
+ return pool.filter(w=>filter==='all'||filter==='new'&&!state.has(w.id)||filter==='old'&&state.has(w.id)||filter==='again'&&state.get(w.id)?.needsReview);
 }
 function usesWholeList(){return Boolean(library&&WHOLE_LIST_LIBRARIES.has(library.id))}
 function integer(id,min,max){const raw=$(id).value.trim(),n=Number(raw);if(!/^\d+$/.test(raw)||!Number.isSafeInteger(n)||n<min||n>max)throw Error(id==='learnTime'?'每题限时需为 0–600 的整数秒。':`本次词数需为 1–${max} 的整数；不能超过当前可用词数。`);return n}
 function updateSetup(){
  $('learnStart').disabled=true;if(loading)return;
- try{const pool=available(),wholeList=usesWholeList();$('learnCountField').hidden=wholeList;$('learnCount').max=pool.length;$('learnCount').value=wholeList?pool.length:manualCount;text('learnAvailable',wholeList?`当前 List 符合条件的 ${pool.length} 个词将全部加入学习包，学习与检查使用同一组词`:`当前范围可用 ${pool.length} 个词 · 随机组成固定学习包，学习与检查使用同一组词`);if(!pool.length)throw Error('当前范围没有这类词，请切换学习内容或 List / 难度。');if(!wholeList)integer('learnCount',1,pool.length);integer('learnTime',0,600);text('learnSetupError','');$('learnStart').disabled=false}catch(e){text('learnSetupError',e.message)}storageNotice();
+ const det=library?.id==='lib:difficulty-100-120';$('learnScopeField').hidden=!det;$('learnPrefixField').hidden=!det||$('learnScope').value!=='prefix';
+ if(det){const group=library.lists.find(l=>l.id===$('learnGroup').value);$('learnPrefix').max=group?.words.length||0}
+ try{const pool=available(),wholeList=usesWholeList();$('learnCountField').hidden=wholeList;$('learnCount').max=pool.length;$('learnCount').value=wholeList?pool.length:manualCount;text('learnAvailable',wholeList?`当前 List 符合条件的 ${pool.length} 个词将全部加入学习包，学习与检查使用同一组词`:`${det&&$('learnScope').value==='prefix'?`${$('learnGroup').selectedOptions[0].textContent} · 第 1–${$('learnPrefix').value} 个词 · `:''}当前可用 ${pool.length} 个词 · 随机组成固定学习包，学习与检查使用同一组词`);if(!pool.length)throw Error('当前范围没有这类词，请切换学习内容或 List / 难度。');if(!wholeList)integer('learnCount',1,pool.length);integer('learnTime',0,600);text('learnSetupError','');$('learnStart').disabled=false}catch(e){text('learnSetupError',e.message)}storageNotice();
 }
 function resumePanel(){const saved=repo.loadActive();$('learnResumePanel').hidden=!saved;if(saved){text('learnResumeName',saved.pack.name);text('learnResumeDetail',`${saved.pack.wordIds.length} 个词 · ${saved.session.currentStage==='completed'?'已完成，可再次复习':'上次进度已保存'}`)}}
 function syncLibraryControls(){
@@ -117,9 +127,9 @@ function onCheckStart({queue,library:loaded,mode}){
  const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:'preset',id:bundle.pack.id}});
  checkBundle={sessionId:bundle.session.id,attempt,answers:[]};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
 }
-function onCheckAnswer({index,typed,hints,skip,reason}){
+function onCheckAnswer({index,typed,hints,spellingChecks,skip,reason}){
  if(!checkAttached||!checkBundle)return;
- const answer=R.createAnswer({attempt:checkBundle.attempt,questionId:checkBundle.attempt.questions[index].id,text:typed,hintCount:hints,skipped:skip});
+ const answer=R.createAnswer({attempt:checkBundle.attempt,questionId:checkBundle.attempt.questions[index].id,text:typed,hintCount:hints,spellingChecks,skipped:skip});
  // Supplemental timeout/skip reason; canonical grade remains unchanged.
  checkBundle.answers.push({...answer,reason:reason||null});repo.saveCheck(checkBundle);storageNotice();
 }
@@ -133,6 +143,7 @@ function onCheckFinish(){
 $('learnHome').onclick=()=>{show('studentHome');$('learnStorageNotice').hidden=true};$('learnBack').onclick=openSetup;$('learnPause').onclick=openSetup;
 $('learnLibrary').onchange=()=>loadLibrary($('learnLibrary').value);$('learnReload').onclick=()=>loadLibrary($('learnLibrary').value||null);
 for(const id of ['learnGroup','learnFilter','learnTime'])$(id).addEventListener(id==='learnTime'?'input':'change',updateSetup);
+for(const id of ['learnScope','learnPrefix'])$(id).addEventListener(id==='learnPrefix'?'input':'change',updateSetup);
 $('learnCount').addEventListener('input',()=>{manualCount=$('learnCount').value;updateSetup()});
 $('learnResume').onclick=resume;$('learnStart').onclick=start;$('flashcard').onclick=()=>act('flip');$('learnPrevious').onclick=()=>act('previous');$('learnNext').onclick=()=>act('next');$('reviewKnow').onclick=()=>act('know');$('reviewAgain').onclick=()=>act('again');$('reviewEnd').onclick=()=>act('end-review');$('learnContinue').onclick=()=>act('review');$('learnCheck').onclick=startCheck;
 returnButton.onclick=()=>{checkAttached=false;render()};

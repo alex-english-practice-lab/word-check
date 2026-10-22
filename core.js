@@ -49,6 +49,8 @@ function totalCount(value,available){const text=String(value).trim(),count=Numbe
 function sampleMixed(words,value){return shuffle(words).slice(0,totalCount(value,words.length))}
 const normalize=x=>x.trim().toLowerCase().replace(/[‘’]/g,"'").replace(/\s+/g,' ');
 function accepts(entry,typed){return [entry.word,...(entry.variants||[])].some(word=>normalize(word)===normalize(typed))}
+function spellingPosition(target,typed){const expected=normalize(target),actual=normalize(typed);let prefix=0;while(prefix<expected.length&&prefix<actual.length&&expected[prefix]===actual[prefix])prefix++;return{prefix,expectedLength:expected.length,actualLength:actual.length,matched:expected===actual}}
+function letterHint(target,count){const letters=[...target].filter(c=>/[a-z]/i.test(c)).length,max=Math.min(Math.floor(letters/2),Math.max(0,letters-1));let shown=0;return{max,text:[...target].map(c=>/[a-z]/i.test(c)?(++shown<=Math.min(count,max)?c:'_'):c).join(' ')}}
 function shuffle(array){const out=[...array];for(let i=out.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out}
 function sampleByList(words,plan){const seen=new Set(),result=[];for(const {list,count} of plan){if(!Number.isInteger(list)||!Number.isSafeInteger(list)||list<1||seen.has(list))throw Error('请检查 List 编号，不能重复。');seen.add(list);const pool=words.filter(w=>w.list===list);if(!pool.length)throw Error('词表中没有 List '+list+'。');if(!Number.isInteger(count)||count<0)throw Error('List '+list+' 的抽取数量需为 0 或正整数。');if(count>pool.length)throw Error('List '+list+' 只有 '+pool.length+' 个词，请减少抽取数量。');result.push(...shuffle(pool).slice(0,count))}if(!result.length)throw Error('请至少抽取 1 个单词。');return shuffle(result)}
 function prefixPool(words,list,count){
@@ -60,5 +62,5 @@ function prefixPool(words,list,count){
  if(count>group.length)throw Error('该难度只有 '+group.length+' 个词，前 N 个词不能超过实际词数。');
  return group.slice(0,count);
 }
-const api={parse,range,meanings,normalize,accepts,shuffle,sampleByList,totalCount,sampleMixed,prefixPool};if(typeof module!=='undefined')module.exports=api;else root.WordCore=api;
+const api={parse,range,meanings,normalize,accepts,spellingPosition,letterHint,shuffle,sampleByList,totalCount,sampleMixed,prefixPool};if(typeof module!=='undefined')module.exports=api;else root.WordCore=api;
 })(typeof window!=='undefined'?window:globalThis);

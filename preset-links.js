@@ -24,19 +24,19 @@ function validateLegacy(input){
  if(input.v===2){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean')throw Error('作业链接中的答题设置无效。');payload.t=input.t;payload.h=input.h}
  return payload;
 }
-function settings(input){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean')throw Error('作业链接中的答题设置无效。');return{t:input.t,h:input.h}}
+function settings(input){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean'||input.u!==undefined&&(input.u!=='check'||!input.h))throw Error('作业链接中的答题设置无效。');return{t:input.t,h:input.h,...(input.u?{u:input.u}:{})}}
 function compact(input){
  if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.lv)||!['full','single'].includes(input.m)||!Array.isArray(input.w)||!input.w.length)throw Error('作业链接内容不完整。');
  if(input.w.length>100)throw Error('学生链接最多支持 100 题，请减少题量。');
  const indexes=[...input.w].sort((a,b)=>a-b),seen=new Set();for(const index of indexes){if(!Number.isSafeInteger(index)||index<0||seen.has(index))throw Error('作业链接中的单词编号无效。');seen.add(index)}
  let previous=0;const q=indexes.map((index,i)=>{const value=i?index-previous:index;previous=index;return value.toString(36)}).join('.'),answer=settings(input);
- return{v:VERSION,l:input.l,x:input.lv,m:input.m==='full'?0:1,q,t:answer.t,h:answer.h?1:0};
+ return{v:VERSION,l:input.l,x:input.lv,m:input.m==='full'?0:1,q,t:answer.t,h:answer.h?1:0,...(answer.u?{u:answer.u}:{})};
 }
 function expand(input){
- if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.x)||![0,1].includes(input.m)||!nonempty(input.q)||!Number.isSafeInteger(input.t)||input.t<0||input.t>600||![0,1].includes(input.h))throw Error('作业链接内容不完整。');
+ if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.x)||![0,1].includes(input.m)||!nonempty(input.q)||!Number.isSafeInteger(input.t)||input.t<0||input.t>600||![0,1].includes(input.h)||input.u!==undefined&&(input.u!=='check'||!input.h))throw Error('作业链接内容不完整。');
  const parts=input.q.split('.');if(!parts.length||parts.length>100)throw Error('学生链接最多支持 100 题，请减少题量。');
  let current=0;const indexes=parts.map((part,i)=>{if(!/^(?:0|[1-9a-z][0-9a-z]*)$/.test(part))throw Error('作业链接中的单词编号无效。');const value=parseInt(part,36);if(!Number.isSafeInteger(value)||(i&&value<1))throw Error('作业链接中的单词编号无效。');current=i?current+value:value;if(!Number.isSafeInteger(current))throw Error('作业链接中的单词编号无效。');return current});
- return{v:VERSION,l:input.l,lv:input.x,m:input.m?'single':'full',w:indexes,t:input.t,h:Boolean(input.h)};
+ return{v:VERSION,l:input.l,lv:input.x,m:input.m?'single':'full',w:indexes,t:input.t,h:Boolean(input.h),...(input.u?{u:input.u}:{})};
 }
 
 const DAILY_VERSION=5;
