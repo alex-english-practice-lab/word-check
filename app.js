@@ -61,7 +61,7 @@ function renderGroupChoices(){
 }
 $('librarySelect').addEventListener('change',()=>{const id=$('librarySelect').value;return id===V3_ID?activateV3():loadLibrary(id)});
 $('groupChoices').addEventListener('change',()=>{$('range').value=[...$('groupChoices').querySelectorAll('input:checked')].map(input=>input.dataset.group).join(',');updateScopeControls();renderListCounts();updateSelection()});
-function show(id){document.querySelector('.page-heading').hidden=id.startsWith('learn');for(const x of ['studentHome','learnSetup','learnCards','learnSummary','setup','quiz','results','presetError','presetLoading','v3Quiz','v3Results'])if($(x))$(x).hidden=x!==id;if($('learnStorageNotice'))$('learnStorageNotice').hidden=!(id.startsWith('learn')||['quiz','results'].includes(id)&&window.WordCheckLearning?.isChecking);window.scrollTo(0,0)}
+function show(id){document.querySelector('.page-heading').hidden=id.startsWith('learn');for(const x of ['studentHome','learnSetup','learnCards','learnSummary','learnPaused','setup','quiz','results','presetError','presetLoading','v3Quiz','v3Results'])if($(x))$(x).hidden=x!==id;if($('learnStorageNotice'))$('learnStorageNotice').hidden=!(id.startsWith('learn')||['quiz','results'].includes(id)&&window.WordCheckLearning?.isChecking);window.scrollTo(0,0)}
 function setSourceKind(kind){
  sourceKind=kind==='v3'?'v3':'spelling';const v3=sourceKind==='v3';
  $('numberedLists').hidden=v3||namedGroups();$('namedLists').hidden=v3||!namedGroups();
@@ -178,7 +178,7 @@ function finish(){stopTimer();active=false;window.WordCheckLearning?.onCheckFini
 $('restart').onclick=()=>{if(window.WordCheckLearning?.restartCheck())return;if(presetSession){const pool=presetSession.recipe?(presetSession.recipe.v===P.SCOPED_RANDOM_VERSION?P.sampleScopedRandom(presetSession.recipe,words,C):P.sampleRandom(presetSession.recipe,words,C)):presetSession.pool;begin(pool,presetSession.mode,presetSession.scope,presetSession.options);}else{show('setup');updateSelection()}};$('retry').onclick=()=>begin(answers.filter(a=>a.status!=='correct').map(a=>a.entry),mode,scope+' · 巩固练习',{timeLimit,hintsAllowed,assistanceMode});
 window.addEventListener('beforeunload',e=>{if(active){e.preventDefault();e.returnValue=''}});
 window.WordCheckHome={show,get sourceKind(){return sourceKind},async startLearnCheck(pack){
- if(teacherMode||presetSession||location.hash.startsWith('#preset='))throw Error('指定检查任务不能替换为学习包。');
+ if(teacherMode||presetSession||location.hash.startsWith('#preset=')&&!window.WordCheckLearning?.isAssignment)throw Error('指定检查任务不能替换为学习包。');
  if(active||H.active)throw Error('请先结束当前检查。');
  const loaded=await loadLibrary(pack.libraryId);if(!loaded||libraryLoadFailed)throw Error('无法加载学习包词库，请重试。');
  const pool=window.WordLearnCore.resolvePack(pack,activeLibrary,words),settings=pack.settings.finalCheck;
@@ -198,6 +198,7 @@ async function initialize(){
   await loadLibrary(preset.l);
   if(activeLibrary?.id!==preset.l)throw Error('无法加载这份练习使用的词库。');
   if(activeLibrary.version!==preset.lv)throw Error('词库版本已经更新，请老师重新生成练习链接。');
+  if(preset.v===P.LEARNING_VERSION){await window.WordCheckLearning.startAssignment(preset,activeLibrary,words,location.hash);return}
   let pool;if(preset.v===P.SCOPED_RANDOM_VERSION)pool=P.sampleScopedRandom(preset,words,C);else if(preset.v===P.RANDOM_VERSION)pool=P.sampleRandom(preset,words,C);else if(preset.v===P.VERSION)pool=preset.w.map(position=>words[position]);else{const byId=new Map(words.map(word=>[word.id,word]));pool=preset.w.map(id=>byId.get(id))}
   if(pool.some(word=>!word))throw Error('部分练习单词已不在当前词库中，请老师重新生成链接。');
   const options={timeLimit:preset.t??0,hintsAllowed:preset.h??true,assistanceMode:preset.u??(preset.h===false?'none':'both')},presetScope=preset.s||(preset.v===P.SCOPED_RANDOM_VERSION?`${listName(preset.r)} · 第 1–${preset.p} 个词 · 随机抽查 ${pool.length} 题`:compactScope(pool));presetSession={pool,mode:preset.m,scope:presetScope,options,recipe:[P.RANDOM_VERSION,P.SCOPED_RANDOM_VERSION].includes(preset.v)?preset:null};$('restart').textContent=presetSession.recipe?'按相同设置再练一组':'重新练习本组单词';

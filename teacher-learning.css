@@ -1,0 +1,11 @@
+.teacher-assignment-switch{max-width:420px;margin:8px 0 22px}.teacher-assignment-switch select{width:100%}
+.teacher-learn{max-width:1050px;margin:0 auto 36px;padding:28px}
+.teacher-learn-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:22px 0}
+.teacher-learn-grid label{display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--muted);min-width:0}
+.teacher-learn-grid select,.teacher-learn-grid input,.teacher-learn #tlSearch{width:100%;box-sizing:border-box}
+.teacher-learn details{margin:24px 0}.teacher-learn details summary{cursor:pointer;font-weight:700}
+.teacher-word-choices{max-height:380px;overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 20px;padding:8px;border:1px solid var(--line);border-radius:10px}
+.teacher-word-choice{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}
+.teacher-word-choice input{flex:0 0 auto}.teacher-word-choice span{min-width:0}.teacher-word-choice small{display:block;color:var(--muted);line-height:1.5}
+.teacher-check-toggle{display:flex;gap:10px;align-items:center}.teacher-learn .preset-link-panel{margin-top:20px}
+@media(max-width:680px){.teacher-learn{padding:20px}.teacher-learn-grid,.teacher-word-choices{grid-template-columns:1fr}.teacher-assignment-switch{max-width:none}}

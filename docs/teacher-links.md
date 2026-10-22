@@ -32,6 +32,21 @@ then sampling without replacement. It never treats the displayed difficulty name
 continue to use v3 and store the already-sampled word indexes. Existing v4 recipes
 have no prefix field and continue to sample from their complete selected lists.
 
+LEARNING_VERSION=7 is a separate, fixed Learning Assignment. Its token contains
+the builtin Library ID and exact version, a user-visible pack name, an ordered
+set of stable Word IDs (UUID suffixes compacted to 16-byte values), the
+Learn → Review directions implicit in LearningPack v1, whether Final Check is
+included, and the spelling mode, timer and assistance permission. The token
+does not contain a random sampling recipe: the teacher's List / DET prefix / manual
+selection is resolved at link creation. The student looks up every exact ID in
+the version-pinned library, failing with an error if the version or an ID is
+missing. Reopening the same link keeps the same IDs and resumes an incomplete
+session in this browser; after completion, reopening starts a new session.
+An oversized link (>2000 characters) produces a clear teacher-side error.
+There is no teacher dashboard, remote completion proof, login, or server-side
+enforcement. A public static token and its SHA-256 checksum are not secrets or
+teacher authentication. Existing Checking Assignment v1–v6 handling is unchanged.
+
 Validation: node --test tests/*.test.cjs
 tests/browser.cjs sharing scenarios start at /teacher/; public homepage is
 checked separately for absence of sharing controls.
