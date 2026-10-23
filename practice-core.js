@@ -63,11 +63,15 @@
   }
   const KEY = 'wordcheck.v3.practice.local.v1';
   function emptyStore() { return { schema_version: 1, attempts: [], progress: {} }; }
+  function readStoreDetailed(storage) {
+    let raw=null;
+    try { raw = storage.getItem(KEY); if (!raw) return { store: emptyStore(), warning: '' };
+      const x = JSON.parse(raw); if (x && x.schema_version === 1 && Array.isArray(x.attempts) && x.attempts.every(a=>a&&typeof a.id==='string'&&Array.isArray(a.answers)) && x.progress && typeof x.progress === 'object' && !Array.isArray(x.progress)) return { store: x, warning: '' };
+    } catch (_) { /* Keep corrupted records intact so they can be backed up or repaired. */ }
+    return { store: emptyStore(), raw, warning: '日常词汇记录读取失败或数据损坏；请先导出备份。' };
+  }
   function readStore(storage) {
-    try { const raw = storage.getItem(KEY); if (!raw) return emptyStore();
-      const x = JSON.parse(raw); if (x && x.schema_version === 1 && Array.isArray(x.attempts) && x.progress && typeof x.progress === 'object' && !Array.isArray(x.progress)) return x;
-    } catch (_) { /* Private mode / corrupted payload / disabled storage. */ }
-    return emptyStore();
+    return readStoreDetailed(storage).store;
   }
   function writeStore(storage, store) {
     try { storage.setItem(KEY, JSON.stringify(store)); return true; }
@@ -85,14 +89,16 @@
     return store;
   }
   function saveAttempt(storage, attempt) {
-    const store = readStore(storage);
+    const { store, warning } = readStoreDetailed(storage); if (warning) return false;
     // Idempotency for one browser session (no cloud-level guarantee).
-    if (store.attempts.some(a => a.id === attempt.id)) return true;
+    const prior = store.attempts.find(a => a.id === attempt.id);
+    if (prior) return JSON.stringify(prior) === JSON.stringify(attempt);
     store.attempts.unshift(attempt);
-    store.attempts = store.attempts.slice(0, 100);
+    // Keep the facts needed to reconstruct progress. Older installations may
+    // already have lost attempts trimmed by previous releases.
     updateProgress(store, attempt.answers);
     return writeStore(storage, store);
   }
   function dueKeys(store) { return new Set(Object.entries(store.progress).filter(([,v])=>v.needs_review).map(([k])=>k)); }
-  return { TYPES, KEY, shuffle, correctIds, validateQuestions, pickQuestions, grade, snapshot, readStore, saveAttempt, updateProgress, dueKeys };
+  return { TYPES, KEY, shuffle, correctIds, validateQuestions, pickQuestions, grade, snapshot, readStore, readStoreDetailed, saveAttempt, updateProgress, dueKeys };
 });
