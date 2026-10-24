@@ -3,6 +3,7 @@
   'use strict';
   const SOURCE_ID = 'practice:daily-v3';
   const C = root.WordCheckPracticeCore;
+  const storage = () => root.WordStudentIdentity?.storage || root.localStorage;
   const P = root.WordPresetLinks;
   const VERSION = '3';
   const byId = id => document.getElementById(id);
@@ -67,7 +68,7 @@
     byId('v3CategoryWrap').hidden = state.mode !== 'recognition';
     const category = state.mode === 'recognition' ? byId('v3Category').value : '';
     const eligible = currentPool().filter(question => !category || question.category === category);
-    const stored = C.readStoreDetailed(root.localStorage), due = C.dueKeys(stored.store);
+    const stored = C.readStoreDetailed(storage()), due = C.dueKeys(stored.store);
     const review = eligible.filter(question => due.has(question.question_type + ':' + question.id));
     text('v3ReviewCount', stored.warning || `当前范围待复习 ${review.length} 题（仅本机）`);
     const available = byId('v3ReviewOnly').checked ? review.length : eligible.length;
@@ -94,7 +95,7 @@
     try {
       updateSetup(); if (byId('start').disabled) return;
       const category = state.mode === 'recognition' ? byId('v3Category').value : '';
-      const due = byId('v3ReviewOnly').checked ? C.dueKeys(C.readStore(root.localStorage)) : null;
+      const due = byId('v3ReviewOnly').checked ? C.dueKeys(C.readStore(storage())) : null;
       const pool = C.pickQuestions(currentPool(), byId('v3QuestionCount').value, category, due);
       state.preset = null; begin(pool, `${category || (state.mode === 'recognition' ? '全部分类' : '近义词词库')}${due ? ' · 本机错题' : ''}`);
     } catch (error) { text('setupError', error.message); }
@@ -189,7 +190,7 @@
   function finish() {
     if (!state.active) return; state.active = false;
     const attempt = { id: state.attemptId, library_id: state.mode === 'recognition' ? 'daily-common-v3' : 'synonym-core-v3', source: state.preset ? 'assignment' : 'free_practice', question_type: practiceType(), started_at: state.startedAt, completed_at: new Date().toISOString(), finished: state.answers.length === state.queue.length, planned_question_ids: state.queue.map(row => row.question.id), answers: state.answers.slice() };
-    let saved = true; if (attempt.answers.length) saved = C.saveAttempt(root.localStorage, attempt);
+    let saved = true; if (attempt.answers.length) saved = C.saveAttempt(storage(), attempt);
     const correct = state.answers.filter(answer => answer.correct).length;
     text('v3ResultTitle', attempt.finished ? '本轮练习完成' : '本轮已结束'); text('v3ResultSummary', `${modeLabel()} · ${state.sourceLabel} · 已作答 ${state.answers.length} / ${state.queue.length} 题`); text('v3CorrectCount', correct); text('v3WrongCount', state.answers.length - correct);
     const rows = byId('v3ResultRows'); rows.replaceChildren();

@@ -55,26 +55,28 @@ part of this branch.
 
 ## Tests
 
-Node 20+ is needed only for development tests:
+Node 20+ is needed only for development tests. Playwright is a pinned development
+dependency; Chromium is downloaded to the developer's Playwright browser cache,
+not bundled with the static website:
 
 ```sh
-npm test
+npm ci
+npm run setup:browser
+npm run test:all
 ```
 
-Optional real-browser regression against upstream commit `08e12ef`:
+For a system-managed Chromium, set `WORD_CHECK_CHROMIUM` to the actual executable
+path before `npm run test:all`. The default Playwright cache installation does
+not require this variable. Run an individual suite with `npm test` or one of
+`test:browser`, `test:learn-browser`, `test:learning-assignment-browser`,
+`test:progress-browser`, and `test:student-identity-browser`.
 
-```sh
-npm install --no-save --package-lock=false playwright@1.51.1
-npx playwright install chromium
-npm run test:browser
-```
+The legacy visual comparison in `test:browser` uses Git history containing
+upstream commit `08e12ef`:
 
-Playwright is an optional development tool, not a website dependency. Use the
-version reported in the development report for the exact baseline test setup;
-screenshots compare before/after in the SAME installed browser, not with old
-images from another browser version. The test starts and closes its own local
-HTTP server, tests the `/word-check/` project subpath, and writes ignored
-`test-artifacts/` screenshots. It requires Git history containing the baseline.
+Screenshots compare before/after in the same installed browser. Browser suites
+start and close local HTTP servers, exercise desktop and mobile viewports, and
+write ignored `test-artifacts/` screenshots.
 
 `practice-records.js` remains pure tested Phase 1 data logic and is not connected
 to a backend. The V3 pilot saves its own isolated practice state in localStorage;

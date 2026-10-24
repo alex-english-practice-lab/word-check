@@ -62,7 +62,7 @@
     $('categoryWrap').hidden = state.mode !== 'recognition';
     const category = state.mode === 'recognition' ? $('category').value : '';
     const eligible = currentPool().filter(q => !category || q.category === category);
-    const due = C.dueKeys(C.readStore(window.localStorage));
+    const due = C.dueKeys(C.readStore(window.WordStudentIdentity?.storage||window.localStorage));
     const availableReview = eligible.filter(q => due.has(q.question_type + ':' + q.id));
     text('reviewCount', `当前模式${category?'及分类':''}待复习 ${availableReview.length} 题（仅本机）`);
     const count = $('reviewOnly').checked ? availableReview.length : eligible.length;
@@ -86,7 +86,7 @@
       updateSetup();
       if ($('start').disabled) return;
       const category = state.mode === 'recognition' ? $('category').value : '';
-      const due = $('reviewOnly').checked ? C.dueKeys(C.readStore(window.localStorage)) : null;
+      const due = $('reviewOnly').checked ? C.dueKeys(C.readStore(window.WordStudentIdentity?.storage||window.localStorage)) : null;
       const count = $('questionCount').value;
       const pool = C.pickQuestions(currentPool(), count, category, due);
       begin(pool, `${category || (state.mode === 'recognition' ? '全部分类' : '近义词词库')}${due ? ' · 本机错题' : ''}`);
@@ -166,7 +166,7 @@
       planned_question_ids: state.queue.map(x => x.question.id),
       answers: state.answers.slice() };
     let saved = true;
-    if (attempt.answers.length) saved = C.saveAttempt(window.localStorage, attempt);
+    if (attempt.answers.length) saved = C.saveAttempt(window.WordStudentIdentity?.storage||window.localStorage, attempt);
     const right = state.answers.filter(a=>a.correct).length;
     text('resultTitle', attempt.finished ? '本轮练习完成' : '本轮已结束');
     text('resultSummary', `${modeLabel()} · ${state.sourceLabel} · 已作答 ${state.answers.length} / ${state.queue.length} 题`);
