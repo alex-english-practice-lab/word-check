@@ -1,6 +1,6 @@
 import {InputError,selectStudent,createStudent,listStudents,updateStudent} from './identity.js';
 import {issueSession,requireStudent,revokeStudent,requireTeacher} from './auth.js';
-import {createAssignment,openAssignment,putRecord,listRecords} from './records.js';
+import {createAssignment,openAssignment,putRecord,listRecords,listTeacherRecords,listTeacherAssignments} from './records.js';
 function json(value,status=200,headers={}){return new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}})}
 async function body(request,max=4096){
  if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json'))throw new InputError('请提交 JSON');
@@ -40,6 +40,12 @@ export async function handle(request,env,{fetcher=fetch}={}){
   }
   if(path.startsWith('/api/teacher/')){
    await requireTeacher(request,env,fetcher);
+   if(path==='/api/teacher/records'&&request.method==='GET'){
+    const query=new URL(request.url).searchParams;
+    const raw=query.get('before');if(raw!==null&&!/^[1-9]\d*$/.test(raw))throw new InputError('分页位置无效');
+    return json(await listTeacherRecords(env.DB,{studentId:query.get('studentId'),assignmentId:query.get('assignmentId')||null,before:raw===null?undefined:Number(raw)}),200,cors);
+   }
+   if(path==='/api/teacher/assignments'&&request.method==='GET')return json({assignments:await listTeacherAssignments(env.DB,new URL(request.url).searchParams.get('studentId'))},200,cors);
    if(path==='/api/teacher/assignments'&&request.method==='POST')return json(await createAssignment(env.DB,await body(request)),201,cors);
    if(path==='/api/teacher/students'&&request.method==='GET')return json({students:await listStudents(env.DB)},200,cors);
    if(path==='/api/teacher/students'&&request.method==='POST')return json({student:await createStudent(env.DB,await body(request))},201,cors);
