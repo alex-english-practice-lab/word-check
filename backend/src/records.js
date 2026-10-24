@@ -60,3 +60,24 @@ export async function listRecords(db,studentId,after=0){
  const rows=(await db.prepare('SELECT rowid AS cursor,kind,record_id,payload_json,updated_at,assignment_id FROM student_records WHERE student_id=? AND rowid>? ORDER BY rowid LIMIT 101').bind(studentId,after).all()).results;
  const page=rows.slice(0,100);return {records:page.map(row=>({kind:row.kind,id:row.record_id,payload:JSON.parse(row.payload_json),assignmentId:row.assignment_id,updatedAt:row.updated_at})),nextCursor:rows.length>100?page[page.length-1].cursor:null};
 }
+
+// Teacher reads are deliberately separate from student bearer-token reads. A cursor
+// moves backwards through immutable rowids, so checkpoint updates do not reshuffle pages.
+export async function listTeacherRecords(db,{studentId,assignmentId=null,before=Number.MAX_SAFE_INTEGER}){
+ if(typeof studentId!=='string'||!/^[0-9a-f-]{36}$/i.test(studentId))throw new InputError('请选择有效的学生');
+ if(assignmentId!==null&&(typeof assignmentId!=='string'||!/^[0-9a-f-]{36}$/i.test(assignmentId)))throw new InputError('作业编号无效');
+ if(!Number.isSafeInteger(before)||before<1)throw new InputError('分页位置无效');
+ const student=await db.prepare('SELECT id,display_name,status FROM students WHERE id=?').bind(studentId).first();
+ if(!student)throw new InputError('找不到该学生',404);
+ if(assignmentId){const assigned=await db.prepare('SELECT id FROM assignments WHERE id=? AND student_id=?').bind(assignmentId,studentId).first();if(!assigned)throw new InputError('作业与学生不匹配',404)}
+ const sql='SELECT rowid AS cursor,kind,record_id,payload_json,updated_at,assignment_id FROM student_records WHERE student_id=? AND rowid<?'+(assignmentId?' AND assignment_id=?':'')+' ORDER BY rowid DESC LIMIT 26';
+ const args=assignmentId?[studentId,before,assignmentId]:[studentId,before];
+ const rows=(await db.prepare(sql).bind(...args).all()).results,page=rows.slice(0,25);
+ return {student:{id:student.id,displayName:student.display_name,status:student.status},records:page.map(row=>({kind:row.kind,id:row.record_id,payload:JSON.parse(row.payload_json),assignmentId:row.assignment_id,updatedAt:row.updated_at})),nextCursor:rows.length>25?page[page.length-1].cursor:null};
+}
+export async function listTeacherAssignments(db,studentId){
+ if(typeof studentId!=='string'||!/^[0-9a-f-]{36}$/i.test(studentId))throw new InputError('请选择有效的学生');
+ const student=await db.prepare('SELECT id FROM students WHERE id=?').bind(studentId).first();if(!student)throw new InputError('找不到该学生',404);
+ const rows=(await db.prepare('SELECT id,created_at,expires_at FROM assignments WHERE student_id=? ORDER BY created_at DESC,id DESC LIMIT 200').bind(studentId).all()).results;
+ return rows.map(row=>({id:row.id,createdAt:row.created_at,expiresAt:row.expires_at}));
+}
