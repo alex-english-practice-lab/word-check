@@ -8,7 +8,7 @@ html.student-link #setup{display:none!important}
 @media(max-width:680px){body:not([data-teacher="true"]) .setup-actions #start{grid-column:auto;grid-row:auto}}
 </style><script>if(location.hash.startsWith('#preset='))document.documentElement.classList.add('student-link');</script></head>
 <body class="home-page" data-teacher="true"><header><a class="brand" href="./"><span class="logo">W</span> Word Check <span class="brand-cn">单词检查</span></a><span class="header-note">课堂词汇检测</span></header>
-<main><div class="page-heading"><div><span class="eyebrow">VOCABULARY CHECK</span><h1>教师练习设置</h1></div><span class="small" id="sourceBadge">正在加载默认词库…</span></div>
+<main><div class="page-heading"><div><span class="eyebrow">VOCABULARY CHECK</span><h1>教师练习设置</h1><a class="text-button" href="teacher/dashboard.html">查看学生记录 →</a></div><span class="small" id="sourceBadge">正在加载默认词库…</span></div>
 <div class="teacher-assignment-switch"><label class="field-label" for="assignmentType">作业类型</label><select id="assignmentType"><option value="checking">Checking Assignment · 检查作业</option><option value="learning">Learning Assignment · 学习作业</option></select><label class="field-label" for="assignmentStudent">指定学生（可选）</label><select id="assignmentStudent"><option value="">普通链接 · 不指定学生</option></select><p id="assignmentStudentNotice" class="small" role="status">正在检查学生服务…</p></div>
 <section id="teacherLearnSetup" class="panel teacher-learn" hidden aria-label="学习作业设置">
  <div class="section-heading"><span class="step">L</span><h2>设置学习作业</h2></div><p class="small">固定同一组词：Learn 英文初识 → Review 中文回忆 → 可选正式拼写检查。学习自评不计入考试成绩。Recognition / Synonym 特殊题库暂无 Flashcard 词条，只能在检查作业中使用。</p>

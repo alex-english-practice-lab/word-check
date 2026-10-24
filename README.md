@@ -34,7 +34,7 @@ the existing spelling checker untouched and provides:
 - Recognition: 309 reviewed English-to-Chinese four-choice questions.
 - Synonym: 46 contextual exact-set multiple-selection questions.
 - A searchable preview of the 1,172-entry V3 master vocabulary.
-- Browser-local attempt history and a review pool; no account or cloud sync.
+- Browser-local attempt history and a review pool. When the optional student service is configured, named students also synchronize submitted Daily attempts; Guest stays local.
 
 The V3 data review and pilot limitations are recorded in
 [`docs/V3-REVIEW.md`](docs/V3-REVIEW.md).
@@ -74,6 +74,8 @@ not require this variable. Run an individual suite with `npm test` or one of
 `test:assigned-cloud-browser` exercises assigned links and cross-browser sync using
 the Worker handler with an in-memory SQLite test database. See
 `docs/PR15-B-ASSIGNED-SYNC.md` for the data model and staging gate.
+The teacher dashboard at `teacher/dashboard.html` reads submitted records through
+teacher-only Access endpoints; see `docs/PR15-C-TEACHER-DASHBOARD.md`.
 
 The legacy visual comparison in `test:browser` uses Git history containing
 upstream commit `08e12ef`.
