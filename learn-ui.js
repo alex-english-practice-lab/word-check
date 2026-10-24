@@ -3,7 +3,7 @@
 'use strict';
 if(document.body.dataset.teacher==='true')return;
 const L=root.WordLearnCore,V=root.WordVocabulary,R=root.WordPracticeRecords,C=root.WordCore,D=root.WordCheckPracticeCore,G=root.WordVocabularyProgress;
-const repo=root.WordLearnStore.createRepository(()=>root.localStorage),registry=V.createRegistry();
+const repo=root.WordLearnStore.createRepository(()=>root.WordStudentIdentity?.storage||root.localStorage),registry=V.createRegistry();
 const $=id=>document.getElementById(id),text=(id,value)=>$(id).textContent=value;
 const WHOLE_LIST_LIBRARIES=new Set(['lib:ielts','lib:writing-survival-100']);
 let catalogPromise,library=null,words=[],bundle=null,checkBundle=null,practiceBundle=null,checkAttached=false,loading=false,request=0,manualCount='8',assignment=false;
@@ -48,7 +48,7 @@ sections.innerHTML=`
 document.querySelector('footer').before(sections);
 const returnButton=document.createElement('button');returnButton.id='returnToLearn';returnButton.className='secondary';returnButton.textContent='返回学习包';returnButton.hidden=true;$('results').querySelector('.result-actions').append(returnButton);
 function show(id){root.WordCheckHome.show(id);$('learnStorageNotice').hidden=false;storageNotice()}
-function dailyData(){try{return D.readStoreDetailed(root.localStorage)}catch{return {store:{attempts:[]},warning:'本浏览器无法读取日常词汇记录。'}}}
+function dailyData(){try{return D.readStoreDetailed(root.WordStudentIdentity?.storage||root.localStorage)}catch{return {store:{attempts:[]},warning:'本浏览器无法读取日常词汇记录。'}}}
 function progress(){return G.derive({sessions:repo.sessions(),checks:repo.checks(),daily:dailyData().store,profileId:repo.identity.profileId})}
 function storageNotice(){const warning=[repo.warning,dailyData().warning].filter(Boolean).join(' ');text('learnStorageNotice',warning||'学习记录只保存在当前浏览器；清理浏览器数据会丢失记录。自评不计入正式成绩。');if(warning)$('learnStorageNotice').hidden=false}
 function refreshDashboard(){const data=progress(),current=data.words.filter(w=>w.libraryId===library?.id),byId=new Map(current.map(w=>[w.wordId,w]));
