@@ -11,8 +11,26 @@ function createRepository(getStorage){
  function write(key,value){memory.set(key,value);try{getStorage().setItem(PREFIX+key,value);dirty.delete(key);return true}catch{dirty.add(key);fail();return false}}
  function parse(key){const raw=read(key);if(raw===null)return null;try{return JSON.parse(raw)}catch{warning='部分本地学习记录已损坏，无法恢复；可以开始新学习包。';return null}}
  let identity=parse('identity');
- if(!identity||typeof identity.profileId!=='string'||!identity.profileId.trim()||typeof identity.deviceId!=='string'||!identity.deviceId.trim()||identity.userId!==null){
-  identity={profileId:globalThis.crypto.randomUUID(),deviceId:globalThis.crypto.randomUUID(),userId:null};write('identity',JSON.stringify(identity));
+ const studentId=root.WordStudentIdentity?.mode==='named'?root.WordStudentIdentity.current.id:null;
+ if(studentId&&identity?.profileId&&identity.profileId!==studentId){
+  // The PR15-A named namespace may contain local records using a device profile.
+  // Preserve their original bytes before remapping that same named namespace.
+  const originals=[],updates=[];try{
+   const s=getStorage();for(let i=0;i<s.length;i++){const key=s.key(i);if(!key?.startsWith(PREFIX+'session.')&&!key?.startsWith(PREFIX+'check.'))continue;
+    const raw=s.getItem(key),b=JSON.parse(raw);originals.push([key,raw]);
+    if(key.startsWith(PREFIX+'session.')){if(b.session.profileId!==identity.profileId)throw Error('mixed profile');b.session.profileId=studentId}
+    else{if(b.attempt.identity.profileId!==identity.profileId)throw Error('mixed profile');b.attempt.identity.profileId=studentId;b.attempt.identity.userId=studentId}
+    updates.push([key,JSON.stringify(b)]);
+   }
+   const backupKey=PREFIX+'identity-migration-backup.'+identity.profileId;
+   s.setItem(backupKey,JSON.stringify({identity,originals}));
+   for(const [key,value] of updates)s.setItem(key,value);
+   identity={...identity,profileId:studentId,userId:studentId};s.setItem(PREFIX+'identity',JSON.stringify(identity));memory.set('identity',JSON.stringify(identity));
+  }catch{try{const s=getStorage();for(const [key,value] of originals)s.setItem(key,value)}catch{}warning='已有学生记录尚未安全迁移；请先导出本机备份，云端同步暂不可用。'}
+ }
+ if(!identity||typeof identity.profileId!=='string'||!identity.profileId.trim()||typeof identity.deviceId!=='string'||!identity.deviceId.trim()||identity.userId!==(studentId||null)){
+  if(studentId&&identity){warning=warning||'学生身份记录需要修复；请先导出本机备份。'}
+  else{identity={profileId:studentId||globalThis.crypto.randomUUID(),deviceId:globalThis.crypto.randomUUID(),userId:studentId};write('identity',JSON.stringify(identity))}
  }
  function validBundle(bundle){L.validateSession(bundle.session,bundle.pack);if(bundle.session.profileId!==identity.profileId)throw Error('本地身份不匹配');return bundle}
  function loadSession(id){const b=parse('session.'+id);if(!b)return null;try{return validBundle(b)}catch{warning='部分本地学习记录已损坏，无法恢复；可以开始新学习包。';return null}}

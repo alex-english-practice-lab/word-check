@@ -34,7 +34,7 @@ the existing spelling checker untouched and provides:
 - Recognition: 309 reviewed English-to-Chinese four-choice questions.
 - Synonym: 46 contextual exact-set multiple-selection questions.
 - A searchable preview of the 1,172-entry V3 master vocabulary.
-- Browser-local attempt history and a review pool; no account or cloud sync.
+- Browser-local attempt history and a review pool. When the optional student service is configured, named students also synchronize submitted Daily attempts; Guest stays local.
 
 The V3 data review and pilot limitations are recorded in
 [`docs/V3-REVIEW.md`](docs/V3-REVIEW.md).
@@ -69,17 +69,23 @@ For a system-managed Chromium, set `WORD_CHECK_CHROMIUM` to the actual executabl
 path before `npm run test:all`. The default Playwright cache installation does
 not require this variable. Run an individual suite with `npm test` or one of
 `test:browser`, `test:learn-browser`, `test:learning-assignment-browser`,
-`test:progress-browser`, and `test:student-identity-browser`.
+`test:progress-browser`, `test:student-identity-browser`, and
+`test:assigned-cloud-browser`.
+`test:assigned-cloud-browser` exercises assigned links and cross-browser sync using
+the Worker handler with an in-memory SQLite test database. See
+`docs/PR15-B-ASSIGNED-SYNC.md` for the data model and staging gate.
+The teacher dashboard at `teacher/dashboard.html` reads submitted records through
+teacher-only Access endpoints; see `docs/PR15-C-TEACHER-DASHBOARD.md`.
 
 The legacy visual comparison in `test:browser` uses Git history containing
-upstream commit `08e12ef`:
+upstream commit `08e12ef`.
 
 Screenshots compare before/after in the same installed browser. Browser suites
 start and close local HTTP servers, exercise desktop and mobile viewports, and
 write ignored `test-artifacts/` screenshots.
 
-`practice-records.js` remains pure tested Phase 1 data logic and is not connected
-to a backend. The V3 pilot saves its own isolated practice state in localStorage;
-it does not implement accounts, cross-device sync, or the general Phase 2 record
-system.
+`practice-records.js` remains pure data logic. With a configured backend,
+student-scoped spelling and V3 records can be synchronized; without it the
+existing local practice flow remains available. The Worker and its D1 database
+must be deployed separately from this static site.
 

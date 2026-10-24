@@ -142,6 +142,7 @@ $('createPreset').onclick=async()=>{
   if(sourceKind==='spelling'&&libraryLoadFailed)throw Error('词库加载失败，请重试或重新选择词库后再生成链接。');
   button.disabled=true;button.textContent='正在生成…';
   const random=$('linkType').value==='random';
+  if(random&&window.WordAssignedTeacher?.assigned)throw Error('指定学生作业请选固定测试，以便每次使用相同题目。');
   let payload,questions,summary;
   if(sourceKind==='v3'){
    const built=H.buildPreset(random?'random':'fixed');payload=built.payload;questions=built.questions;
@@ -161,8 +162,9 @@ $('createPreset').onclick=async()=>{
    questions=quiz.pool.length;
    summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 个单词 · '+quiz.label+' · '+(quiz.options.timeLimit?'每题 '+quiz.options.timeLimit+' 秒':'不限时')+' · '+(quiz.options.hintsAllowed?'允许提示':'不提供提示')+(random?' · 刷新或再练会重新抽词，可能与上一轮重合':' · 学生每次打开时随机排列');
   }
-  const url=await P.createUrl(payload,new URL('./',document.baseURI).href);
+  let url=await P.createUrl(payload,new URL('./',document.baseURI).href);
   if(url.length>2000)throw Error('链接过长，请减少题量或选择范围。');
+  if(window.WordAssignedTeacher?.assigned){url=await window.WordAssignedTeacher.wrap(url);summary+=' · 已指定学生，成绩需提交到服务端'}
   $('presetLink').value=url;$('presetSummary').textContent=summary;$('presetLinkPanel').hidden=false;$('presetLink').focus();$('presetLink').select();
  }catch(e){$('setupError').textContent=e.message}
  finally{button.textContent='生成学生练习链接';button.disabled=$('start').disabled||(sourceKind==='spelling'&&(activeLibrary?.source.type!=='builtin'||libraryLoadFailed))}
@@ -178,7 +180,7 @@ function finish(){stopTimer();active=false;window.WordCheckLearning?.onCheckFini
 $('restart').onclick=()=>{if(window.WordCheckLearning?.restartCheck())return;if(presetSession){const pool=presetSession.recipe?(presetSession.recipe.v===P.SCOPED_RANDOM_VERSION?P.sampleScopedRandom(presetSession.recipe,words,C):P.sampleRandom(presetSession.recipe,words,C)):presetSession.pool;begin(pool,presetSession.mode,presetSession.scope,presetSession.options);}else{show('setup');updateSelection()}};$('retry').onclick=()=>begin(answers.filter(a=>a.status!=='correct').map(a=>a.entry),mode,scope+' · 巩固练习',{timeLimit,hintsAllowed,assistanceMode});
 window.addEventListener('beforeunload',e=>{if(active){e.preventDefault();e.returnValue=''}});
 window.WordCheckHome={show,get sourceKind(){return sourceKind},async startLearnCheck(pack){
- if(teacherMode||presetSession||location.hash.startsWith('#preset=')&&!window.WordCheckLearning?.isAssignment)throw Error('指定检查任务不能替换为学习包。');
+ if(teacherMode||presetSession||/^(#preset=|#assigned=)/.test(location.hash)&&!window.WordCheckLearning?.isAssignment)throw Error('指定检查任务不能替换为学习包。');
  if(active||H.active)throw Error('请先结束当前检查。');
  const loaded=await loadLibrary(pack.libraryId);if(!loaded||libraryLoadFailed)throw Error('无法加载学习包词库，请重试。');
  const pool=window.WordLearnCore.resolvePack(pack,activeLibrary,words),settings=pack.settings.finalCheck;
@@ -188,17 +190,21 @@ $('goLearn')?.addEventListener('click',()=>window.WordCheckLearning.openSetup())
 $('goCheck')?.addEventListener('click',()=>{show('setup');updateSelection()});
 $('checkHome')?.addEventListener('click',()=>show('studentHome'));
 async function initialize(){
- if(!location.hash.startsWith('#preset=')){show(teacherMode||location.hash==='#check'?'setup':'studentHome');loadDefault();return}
+ const assigned=location.hash.startsWith('#assigned=');
+ if(!location.hash.startsWith('#preset=')&&!assigned){show(teacherMode||location.hash==='#check'?'setup':'studentHome');loadDefault();return}
  show('presetLoading');document.body.classList.add('preset-mode');document.title='Word Check · 学生练习';
  try{
-  const preset=await P.readHash();
+  if(assigned)await window.WordAssignedReady;
+  if(assigned&&!window.WordAssignedPreset)throw Error('指定作业需要连接服务器并保存学习记录，请稍后重试。');
+  if(assigned){const sync=await window.WordCloudSync?.ready;if(sync?.status==='pending')throw Error('目前无法读取学生云端记录，请检查网络后重新打开作业链接。')}
+  const preset=await P.readHash(assigned?window.WordAssignedPreset.presetHash:location.hash);
   if(preset.v===P.DAILY_VERSION){setSourceKind('v3');await H.startPreset(preset);return}
   await ensureCatalog();
   if(!libraries.list().some(entry=>entry.id===preset.l))throw Error('这份练习使用的词库目前不可用。');
   await loadLibrary(preset.l);
   if(activeLibrary?.id!==preset.l)throw Error('无法加载这份练习使用的词库。');
   if(activeLibrary.version!==preset.lv)throw Error('词库版本已经更新，请老师重新生成练习链接。');
-  if(preset.v===P.LEARNING_VERSION){await window.WordCheckLearning.startAssignment(preset,activeLibrary,words,location.hash);return}
+  if(preset.v===P.LEARNING_VERSION){await window.WordCheckLearning.startAssignment(preset,activeLibrary,words,assigned?window.WordAssignedPreset.presetHash:location.hash);return}
   let pool;if(preset.v===P.SCOPED_RANDOM_VERSION)pool=P.sampleScopedRandom(preset,words,C);else if(preset.v===P.RANDOM_VERSION)pool=P.sampleRandom(preset,words,C);else if(preset.v===P.VERSION)pool=preset.w.map(position=>words[position]);else{const byId=new Map(words.map(word=>[word.id,word]));pool=preset.w.map(id=>byId.get(id))}
   if(pool.some(word=>!word))throw Error('部分练习单词已不在当前词库中，请老师重新生成链接。');
   const options={timeLimit:preset.t??0,hintsAllowed:preset.h??true,assistanceMode:preset.u??(preset.h===false?'none':'both')},presetScope=preset.s||(preset.v===P.SCOPED_RANDOM_VERSION?`${listName(preset.r)} · 第 1–${preset.p} 个词 · 随机抽查 ${pool.length} 题`:compactScope(pool));presetSession={pool,mode:preset.m,scope:presetScope,options,recipe:[P.RANDOM_VERSION,P.SCOPED_RANDOM_VERSION].includes(preset.v)?preset:null};$('restart').textContent=presetSession.recipe?'按相同设置再练一组':'重新练习本组单词';
@@ -206,4 +212,4 @@ async function initialize(){
  }catch(e){active=false;$('presetErrorMessage').textContent=e.message;show('presetError')}
 }
 initialize();
-if(document.modelContext?.registerTool){const lifecycle=new AbortController();for(const tool of [{name:'read_vocabulary_summary',description:'Read the loaded vocabulary lists and the current quiz status without revealing answers.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(){return{lists:[...new Set(words.map(w=>w.list))],words:words.length,isDemo,active,completed:answers.length}}},{name:'start_vocabulary_check',description:'Start a new vocabulary check from the loaded lists. Fails while a quiz is active.',inputSchema:{type:'object',properties:{lists:{type:'string'},mode:{type:'string',enum:['full','single']},count:{type:'integer',minimum:0,maximum:10000}},required:['lists','mode','count'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){if(presetSession||location.hash.startsWith('#preset='))throw Error('学生练习链接不允许更改设置。');if(active)throw Error('请先结束当前检查。');if(!input||typeof input.lists!=='string'||!['full','single'].includes(input.mode)||!Number.isInteger(input.count)||input.count<0||input.count>10000)throw Error('Invalid quiz settings');const r=C.range(input.lists,words.map(w=>w.list));if(r.some(n=>!words.some(w=>w.list===n)))throw Error('所选 List 不在词表中。');let pool=C.sampleMixed(words.filter(w=>r.includes(w.list)),input.count);return begin(pool,input.mode,'List '+input.lists)}}]){try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{})}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true})}
+if(document.modelContext?.registerTool){const lifecycle=new AbortController();for(const tool of [{name:'read_vocabulary_summary',description:'Read the loaded vocabulary lists and the current quiz status without revealing answers.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(){return{lists:[...new Set(words.map(w=>w.list))],words:words.length,isDemo,active,completed:answers.length}}},{name:'start_vocabulary_check',description:'Start a new vocabulary check from the loaded lists. Fails while a quiz is active.',inputSchema:{type:'object',properties:{lists:{type:'string'},mode:{type:'string',enum:['full','single']},count:{type:'integer',minimum:0,maximum:10000}},required:['lists','mode','count'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){if(presetSession||/^(#preset=|#assigned=)/.test(location.hash))throw Error('学生练习链接不允许更改设置。');if(active)throw Error('请先结束当前检查。');if(!input||typeof input.lists!=='string'||!['full','single'].includes(input.mode)||!Number.isInteger(input.count)||input.count<0||input.count>10000)throw Error('Invalid quiz settings');const r=C.range(input.lists,words.map(w=>w.list));if(r.some(n=>!words.some(w=>w.list===n)))throw Error('所选 List 不在词表中。');let pool=C.sampleMixed(words.filter(w=>r.includes(w.list)),input.count);return begin(pool,input.mode,'List '+input.lists)}}]){try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{})}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true})}
