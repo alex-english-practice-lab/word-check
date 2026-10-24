@@ -189,8 +189,8 @@
   function next() { if (!state.graded) return; if (++state.index >= state.queue.length) finish(); else renderQuestion(); }
   function finish() {
     if (!state.active) return; state.active = false;
-    const attempt = { id: state.attemptId, library_id: state.mode === 'recognition' ? 'daily-common-v3' : 'synonym-core-v3', source: state.preset ? 'assignment' : 'free_practice', question_type: practiceType(), started_at: state.startedAt, completed_at: new Date().toISOString(), finished: state.answers.length === state.queue.length, planned_question_ids: state.queue.map(row => row.question.id), answers: state.answers.slice() };
-    let saved = true; if (attempt.answers.length) saved = C.saveAttempt(storage(), attempt);
+    const attempt = { id: state.attemptId, library_id: state.mode === 'recognition' ? 'daily-common-v3' : 'synonym-core-v3', source: state.preset ? 'assignment' : 'free_practice', question_type: practiceType(), started_at: state.startedAt, completed_at: new Date().toISOString(), finished: state.answers.length === state.queue.length, planned_question_ids: state.queue.map(row => row.question.id), answers: state.answers.slice(), ...(root.WordStudentIdentity?.assignmentId?{assignmentId:root.WordStudentIdentity.assignmentId}:{}) };
+    let saved = true; if (attempt.answers.length) {saved = C.saveAttempt(storage(), attempt);if(saved)root.WordCloudSync?.queue()}
     const correct = state.answers.filter(answer => answer.correct).length;
     text('v3ResultTitle', attempt.finished ? '本轮练习完成' : '本轮已结束'); text('v3ResultSummary', `${modeLabel()} · ${state.sourceLabel} · 已作答 ${state.answers.length} / ${state.queue.length} 题`); text('v3CorrectCount', correct); text('v3WrongCount', state.answers.length - correct);
     const rows = byId('v3ResultRows'); rows.replaceChildren();

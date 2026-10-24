@@ -60,7 +60,7 @@ function refreshDashboard(){const data=progress(),current=data.words.filter(w=>w
  }
  text('todayNew',`New Words · ${range.filter(w=>!byId.get(w.id)?.seen).length}`);text('todayDue',`Due for Review · ${range.filter(w=>byId.get(w.id)?.due).length}`);text('todayNeeds',`Needs More Practice · ${range.filter(w=>byId.get(w.id)?.needsPractice).length}`);
  text('learnHistoryNote',dailyData().warning||'今日任务仅作建议；可自行选择其他词库、List 和学习内容。旧版日常词汇最多保留 100 轮历史，已删除的旧记录无法恢复。');storageNotice();return byId}
-function save(){repo.saveSession(bundle);storageNotice();refreshDashboard()}
+function save(){if(root.WordStudentIdentity?.assignmentId)bundle.assignmentId=root.WordStudentIdentity.assignmentId;repo.saveSession(bundle);root.WordCloudSync?.queue();storageNotice();refreshDashboard()}
 function catalog(){return catalogPromise||(catalogPromise=registry.loadManifest(new URL('data/catalog.json',document.baseURI).href).catch(error=>{catalogPromise=null;throw error}))}
 function available(){
  if(!library)throw Error('词库尚未加载。');const state=refreshDashboard(),group=$('learnGroup').value,filter=$('learnFilter').value;
@@ -94,7 +94,7 @@ async function loadLibrary(id){
  }catch(e){if(ticket!==request)return;text('learnSetupError','加载失败：'+e.message);$('learnReload').hidden=false}
  finally{if(ticket===request){loading=false;if(library)updateSetup();storageNotice()}}
 }
-async function openSetup(){checkAttached=false;returnButton.hidden=true;show('learnSetup');resumePanel();refreshDashboard();if(!library)await loadLibrary($('learnLibrary').value||null);else updateSetup()}
+async function openSetup(){checkAttached=false;returnButton.hidden=true;show('learnSetup');if(root.WordStudentIdentity?.mode==='named')await root.WordCloudSync?.ready;resumePanel();refreshDashboard();if(!library)await loadLibrary($('learnLibrary').value||null);else updateSetup()}
 function render(){
  const s=bundle.session,p=bundle.pack;L.validateSession(s,p);text('learnActionError','');
  if(s.currentStage==='learn'||s.currentStage==='review'){
@@ -136,7 +136,7 @@ async function startCheck(){
 function startAssignment(preset,loaded,practiceWords,hash){
  const ids=new Set(preset.w),selected=preset.w.map(id=>practiceWords.find(w=>w.id===id));
  if(selected.some(w=>!w)||new Set(selected.map(w=>w.id)).size!==ids.size)throw Error('指定词条不在当前词库中，请老师重新生成学习链接。');
- const assignmentId=hash.split('.')[1];if(!assignmentId)throw Error('学习作业编号无效。');
+ const assignmentId=root.WordStudentIdentity?.assignmentId||hash.split('.')[1];if(!assignmentId)throw Error('学习作业编号无效。');
  const pack=L.createTeacherPack({library:loaded,words:selected,name:preset.name,assignmentId,settings:{mode:preset.m,timeLimit:preset.t,hintsAllowed:preset.h,assistanceMode:preset.u??(preset.h?'both':'none'),includeFinalCheck:preset.f}});
  L.resolvePack(pack,loaded,practiceWords);
  library=loaded;words=practiceWords;assignment=true;checkAttached=false;returnButton.hidden=true;
@@ -148,15 +148,15 @@ function onCheckStart({queue,library:loaded,mode}){
  if(!checkAttached){
   if(practiceBundle?.attempt.status==='in_progress'){practiceBundle.attempt=R.closeAttempt(practiceBundle.attempt,practiceBundle.answers,{status:'abandoned'});repo.saveCheck(practiceBundle)}
   const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
-  const linked=root.location.hash.startsWith('#preset=');const source=linked?{type:'assignment',id:root.location.hash.slice(0,100)}:{type:'free',id:null};
-  practiceBundle={attempt:R.createAttempt({library:loaded,identity:repo.identity,questions,source}),answers:[]};repo.saveCheck(practiceBundle);storageNotice();return;
+  const linked=/^(#preset=|#assigned=)/.test(root.location.hash);const source=linked?{type:'assignment',id:root.WordStudentIdentity?.assignmentId||root.location.hash.slice(0,100)}:{type:'free',id:null};
+  practiceBundle={attempt:R.createAttempt({library:loaded,identity:repo.identity,questions,source}),answers:[],...(root.WordStudentIdentity?.assignmentId?{assignmentId:root.WordStudentIdentity.assignmentId}:{})};repo.saveCheck(practiceBundle);storageNotice();return;
  }
  L.resolvePack(bundle.pack,loaded,V.toPracticeWords(loaded));if(queue.some(w=>!bundle.pack.wordIds.includes(w.id)))throw Error('检查词条不属于当前学习包');
  // A reload/restart begins a new attempt; never silently complete the interrupted one.
  for(const prior of repo.checks().filter(b=>b.sessionId===bundle.session.id&&b.attempt.status==='in_progress')){prior.attempt=R.closeAttempt(prior.attempt,prior.answers,{status:'abandoned'});repo.saveCheck(prior)}
  const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
  const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:bundle.pack.source.type==='teacher'?'assignment':'preset',id:bundle.pack.id}});
- checkBundle={sessionId:bundle.session.id,attempt,answers:[]};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
+ checkBundle={sessionId:bundle.session.id,attempt,answers:[],...(root.WordStudentIdentity?.assignmentId?{assignmentId:root.WordStudentIdentity.assignmentId}:{})};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
 }
 function onCheckAnswer({index,typed,hints,spellingChecks,skip,reason}){
  const target=checkAttached?checkBundle:practiceBundle;if(!target)return;
@@ -165,10 +165,10 @@ function onCheckAnswer({index,typed,hints,spellingChecks,skip,reason}){
  target.answers.push({...answer,reason:reason||null});repo.saveCheck(target);storageNotice();
 }
 function onCheckFinish(){
- if(!checkAttached){if(!practiceBundle)return;const complete=practiceBundle.answers.length===practiceBundle.attempt.questionCount;practiceBundle.attempt=R.closeAttempt(practiceBundle.attempt,practiceBundle.answers,{status:complete?'completed':'abandoned'});repo.saveCheck(practiceBundle);practiceBundle=null;storageNotice();return}
+ if(!checkAttached){if(!practiceBundle)return;const complete=practiceBundle.answers.length===practiceBundle.attempt.questionCount;practiceBundle.attempt=R.closeAttempt(practiceBundle.attempt,practiceBundle.answers,{status:complete?'completed':'abandoned'});repo.saveCheck(practiceBundle);practiceBundle=null;root.WordCloudSync?.queue();storageNotice();return}
  if(!checkBundle)return;
  const complete=checkBundle.answers.length===checkBundle.attempt.questionCount;
- checkBundle.attempt=R.closeAttempt(checkBundle.attempt,checkBundle.answers,{status:complete?'completed':'abandoned'});repo.saveCheck(checkBundle);
+ checkBundle.attempt=R.closeAttempt(checkBundle.attempt,checkBundle.answers,{status:complete?'completed':'abandoned'});repo.saveCheck(checkBundle);root.WordCloudSync?.queue();
  const whole=complete&&new Set(checkBundle.answers.map(a=>a.wordId)).size===bundle.pack.wordIds.length;
  bundle.session.currentStage=whole?'completed':'review_complete';bundle.session.status=whole?'completed':'in_progress';bundle.session.updatedAt=new Date().toISOString();save();returnButton.hidden=false;
 }
