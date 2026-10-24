@@ -166,7 +166,7 @@
       planned_question_ids: state.queue.map(x => x.question.id),
       answers: state.answers.slice() };
     let saved = true;
-    if (attempt.answers.length) saved = C.saveAttempt(window.WordStudentIdentity?.storage||window.localStorage, attempt);
+    if (attempt.answers.length) {saved = C.saveAttempt(window.WordStudentIdentity?.storage||window.localStorage, attempt);if(saved)window.WordCloudSync?.queue()}
     const right = state.answers.filter(a=>a.correct).length;
     text('resultTitle', attempt.finished ? '本轮练习完成' : '本轮已结束');
     text('resultSummary', `${modeLabel()} · ${state.sourceLabel} · 已作答 ${state.answers.length} / ${state.queue.length} 题`);

@@ -57,8 +57,9 @@ $('tlGenerate').onclick=async()=>{
   const selected=picked();if(!selected.length||selected.length>100)throw Error('固定学习包需包含 1–100 个词。');
   const assistance=$('tlAssistance').value;
   const payload={v:P.LEARNING_VERSION,l:library.id,lv:library.version,w:selected.map(w=>w.id),name:$('tlName').value.trim(),m:$('tlMode').value,f:$('tlFinal').checked,t:Number($('tlTime').value),h:assistance!=='none',...(assistance==='check'?{u:'check'}:{})};
-  const url=await P.createUrl(payload,new URL('./',document.baseURI).href);if(url.length>2000)throw Error(`链接长 ${url.length} 字符，可能无法稳定分享；请减少词数或拆成多个学习包。`);
-  $('tlLink').value=url;$('tlLinkSummary').textContent=`${selected.length} 个固定 Word ID · ${payload.f?'含正式检查':'仅学习与复习'} · 学生刷新后可恢复本机进度`;$('tlLinkPanel').hidden=false;$('tlError').textContent='';$('tlLink').focus();$('tlLink').select();
+  let url=await P.createUrl(payload,new URL('./',document.baseURI).href);if(url.length>2000)throw Error(`链接长 ${url.length} 字符，可能无法稳定分享；请减少词数或拆成多个学习包。`);
+  if(root.WordAssignedTeacher?.assigned)url=await root.WordAssignedTeacher.wrap(url);
+  $('tlLink').value=url;$('tlLinkSummary').textContent=`${selected.length} 个固定 Word ID · ${payload.f?'含正式检查':'仅学习与复习'} · ${root.WordAssignedTeacher?.assigned?'已指定学生，进度需提交到服务端':'学生刷新后可恢复本机进度'}`;$('tlLinkPanel').hidden=false;$('tlError').textContent='';$('tlLink').focus();$('tlLink').select();
  }catch(e){$('tlError').textContent=e.message;$('tlLinkPanel').hidden=true}
 };
 $('tlCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('tlLink').value)}catch{$('tlLink').select();document.execCommand('copy')}$('tlCopy').textContent='已复制'};

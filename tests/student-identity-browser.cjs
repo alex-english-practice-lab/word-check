@@ -10,6 +10,7 @@ async function main(){await new Promise(resolve=>server.listen(0,'127.0.0.1',res
    const alias=JSON.parse(request.postData()).alias.trim().toLowerCase(),z=['zining','isabella'].includes(alias);
    const payload=z?{student:{id:'11111111-1111-4111-8111-111111111111',displayName:'Zining'},accessToken:'a'.repeat(43)}:alias==='irving'?{student:{id:'22222222-2222-4222-8222-222222222222',displayName:'Irving'},accessToken:'b'.repeat(43)}:{error:'找不到该 Student ID'};
    return route.fulfill({contentType:'application/json',body:JSON.stringify(payload),status:z||alias==='irving'?200:404})}
+   if(url.pathname==='/api/student/records')return route.fulfill({contentType:'application/json',body:request.method()==='GET'?'{"records":[],"nextCursor":null}':'{"saved":true}'});
    return route.fulfill({contentType:'application/json',body:'{"ok":true}'})});
   const url=`http://127.0.0.1:${server.address().port}/word-check/`;
   await page.goto(url);assert.ok(await page.locator('#identityDialog').isVisible());await page.locator('#studentAlias').fill('unknown');await page.locator('#identitySelect').click();assert.match(await page.locator('#identityError').innerText(),/找不到/);
