@@ -34,6 +34,16 @@ The D1 UUID and Access values are account-specific. Until configured and verifie
 
 `npm test` uses an in-memory SQLite D1-compatible adapter to execute the actual migration and route SQL. It checks alias equivalence/conflicts, JWT signature/issuer/audience/email, disabled accounts, rate limiting, Guest and UUID storage separation, and legacy fallback. Existing vocabulary/preset suites continue to run.
 
-With Chromium and Playwright installed separately, `npm run test:student-identity-browser` checks desktop and mobile identity selection, switching, Guest, and record isolation against a mocked API. A real Cloudflare D1/Access staging deployment must be validated before production, followed by PR15-B and C.
+Run `npm ci`, `npm run setup:browser`, then `npm run test:all`. `test:student-identity-browser` checks desktop and mobile identity selection, switching, Guest, record isolation, and an existing teacher link opening directly against a mocked API. The mock does not prove cloud persistence or teacher authorization. A real Cloudflare D1/Access staging deployment must be validated before production, followed by PR15-B and C.
+
+PR15-B/C browser regression gate, to add alongside each feature when implemented:
+
+| Feature | Browser scenario required on desktop and mobile |
+| --- | --- |
+| Assigned Links | Valid assigned token binds the expected Student UUID and fixed questions; wrong student, expired, malformed, and replayed submissions fail visibly. Existing unassigned v1–v7 links remain usable. |
+| Cloud Sync | Named student completes Learn and Check, reloads on another browser context, sees the same history; retries deduplicate immutable answers, offline failure preserves a pending local record, and Guest sends no record. |
+| Teacher Dashboard | Authorized teacher sees only the assigned students and actual submitted outcomes; unauthorized and student sessions cannot see teacher data; empty and failed API states display correctly. |
+
+Do not mark these PR15-B/C scenarios passed until the features, browser scripts, and staging checks exist and run.
 
 Official setup references: [D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/), [D1 batch transactions](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch), [Access JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), [Worker rate limiting](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).

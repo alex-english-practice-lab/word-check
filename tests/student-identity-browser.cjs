@@ -13,14 +13,17 @@ async function main(){await new Promise(resolve=>server.listen(0,'127.0.0.1',res
    return route.fulfill({contentType:'application/json',body:'{"ok":true}'})});
   const url=`http://127.0.0.1:${server.address().port}/word-check/`;
   await page.goto(url);assert.ok(await page.locator('#identityDialog').isVisible());await page.locator('#studentAlias').fill('unknown');await page.locator('#identitySelect').click();assert.match(await page.locator('#identityError').innerText(),/找不到/);
-  await page.locator('#studentAlias').fill(' Isabella ');await page.locator('#identitySelect').click();await page.waitForFunction(()=>WordStudentIdentity.current?.id==='11111111-1111-4111-8111-111111111111');
+  await page.locator('#studentAlias').fill(' Isabella ');await page.locator('#identitySelect').click();await page.waitForFunction(()=>window.WordStudentIdentity?.current?.id==='11111111-1111-4111-8111-111111111111');
   await page.locator('#goLearn').click();await page.locator('#learnLibrary').selectOption('lib:difficulty-100-120');await page.waitForFunction(()=>!document.querySelector('#learnStart').disabled);
   await page.locator('#learnCount').fill('1');await page.locator('#learnStart').click();await page.locator('#flashcard').click();
   await page.locator('#learnPause').click();await page.locator('#identityTrigger').click();await page.locator('#identitySwitch').click();await page.locator('#studentAlias').fill('irving');await page.locator('#identitySelect').click();
-  await page.waitForFunction(()=>WordStudentIdentity.current?.id==='22222222-2222-4222-8222-222222222222');await page.locator('#goLearn').click();assert.equal(await page.locator('#metricSeen').innerText(),'0');
-  await page.locator('#identityTrigger').click();await page.locator('#identityNoRecord').click();await page.waitForFunction(()=>WordStudentIdentity.mode==='guest');
+  await page.waitForFunction(()=>window.WordStudentIdentity?.current?.id==='22222222-2222-4222-8222-222222222222');await page.locator('#goLearn').click();assert.equal(await page.locator('#metricSeen').innerText(),'0');
+  await page.locator('#identityTrigger').click();await page.locator('#identityNoRecord').click();await page.waitForFunction(()=>window.WordStudentIdentity?.mode==='guest');
   assert.equal(await page.evaluate(()=>WordStudentIdentity.storage.getItem('wordcheck.v3.practice.local.v1')),null);assert.ok(await page.evaluate(()=>Object.keys(localStorage).some(k=>k.includes('11111111-1111-4111-8111-111111111111'))));
+  const assignedUrl=await page.evaluate(()=>WordPresetLinks.createUrl({v:3,l:'lib:ielts',lv:'1.0.0',m:'full',w:[0],t:0,h:false},new URL('./',document.baseURI).href));
+  const assignedContext=await browser.newContext({viewport:{width:390,height:844}}),assigned=await assignedContext.newPage();await assigned.route('**/student-config.js*',route=>route.fulfill({contentType:'text/javascript',body:'window.WordCheckStudentConfig={apiBase:"https://api.example.test"};'}));
+  await assigned.goto(assignedUrl);await assigned.locator('#quiz').waitFor({state:'visible'});assert.ok(await assigned.locator('#identityDialog').isHidden());assert.ok(await assigned.locator('#setup').isHidden());assert.equal(await assigned.evaluate(()=>WordStudentIdentity.mode),'guest');assert.ok(await assigned.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await assignedContext.close();
   await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile overflow');
-  assert.deepEqual(errors,[]);await page.close();process.stdout.write('Student identity desktop/mobile isolation passed\n');
+  assert.deepEqual(errors,[]);await page.close();process.stdout.write('Student identity, Guest, legacy assigned link, and desktop/mobile isolation passed\n');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve))}}
 main().catch(error=>{console.error(error);process.exitCode=1});
