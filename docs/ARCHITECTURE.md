@@ -86,7 +86,7 @@ Library 嵌套 Lists，List 嵌套 Words，同时显式保存外键，便于未�
 | parentAttemptId | 重练关联原 Attempt；没有则 null，重练不能覆盖原练习 |
 | status | in_progress → completed 或 abandoned；终态不可重新开启 |
 
-每个 Question 有独立随机 `id`、wordId、listId、wordRevision、mode、`snapshot` 和 `prompt`。同一个 wordId 在同一轮重复出现也会有不同 question.id。snapshot 保存 text/phonetic/pos/senses/acceptedAnswers；prompt 保存当时实际显示的 meaning/phonetic/pos，单释义题不会在回看时重新随机。词库更新不重写题目快照。
+每个 Question 有独立随机 `id`、wordId、listId、wordRevision、mode、`snapshot` 和 `prompt`。同一个 wordId 在同一轮重复出现也会有不同 question.id。snapshot 保存 text/phonetic/pos/senses/acceptedAnswers；prompt 保存当时实际显示的 meaning/phonetic/pos。新版单释义题还记录 `format: single-cue-v1`、`initialShown` 与实际显示的 `initial`；首字母属于题干，不增加 Answer 的辅助次数。每题释义在开始时只选一次，网页与历史记录共用它。历史记录没有这些字段时仍按旧题干解释。词库更新不重写题目快照。
 
 ### Answer：一道已提交题目的历史事实
 

@@ -17,16 +17,17 @@ function validatePack(p){
  requireValue(f&&f.type==='spelling'&&['full','single'].includes(f.mode)&&Number.isSafeInteger(f.timeLimit)&&f.timeLimit>=0&&f.timeLimit<=600&&typeof f.hintsAllowed==='boolean','正式检查设置无效');
  requireValue(p.settings.includeFinalCheck===undefined||typeof p.settings.includeFinalCheck==='boolean','是否包含正式检查的设置无效');
  requireValue(f.assistanceMode===undefined||['none','check','both'].includes(f.assistanceMode)&&f.hintsAllowed===(f.assistanceMode!=='none'),'提示权限设置无效');
+ requireValue(f.showFirstLetter===undefined||f.mode==='single'&&typeof f.showFirstLetter==='boolean','首字母题干设置无效');
  return p;
 }
 function createPack({library,words,name,profileId,settings={}}){
  const ids=words.map(w=>w.id);
- return validatePack({schemaVersion:1,id:uuid(),name:name||library.name+' · 学习包',libraryId:library.id,libraryVersion:library.version,wordIds:ids,order:[...ids],source:{type:'user',profileId},settings:{learnDirection:'en-zh',reviewDirection:'zh-en',finalCheck:{type:'spelling',mode:'single',timeLimit:settings.timeLimit??0,hintsAllowed:settings.hintsAllowed??false}}});
+ return validatePack({schemaVersion:1,id:uuid(),name:name||library.name+' · 学习包',libraryId:library.id,libraryVersion:library.version,wordIds:ids,order:[...ids],source:{type:'user',profileId},settings:{learnDirection:'en-zh',reviewDirection:'zh-en',finalCheck:{type:'spelling',mode:'single',timeLimit:settings.timeLimit??0,hintsAllowed:settings.hintsAllowed??false,showFirstLetter:true}}});
 }
 function createTeacherPack({library,words,name,assignmentId,settings}){
  requireValue(text(assignmentId),'缺少学习作业编号');
  const ids=words.map(w=>w.id);
- return validatePack({schemaVersion:1,id:'assignment:'+assignmentId,name,libraryId:library.id,libraryVersion:library.version,wordIds:ids,order:[...ids],source:{type:'teacher',assignmentId},settings:{learnDirection:'en-zh',reviewDirection:'zh-en',finalCheck:{type:'spelling',mode:settings.mode,timeLimit:settings.timeLimit,hintsAllowed:settings.hintsAllowed,...(settings.assistanceMode?{assistanceMode:settings.assistanceMode}:{})},includeFinalCheck:settings.includeFinalCheck}});
+ return validatePack({schemaVersion:1,id:'assignment:'+assignmentId,name,libraryId:library.id,libraryVersion:library.version,wordIds:ids,order:[...ids],source:{type:'teacher',assignmentId},settings:{learnDirection:'en-zh',reviewDirection:'zh-en',finalCheck:{type:'spelling',mode:settings.mode,timeLimit:settings.timeLimit,hintsAllowed:settings.hintsAllowed,...(settings.assistanceMode?{assistanceMode:settings.assistanceMode}:{}),...(settings.showFirstLetter!==undefined?{showFirstLetter:settings.showFirstLetter}:{})},includeFinalCheck:settings.includeFinalCheck}});
 }
 function resolvePack(pack,library,words){
  validatePack(pack);requireValue(library.id===pack.libraryId&&library.version===pack.libraryVersion,'词库版本已改变，请创建新学习包；旧进度仍保留');

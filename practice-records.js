@@ -33,7 +33,11 @@ function validateAttempt(a){
   check(s&&text(s.text)&&typeof s.phonetic==='string'&&typeof s.pos==='string'&&Array.isArray(s.senses)&&s.senses.length>0&&s.senses.every(text),'word snapshot required');
   check(Array.isArray(s.acceptedAnswers)&&s.acceptedAnswers.includes(s.text)&&s.acceptedAnswers.every(text),'answer snapshot required');
   check(q.prompt&&typeof q.prompt.meaning==='string'&&typeof q.prompt.phonetic==='string'&&typeof q.prompt.pos==='string','prompt snapshot required');
-  check(q.mode==='full'?(q.prompt.meaning===s.senses.join('；')&&q.prompt.phonetic===s.phonetic&&q.prompt.pos===s.pos):(s.senses.includes(q.prompt.meaning)&&q.prompt.phonetic===''&&q.prompt.pos===''),'prompt/mode mismatch');
+ const senseIndex=s.senses.indexOf(q.prompt.meaning);
+ const promptValid=q.mode==='full'?(q.prompt.meaning===s.senses.join('；')&&q.prompt.phonetic===s.phonetic&&q.prompt.pos===s.pos&&q.prompt.initialShown===undefined&&q.prompt.initial===undefined&&q.prompt.format===undefined):(senseIndex>=0&&q.prompt.phonetic===''&&(
+  q.prompt.format==='single-cue-v1'?(q.prompt.pos===(s.pos||'词性未提供')&&typeof q.prompt.initialShown==='boolean'&&(!q.prompt.initialShown||C.spellingPrompt(s,'single',senseIndex).initialShown)&&q.prompt.initial===(q.prompt.initialShown?C.spellingPrompt(s,'single',senseIndex).initial:'')):
+  q.prompt.format===undefined&&q.prompt.initialShown===undefined&&q.prompt.initial===undefined&&(q.prompt.pos===''||q.prompt.pos===(s.pos||'词性未提供'))));
+ check(promptValid,'prompt/mode mismatch');
  }
  const actualMode=new Set(a.questions.map(q=>q.mode)).size===1?a.questions[0].mode:'mixed';
  check(a.mode===actualMode,'attempt mode does not match questions');
@@ -48,7 +52,7 @@ function createAttempt({library,identity,questions,listIds,source={type:'free',i
   check(Number.isInteger(senseIndex)&&senseIndex>=0&&senseIndex<w.senses.length,'invalid sense index');
   return {id:idFactory(),wordId:w.id,listId:w.listId,wordRevision:w.revision,mode:request.mode,
    snapshot:{text:w.text,phonetic:w.phonetic,pos:w.pos,senses:[...w.senses],acceptedAnswers:[...w.acceptedAnswers]},
-   prompt:{meaning:request.mode==='single'?w.senses[senseIndex]:w.senses.join('；'),phonetic:request.mode==='full'?w.phonetic:'',pos:request.mode==='full'?w.pos:''}};
+   prompt:request.prompt?copy(request.prompt):C.spellingPrompt(w,request.mode,senseIndex,{legacy:request.legacyPrompt===true,showFirstLetter:request.showFirstLetter!==false})};
  });
  const selected=listIds||[...new Set(materialized.map(q=>q.listId))];
  check(selected.every(id=>library.lists.some(l=>l.id===id)),'unknown selected list');

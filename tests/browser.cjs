@@ -43,7 +43,7 @@ async function scenario(browser,url,prefix){
  await page.locator('#retry').click();assert.equal(await page.locator('#progressText').innerText(),'1 / 2');
  page.once('dialog',d=>d.accept());await page.locator('#exit').click();assert.match(await page.locator('#resultScope').innerText(),/已完成 0 \/ 2/);
  await page.locator('#restart').click();await page.locator('[name=mode][value=single]').check();await page.locator('#count').fill('1');await page.locator('#start').click();
- assert.equal(await page.locator('#phonetic').isVisible(),false);assert.equal(await page.locator('#pos').isVisible(),false);
+ assert.equal(await page.locator('#phonetic').isVisible(),false);if(prefix==='after'){assert.equal(await page.locator('#pos').isVisible(),true);assert.equal(await page.locator('#pos').innerText(),await page.evaluate(()=>queue[index].pos||'词性未提供'))}else assert.equal(await page.locator('#pos').isVisible(),false);
  await page.locator('#answer').fill('wrong');await page.locator('#submit').click();assert.match(await page.locator('#feedback').innerText(),/同义词/);
  await page.locator('#next').click();await page.locator('#restart').click();
  const text='Word List 29\nexact /ɪgˈzækt/ a. 准确的\nWord List 61\nbank n. 银行；河岸';
@@ -146,7 +146,7 @@ async function main(){
   const mobileUrl=await mobileTeacher.locator('#presetLink').inputValue();await screenshot(mobileTeacher,'det-mobile-teacher');
   assert.ok(await mobileTeacher.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   const mobileStudent=await browser.newPage({viewport:{width:390,height:844}});await mobileStudent.goto(mobileUrl);
-  await mobileStudent.locator('#quiz').waitFor({state:'visible'});assert.equal(await mobileStudent.locator('#phonetic').isHidden(),true);
+  await mobileStudent.locator('#quiz').waitFor({state:'visible'});assert.equal(await mobileStudent.locator('#phonetic').isHidden(),true);assert.equal(await mobileStudent.locator('#pos').innerText(),await mobileStudent.evaluate(()=>queue[index].pos||'词性未提供'));assert.equal(await mobileStudent.locator('#pos').isVisible(),true);
   assert.equal(await mobileStudent.locator('#hint').isVisible(),true);await mobileStudent.locator('#hint').click();
   await mobileStudent.waitForFunction(()=>document.getElementById('feedback').textContent.includes('本题超时'));
   assert.equal(await mobileStudent.locator('#progressText').innerText(),'1 / 20');await mobileStudent.locator('#next').click();

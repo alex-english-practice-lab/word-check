@@ -74,3 +74,7 @@
 }
 .home-setup #questionTime{-moz-appearance:textfield;appearance:textfield}
 .home-setup #questionTime::-webkit-inner-spin-button,.home-setup #questionTime::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+/* The initial is part of the question, separate from the interactive hint area. */
+.first-letter-setting{display:flex;gap:9px;align-items:center;padding:10px 12px;font-size:14px;color:var(--muted)}
+.first-letter-setting input{accent-color:var(--blue)}
+.initial-cue{margin:0;font-size:16px;color:var(--blue);font-weight:650}

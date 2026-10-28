@@ -8,6 +8,11 @@ Existing v1/v2/v3 fixed links remain supported. VERSION stays 3 for compatibilit
 RANDOM_VERSION=4 stores library/version, mode, sampling type, list numbers,
 per-list counts or mixed count (0 = all), time limit, and hint policy.
 Student links always point to the public site root, not /teacher/.
+New Single Meaning links use an optional `i` boolean to fix the first-letter
+cue setting. v3/v7 compact it as 0/1; v4/v6 retain the boolean. Old links
+without `i` keep their original meaning-only prompt (no POS or initial), while
+new free and assigned Single sessions display POS and optionally the initial.
+Full Meaning links never use the cue field. See `SINGLE-MEANING-PROMPT.md`.
 Each open/refresh or "practice another set" samples again. A sampled word may recur.
 Wrong-answer retry still uses that attempt's wrong words, not a fresh random pool.
 Both link types support at most 100 actual questions. Missing lists, excess counts

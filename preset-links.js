@@ -24,19 +24,19 @@ function validateLegacy(input){
  if(input.v===2){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean')throw Error('作业链接中的答题设置无效。');payload.t=input.t;payload.h=input.h}
  return payload;
 }
-function settings(input){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean'||input.u!==undefined&&(input.u!=='check'||!input.h))throw Error('作业链接中的答题设置无效。');return{t:input.t,h:input.h,...(input.u?{u:input.u}:{})}}
+function settings(input){if(!Number.isSafeInteger(input.t)||input.t<0||input.t>600||typeof input.h!=='boolean'||input.u!==undefined&&(input.u!=='check'||!input.h)||input.i!==undefined&&(input.m!=='single'||typeof input.i!=='boolean'))throw Error('作业链接中的答题设置无效。');return{t:input.t,h:input.h,...(input.u?{u:input.u}:{}),...(input.i!==undefined?{i:input.i}:{})}}
 function compact(input){
  if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.lv)||!['full','single'].includes(input.m)||!Array.isArray(input.w)||!input.w.length)throw Error('作业链接内容不完整。');
  if(input.w.length>100)throw Error('学生链接最多支持 100 题，请减少题量。');
  const indexes=[...input.w].sort((a,b)=>a-b),seen=new Set();for(const index of indexes){if(!Number.isSafeInteger(index)||index<0||seen.has(index))throw Error('作业链接中的单词编号无效。');seen.add(index)}
  let previous=0;const q=indexes.map((index,i)=>{const value=i?index-previous:index;previous=index;return value.toString(36)}).join('.'),answer=settings(input);
- return{v:VERSION,l:input.l,x:input.lv,m:input.m==='full'?0:1,q,t:answer.t,h:answer.h?1:0,...(answer.u?{u:answer.u}:{})};
+ return{v:VERSION,l:input.l,x:input.lv,m:input.m==='full'?0:1,q,t:answer.t,h:answer.h?1:0,...(answer.u?{u:answer.u}:{}),...(answer.i!==undefined?{i:answer.i?1:0}:{})};
 }
 function expand(input){
- if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.x)||![0,1].includes(input.m)||!nonempty(input.q)||!Number.isSafeInteger(input.t)||input.t<0||input.t>600||![0,1].includes(input.h)||input.u!==undefined&&(input.u!=='check'||!input.h))throw Error('作业链接内容不完整。');
+ if(!input||input.v!==VERSION||!nonempty(input.l)||!nonempty(input.x)||![0,1].includes(input.m)||!nonempty(input.q)||!Number.isSafeInteger(input.t)||input.t<0||input.t>600||![0,1].includes(input.h)||input.u!==undefined&&(input.u!=='check'||!input.h)||input.i!==undefined&&(input.m!==1||![0,1].includes(input.i)))throw Error('作业链接内容不完整。');
  const parts=input.q.split('.');if(!parts.length||parts.length>100)throw Error('学生链接最多支持 100 题，请减少题量。');
  let current=0;const indexes=parts.map((part,i)=>{if(!/^(?:0|[1-9a-z][0-9a-z]*)$/.test(part))throw Error('作业链接中的单词编号无效。');const value=parseInt(part,36);if(!Number.isSafeInteger(value)||(i&&value<1))throw Error('作业链接中的单词编号无效。');current=i?current+value:value;if(!Number.isSafeInteger(current))throw Error('作业链接中的单词编号无效。');return current});
- return{v:VERSION,l:input.l,lv:input.x,m:input.m?'single':'full',w:indexes,t:input.t,h:Boolean(input.h),...(input.u?{u:input.u}:{})};
+ return{v:VERSION,l:input.l,lv:input.x,m:input.m?'single':'full',w:indexes,t:input.t,h:Boolean(input.h),...(input.u?{u:input.u}:{}),...(input.i!==undefined?{i:Boolean(input.i)}:{})};
 }
 
 const DAILY_VERSION=5;
@@ -139,12 +139,12 @@ function validateLearning(input){
  return{v:LEARNING_VERSION,l:input.l,lv:input.lv,w:[...input.w],m:input.m,f:input.f,name:input.name,...settings(input)};
 }
 function compactLearning(input){
- const p=validateLearning(input);return{v:LEARNING_VERSION,l:p.l,x:p.lv,w:p.w.map(id=>encodeWordId(id,p.l)).join('.'),m:p.m==='full'?0:1,f:p.f?1:0,n:p.name,t:p.t,h:p.h?1:0,...(p.u?{u:p.u}:{})};
+ const p=validateLearning(input);return{v:LEARNING_VERSION,l:p.l,x:p.lv,w:p.w.map(id=>encodeWordId(id,p.l)).join('.'),m:p.m==='full'?0:1,f:p.f?1:0,n:p.name,t:p.t,h:p.h?1:0,...(p.u?{u:p.u}:{}),...(p.i!==undefined?{i:p.i?1:0}:{})};
 }
 function expandLearning(input){
- if(!input||input.v!==LEARNING_VERSION||!nonempty(input.l)||!nonempty(input.x)||!nonempty(input.w)||![0,1].includes(input.m)||![0,1].includes(input.f)||!nonempty(input.n)||!Number.isSafeInteger(input.t)||![0,1].includes(input.h))throw Error('学习作业设置不完整。');
+ if(!input||input.v!==LEARNING_VERSION||!nonempty(input.l)||!nonempty(input.x)||!nonempty(input.w)||![0,1].includes(input.m)||![0,1].includes(input.f)||!nonempty(input.n)||!Number.isSafeInteger(input.t)||![0,1].includes(input.h)||input.i!==undefined&&(input.m!==1||![0,1].includes(input.i)))throw Error('学习作业设置不完整。');
  if(input.w.split('.').length>100)throw Error('学习作业最多支持 100 个词。');
- return validateLearning({v:LEARNING_VERSION,l:input.l,lv:input.x,w:input.w.split('.').map(id=>decodeWordId(id,input.l)),m:input.m?'single':'full',f:Boolean(input.f),name:input.n,t:input.t,h:Boolean(input.h),...(input.u?{u:input.u}:{})});
+ return validateLearning({v:LEARNING_VERSION,l:input.l,lv:input.x,w:input.w.split('.').map(id=>decodeWordId(id,input.l)),m:input.m?'single':'full',f:Boolean(input.f),name:input.n,t:input.t,h:Boolean(input.h),...(input.u?{u:input.u}:{}),...(input.i!==undefined?{i:Boolean(input.i)}:{})});
 }
 
 function validate(input){return input?.v===LEARNING_VERSION?compactLearning(input):input?.v===SCOPED_RANDOM_VERSION?validateScopedRandom(input):input?.v===DAILY_VERSION?compactDaily(input):input?.v===RANDOM_VERSION?validateRandom(input):input?.v===VERSION?compact(input):validateLegacy(input)}
