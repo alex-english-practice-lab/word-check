@@ -70,10 +70,13 @@ path before `npm run test:all`. The default Playwright cache installation does
 not require this variable. Run an individual suite with `npm test` or one of
 `test:browser`, `test:learn-browser`, `test:learning-assignment-browser`,
 `test:progress-browser`, `test:student-identity-browser`, and
-`test:assigned-cloud-browser`.
+`test:assigned-cloud-browser`, and `test:single-prompt-browser`.
 `test:assigned-cloud-browser` exercises assigned links and cross-browser sync using
 the Worker handler with an in-memory SQLite test database. See
 `docs/PR15-B-ASSIGNED-SYNC.md` for the data model and staging gate.
+Single Meaning now records the exact one-sense question prompt, POS and optional
+first letter; existing v1–v7 tokens without the setting retain their original
+meaning-only prompt. See `docs/SINGLE-MEANING-PROMPT.md`.
 The teacher dashboard at `teacher/dashboard.html` reads submitted records through
 teacher-only Access endpoints; see `docs/PR15-C-TEACHER-DASHBOARD.md`.
 

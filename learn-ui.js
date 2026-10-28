@@ -137,24 +137,24 @@ function startAssignment(preset,loaded,practiceWords,hash){
  const ids=new Set(preset.w),selected=preset.w.map(id=>practiceWords.find(w=>w.id===id));
  if(selected.some(w=>!w)||new Set(selected.map(w=>w.id)).size!==ids.size)throw Error('指定词条不在当前词库中，请老师重新生成学习链接。');
  const assignmentId=root.WordStudentIdentity?.assignmentId||hash.split('.')[1];if(!assignmentId)throw Error('学习作业编号无效。');
- const pack=L.createTeacherPack({library:loaded,words:selected,name:preset.name,assignmentId,settings:{mode:preset.m,timeLimit:preset.t,hintsAllowed:preset.h,assistanceMode:preset.u??(preset.h?'both':'none'),includeFinalCheck:preset.f}});
+ const pack=L.createTeacherPack({library:loaded,words:selected,name:preset.name,assignmentId,settings:{mode:preset.m,timeLimit:preset.t,hintsAllowed:preset.h,assistanceMode:preset.u??(preset.h?'both':'none'),includeFinalCheck:preset.f,showFirstLetter:preset.i}});
  L.resolvePack(pack,loaded,practiceWords);
  library=loaded;words=practiceWords;assignment=true;checkAttached=false;returnButton.hidden=true;
  const prior=repo.sessions().filter(b=>b.pack.id===pack.id&&b.session.status==='in_progress').sort((a,b)=>b.session.updatedAt.localeCompare(a.session.updatedAt))[0];
  bundle=prior||{pack,session:L.createSession(pack,repo.identity.profileId,[])};
  save();render();return bundle;
 }
-function onCheckStart({queue,library:loaded,mode}){
+function onCheckStart({queue,library:loaded,mode,prompts}){
  if(!checkAttached){
   if(practiceBundle?.attempt.status==='in_progress'){practiceBundle.attempt=R.closeAttempt(practiceBundle.attempt,practiceBundle.answers,{status:'abandoned'});repo.saveCheck(practiceBundle)}
-  const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
+  const questions=queue.map((w,i)=>({wordId:w.id,mode,prompt:prompts[i]}));
   const linked=/^(#preset=|#assigned=)/.test(root.location.hash);const source=linked?{type:'assignment',id:root.WordStudentIdentity?.assignmentId||root.location.hash.slice(0,100)}:{type:'free',id:null};
   practiceBundle={attempt:R.createAttempt({library:loaded,identity:repo.identity,questions,source}),answers:[],...(root.WordStudentIdentity?.assignmentId?{assignmentId:root.WordStudentIdentity.assignmentId}:{})};repo.saveCheck(practiceBundle);storageNotice();return;
  }
  L.resolvePack(bundle.pack,loaded,V.toPracticeWords(loaded));if(queue.some(w=>!bundle.pack.wordIds.includes(w.id)))throw Error('检查词条不属于当前学习包');
  // A reload/restart begins a new attempt; never silently complete the interrupted one.
  for(const prior of repo.checks().filter(b=>b.sessionId===bundle.session.id&&b.attempt.status==='in_progress')){prior.attempt=R.closeAttempt(prior.attempt,prior.answers,{status:'abandoned'});repo.saveCheck(prior)}
- const questions=queue.map(w=>({wordId:w.id,mode,senseIndex:Math.floor(Math.random()*w.senses.length)}));
+ const questions=queue.map((w,i)=>({wordId:w.id,mode,prompt:prompts[i]}));
  const attempt=R.createAttempt({library:loaded,identity:repo.identity,questions,source:{type:bundle.pack.source.type==='teacher'?'assignment':'preset',id:bundle.pack.id}});
  checkBundle={sessionId:bundle.session.id,attempt,answers:[],...(root.WordStudentIdentity?.assignmentId?{assignmentId:root.WordStudentIdentity.assignmentId}:{})};repo.saveCheck(checkBundle);bundle.session.checkAttemptIds.push(attempt.id);bundle.session.currentStage='check';bundle.session.status='in_progress';save();
 }

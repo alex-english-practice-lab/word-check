@@ -13,7 +13,7 @@ async function main(){await new Promise(resolve=>server.listen(0,'127.0.0.1',res
    if(url.pathname==='/api/student/records')return route.fulfill({contentType:'application/json',body:request.method()==='GET'?'{"records":[],"nextCursor":null}':'{"saved":true}'});
    return route.fulfill({contentType:'application/json',body:'{"ok":true}'})});
   const url=`http://127.0.0.1:${server.address().port}/word-check/`;
-  await page.goto(url);assert.ok(await page.locator('#identityDialog').isVisible());await page.locator('#studentAlias').fill('unknown');await page.locator('#identitySelect').click();assert.match(await page.locator('#identityError').innerText(),/找不到/);
+  await page.goto(url);assert.ok(await page.locator('#identityDialog').isVisible());await page.locator('#studentAlias').fill('unknown');await page.locator('#identitySelect').click();await page.locator('#identityError').filter({hasText:'找不到'}).waitFor();
   await page.locator('#studentAlias').fill(' Isabella ');await page.locator('#identitySelect').click();await page.waitForFunction(()=>window.WordStudentIdentity?.current?.id==='11111111-1111-4111-8111-111111111111');
   await page.locator('#goLearn').click();await page.locator('#learnLibrary').selectOption('lib:difficulty-100-120');await page.waitForFunction(()=>!document.querySelector('#learnStart').disabled);
   await page.locator('#learnCount').fill('1');await page.locator('#learnStart').click();await page.locator('#flashcard').click();

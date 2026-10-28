@@ -15,6 +15,16 @@ test('D: correct, wrong, assisted, repeated words and separate modes are traceab
  assert.equal(closed.status,'completed');assert.equal(a.status,'in_progress');
  assert.equal(facts[0].result.grading.normalizedAnswer,'emperor');
 });
+test('single-sense questions store the displayed part of speech and still read old meaning-only attempts',()=>{
+ const a=attempt(),single=a.questions[2];
+ assert.equal(single.prompt.pos,word.pos||'词性未提供');
+ assert.equal(single.prompt.phonetic,'');
+ const legacy=structuredClone(a);legacy.questions[2].prompt={meaning:single.prompt.meaning,phonetic:'',pos:''};
+ assert.equal(R.validateAttempt(legacy).questions[2].prompt.pos,'');
+ assert.equal(R.createAnswer({attempt:legacy,questionId:legacy.questions[2].id,text:'emperor',answeredAt}).result.isCorrect,true);
+ const invalid=structuredClone(a);invalid.questions[2].prompt.pos='v.';
+ assert.throws(()=>R.validateAttempt(invalid),/prompt\/mode mismatch/);
+});
 test('repeat attempts and multi-device uploads deduplicate without merging distinct practice',()=>{
  const a=attempt(),first=answer(a,0,'wrong');
  const b=attempt({identity:{...identity,deviceId:'device:b'},parentAttemptId:a.id}),second=answer(b,0,'emperor');

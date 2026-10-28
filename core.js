@@ -49,6 +49,14 @@ function totalCount(value,available){const text=String(value).trim(),count=Numbe
 function sampleMixed(words,value){return shuffle(words).slice(0,totalCount(value,words.length))}
 const normalize=x=>x.trim().toLowerCase().replace(/[‘’]/g,"'").replace(/\s+/g,' ');
 function accepts(entry,typed){return [entry.word,...(entry.variants||[])].some(word=>normalize(word)===normalize(typed))}
+function spellingPrompt(word,mode,senseIndex=0,{legacy=false,showFirstLetter=true}={}){
+ const senses=word.senses,text=word.text||word.word;
+ if(!['full','single'].includes(mode)||!Number.isInteger(senseIndex)||senseIndex<0||senseIndex>=senses.length)throw Error('题干释义无效。');
+ if(mode==='full')return{meaning:senses.join('；'),phonetic:word.phonetic||'',pos:word.pos||''};
+ if(legacy)return{meaning:senses[senseIndex],phonetic:'',pos:''};
+ const letters=[...text].filter(c=>/[a-z]/i.test(c)),initialShown=!!showFirstLetter&&letters.length>1;
+ return{meaning:senses[senseIndex],phonetic:'',pos:word.pos||'词性未提供',format:'single-cue-v1',initialShown,initial:initialShown?letters[0].toLowerCase():''};
+}
 function spellingPosition(target,typed){const expected=normalize(target),actual=normalize(typed);let prefix=0;while(prefix<expected.length&&prefix<actual.length&&expected[prefix]===actual[prefix])prefix++;return{prefix,expectedLength:expected.length,actualLength:actual.length,matched:expected===actual}}
 function letterHint(target,count){const letters=[...target].filter(c=>/[a-z]/i.test(c)).length,max=Math.min(Math.floor(letters/2),Math.max(0,letters-1));let shown=0;return{max,text:[...target].map(c=>/[a-z]/i.test(c)?(++shown<=Math.min(count,max)?c:'_'):c).join(' ')}}
 function shuffle(array){const out=[...array];for(let i=out.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out}
@@ -62,5 +70,5 @@ function prefixPool(words,list,count){
  if(count>group.length)throw Error('该难度只有 '+group.length+' 个词，前 N 个词不能超过实际词数。');
  return group.slice(0,count);
 }
-const api={parse,range,meanings,normalize,accepts,spellingPosition,letterHint,shuffle,sampleByList,totalCount,sampleMixed,prefixPool};if(typeof module!=='undefined')module.exports=api;else root.WordCore=api;
+const api={parse,range,meanings,normalize,accepts,spellingPrompt,spellingPosition,letterHint,shuffle,sampleByList,totalCount,sampleMixed,prefixPool};if(typeof module!=='undefined')module.exports=api;else root.WordCore=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -10,7 +10,8 @@
     "test:progress-browser": "node tests/progress-browser.cjs",
     "test:student-identity-browser": "node tests/student-identity-browser.cjs",
     "test:assigned-cloud-browser": "node tests/assigned-cloud-browser.cjs",
-    "test:browser:all": "npm run test:browser && npm run test:learn-browser && npm run test:learning-assignment-browser && npm run test:progress-browser && npm run test:student-identity-browser && npm run test:assigned-cloud-browser",
+    "test:single-prompt-browser": "node tests/single-prompt-browser.cjs",
+    "test:browser:all": "npm run test:browser && npm run test:learn-browser && npm run test:learning-assignment-browser && npm run test:progress-browser && npm run test:student-identity-browser && npm run test:assigned-cloud-browser && npm run test:single-prompt-browser",
     "test:all": "npm test && npm run test:browser:all",
     "setup:browser": "playwright install chromium"
   },

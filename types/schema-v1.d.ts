@@ -71,7 +71,9 @@ export interface PracticeQuestion {
   wordRevision: number;
   mode: Mode;
   snapshot: Pick<VocabularyWord, 'text' | 'phonetic' | 'pos' | 'senses' | 'acceptedAnswers'>;
-  prompt: { meaning: string; phonetic: string; pos: string };
+  /** Exact question shown. Legacy records omit the cue fields. */
+  prompt: { meaning: string; phonetic: string; pos: string;
+    format?: 'single-cue-v1'; initialShown?: boolean; initial?: string };
 }
 export interface PracticeAttempt {
   schemaVersion: 1;
@@ -94,8 +96,9 @@ export interface PracticeAttempt {
 }
 export interface GradeResult {
   isCorrect: boolean;
-  outcome: 'correct' | 'assisted' | 'wrong';
-  grading: { algorithm: 'legacy-spelling-v1'; normalizedAnswer: string; acceptedAnswers: string[] };
+  outcome: 'correct' | 'checked' | 'letter_assisted' | 'assisted' | 'wrong';
+  grading: { algorithm: 'legacy-spelling-v1' | 'spelling-assistance-v2'; normalizedAnswer: string; acceptedAnswers: string[];
+    assistance?: { spellingChecks: number; letterHints: number } };
 }
 export interface AttemptAnswer {
   schemaVersion: 1;
@@ -104,7 +107,7 @@ export interface AttemptAnswer {
   questionId: ID;
   wordId: ID;
   mode: Mode;
-  response: { text: string; skipped: boolean; hintCount: number };
+  response: { text: string; skipped: boolean; hintCount: number; spellingChecks?: number };
   result: GradeResult;
   answeredAt: UTCDateTime;
   durationMs: number | null;

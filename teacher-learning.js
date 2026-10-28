@@ -27,6 +27,7 @@ function renderChoices(pool){
 }
 function update(){
  $('tlLinkPanel').hidden=true;$('tlGenerate').disabled=true;
+ $('tlFirstLetterWrap').hidden=$('tlMode').value!=='single';
  const method=$('tlSelection').value,det=library?.id==='lib:difficulty-100-120';
  $('tlScopeWrap').hidden=!det||method==='list';$('tlPrefixWrap').hidden=$('tlScopeWrap').hidden||$('tlScope').value!=='prefix';$('tlCountWrap').hidden=method!=='range';$('tlManualWrap').hidden=method!=='manual';
  try{const pool=eligible();if(method==='manual')renderChoices(pool);const count=method==='list'?pool.length:method==='manual'?pool.filter(w=>manualIds.has(w.id)).length:positive('tlCount',pool.length);
@@ -48,7 +49,7 @@ async function loadLibrary(id){
 }
 $('assignmentType').onchange=toggle;$('tlLibrary').onchange=()=>loadLibrary($('tlLibrary').value);
 $('tlGroup').onchange=()=>{manualIds.clear();update()};$('tlSelection').onchange=()=>{manualIds.clear();update()};
-for(const id of ['tlScope','tlPrefix','tlCount','tlTime','tlName','tlFinal','tlMode','tlAssistance'])$(id).addEventListener(['tlScope','tlFinal','tlMode','tlAssistance'].includes(id)?'change':'input',update);
+for(const id of ['tlScope','tlPrefix','tlCount','tlTime','tlName','tlFinal','tlMode','tlAssistance','tlFirstLetter'])$(id).addEventListener(['tlScope','tlFinal','tlMode','tlAssistance','tlFirstLetter'].includes(id)?'change':'input',update);
 $('tlSearch').oninput=()=>{try{renderChoices(eligible())}catch{}};
 $('tlWordChoices').onchange=e=>{const id=e.target.dataset.wordId;if(!id)return;if(e.target.checked)manualIds.add(id);else manualIds.delete(id);update()};
 $('tlGenerate').onclick=async()=>{
@@ -56,7 +57,7 @@ $('tlGenerate').onclick=async()=>{
   if(loading||!library||library.source.type!=='builtin')throw Error('只能从已加载的内置词库生成学习作业。');
   const selected=picked();if(!selected.length||selected.length>100)throw Error('固定学习包需包含 1–100 个词。');
   const assistance=$('tlAssistance').value;
-  const payload={v:P.LEARNING_VERSION,l:library.id,lv:library.version,w:selected.map(w=>w.id),name:$('tlName').value.trim(),m:$('tlMode').value,f:$('tlFinal').checked,t:Number($('tlTime').value),h:assistance!=='none',...(assistance==='check'?{u:'check'}:{})};
+  const payload={v:P.LEARNING_VERSION,l:library.id,lv:library.version,w:selected.map(w=>w.id),name:$('tlName').value.trim(),m:$('tlMode').value,f:$('tlFinal').checked,t:Number($('tlTime').value),h:assistance!=='none',...(assistance==='check'?{u:'check'}:{}),...($('tlMode').value==='single'?{i:$('tlFirstLetter').checked}:{})};
   let url=await P.createUrl(payload,new URL('./',document.baseURI).href);if(url.length>2000)throw Error(`链接长 ${url.length} 字符，可能无法稳定分享；请减少词数或拆成多个学习包。`);
   if(root.WordAssignedTeacher?.assigned)url=await root.WordAssignedTeacher.wrap(url);
   $('tlLink').value=url;$('tlLinkSummary').textContent=`${selected.length} 个固定 Word ID · ${payload.f?'含正式检查':'仅学习与复习'} · ${root.WordAssignedTeacher?.assigned?'已指定学生，进度需提交到服务端':'学生刷新后可恢复本机进度'}`;$('tlLinkPanel').hidden=false;$('tlError').textContent='';$('tlLink').focus();$('tlLink').select();
