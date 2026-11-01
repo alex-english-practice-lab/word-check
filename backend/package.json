@@ -1,1 +1,1 @@
-{"name":"word-check-classroom-api","private":true,"type":"module","engines":{"node":">=20"}}
+{"name":"word-check-classroom-api","private":true,"type":"module","engines":{"node":">=20"},"scripts":{"build:teacher-assets":"node ../scripts/build-teacher-assets.mjs","deploy":"npm run build:teacher-assets && node ../scripts/check-deployment-config.mjs && npx wrangler deploy"}}

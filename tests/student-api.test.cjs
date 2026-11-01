@@ -20,6 +20,7 @@ async function setup(){await ready;const DB=database(),pair=await crypto.subtle.
  const call=(r)=>handle(r,env,{fetcher});return{DB,env,call,teacher,pair,claims,fetcher};
 }
 test('aliases normalize to a single UUID; unknown IDs do not self-register; sessions revoke',async()=>{const {DB,call,teacher}=await setup();try{
+ assert.deepEqual(await (await call(req('/api/health'))).json(),{ok:true});
  const created=await call(req('/api/teacher/students','POST',{displayName:'Zining',aliases:['zining','isabella']},teacher));assert.equal(created.status,201);const student=(await created.json()).student;assert.match(student.id,/^[0-9a-f-]{36}$/i);
  assert.equal(normalizeAlias(' ＩＳＡＢＥＬＬＡ '),'isabella');
  for(const alias of ['zining','isabella',' Isabella ']){const response=await call(req('/api/student/select','POST',{alias}));assert.equal(response.status,200);const result=await response.json();assert.equal(result.student.id,student.id);assert.ok(result.accessToken.length>40);
@@ -31,6 +32,10 @@ test('aliases normalize to a single UUID; unknown IDs do not self-register; sess
  assert.equal((await call(req('/api/teacher/students','POST',{displayName:'Other',aliases:['ISABELLA']},teacher))).status,409);
  assert.equal((await DB.prepare('SELECT COUNT(*) AS n FROM students').first()).n,1);
 }finally{DB.close()}});
+test('health check requires a functioning D1 binding',async()=>{await ready;
+ const noDb=await handle(req('/api/health'),{FRONTEND_ORIGIN:origin});assert.equal(noDb.status,503);
+ const unavailable=await handle(req('/api/health'),{FRONTEND_ORIGIN:origin,DB:{prepare:()=>({first:async()=>({ok:0})})}});assert.equal(unavailable.status,503);
+});
 test('teacher APIs require signed Access JWT, matching audience, issuer and teacher email',async()=>{const {DB,call,env,pair,claims,fetcher,teacher}=await setup();try{
  assert.equal((await call(req('/api/teacher/students'))).status,403);
  assert.equal((await call(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':'forged'}))).status,403);
@@ -38,6 +43,16 @@ test('teacher APIs require signed Access JWT, matching audience, issuer and teac
  const expired=await sign(pair.privateKey,{...claims,exp:Math.floor(Date.now()/1000)-1});assert.equal((await handle(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':expired}),env,{fetcher})).status,403);
  const email=await sign(pair.privateKey,{...claims,email:'other@example.test'});assert.equal((await handle(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':email}),env,{fetcher})).status,403);
  assert.equal((await call(req('/api/teacher/students','GET',null,teacher))).status,200);
+}finally{DB.close()}});
+test('same-origin teacher assets require signed Access while public API and shared stylesheet stay available',async()=>{const {DB,env,fetcher,teacher}=await setup();try{
+ env.ASSETS={fetch:async request=>new Response('asset:'+new URL(request.url).pathname)};
+ assert.equal((await handle(req('/teacher/dashboard.html'),env,{fetcher})).status,403);
+ assert.equal((await handle(req('/teacher/dashboard.js','GET',null,{Authorization:'Bearer '+'a'.repeat(43)}),env,{fetcher})).status,403);
+ assert.equal(await (await handle(req('/teacher/dashboard.html','GET',null,teacher),env,{fetcher})).text(),'asset:/teacher/dashboard.html');
+ assert.equal(await (await handle(req('/style.css'),env,{fetcher})).text(),'asset:/style.css');
+ assert.equal((await handle(req('/api/health'),env,{fetcher})).status,200);
+ assert.equal((await handle(req('/api/teacher/students','POST',{displayName:'Same-origin teacher',aliases:['teacher-test']},{...teacher,Origin:base}),env,{fetcher})).status,201);
+ assert.equal((await handle(req('/teacher/other.js','GET',null,teacher),env,{fetcher})).status,404);
 }finally{DB.close()}});
 test('alias edits preserve historical ownership; disabled student and rate limits fail closed',async()=>{const {DB,call,teacher,env,fetcher}=await setup();try{
  const created=await call(req('/api/teacher/students','POST',{displayName:'Zining',aliases:['zining','isabella']},teacher));const id=(await created.json()).student.id;
