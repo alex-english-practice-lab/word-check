@@ -14,7 +14,7 @@
   "d1_databases": [{
     "binding": "DB",
     "database_name": "word-check-classroom",
-    "database_id": "00000000-0000-0000-0000-000000000000",
+    "database_id": "cecf28ba-6e8b-429a-b4ba-922592fe1b13",
     "migrations_dir": "migrations"
   }],
   "ratelimits": [{

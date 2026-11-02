@@ -1,12 +1,12 @@
 # PR20 — Cloudflare deployment and acceptance
 
-This branch prepares the existing Worker and teacher dashboard for a private classroom pilot. It does **not** enable the production student API. `student-config.js` remains empty until all live gates below pass. The D1 UUID in `backend/wrangler.jsonc` is still a placeholder; `npm run deploy` deliberately refuses it.
+This branch prepares the existing Worker and teacher dashboard for a private classroom pilot. It does **not** enable the production student API. `student-config.js` remains empty until all live gates below pass. `backend/wrangler.jsonc` now identifies the provisioned `word-check-classroom` D1 database; deployment still requires authenticated migration and Worker steps.
 
 ## Current evidence
 
 - Base: `main` at `2a28c804`, including Single Meaning PR #19.
-- Local Wrangler 4.156.0 is unauthenticated (`wrangler whoami`). Account plan, Workers, D1, Zero Trust, Access application, teacher email, and Worker URL are therefore **unverified**.
-- `npm ci`, `npm run setup:browser`, the project test suites, local D1 migrations, foreign key check, and `wrangler deploy --dry-run` are local checks only. A dry run accepts the placeholder UUID and does not imply a usable D1 binding.
+- Local Wrangler 4.156.0 is unauthenticated (`wrangler whoami`). The Cloudflare dashboard shows a newly provisioned `word-check-classroom` D1 database with UUID `cecf28ba-6e8b-429a-b4ba-922592fe1b13`, zero tables, and no Worker projects. Account plan, remote migrations, Zero Trust, Access application, teacher email, and Worker URL remain **unverified**.
+- `npm ci`, `npm run setup:browser`, the project test suites, local D1 migrations, foreign key check, and `wrangler deploy --dry-run` are local checks only. A dry run does not prove that the remote D1 binding or deployed Worker is usable.
 - `/api/health` now performs a D1 read (`SELECT 1`) instead of checking only that a binding object exists.
 - Opening an assigned link temporarily selects its student in the current tab. The ordinary saved Student ID and the other student's local namespace are preserved. Navigation into or out of `#assigned=` reloads so the correct profile initializes.
 
