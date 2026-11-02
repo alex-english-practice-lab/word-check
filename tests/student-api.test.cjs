@@ -37,11 +37,13 @@ test('health check requires a functioning D1 binding',async()=>{await ready;
  const unavailable=await handle(req('/api/health'),{FRONTEND_ORIGIN:origin,DB:{prepare:()=>({first:async()=>({ok:0})})}});assert.equal(unavailable.status,503);
 });
 test('teacher APIs require signed Access JWT, matching audience, issuer and teacher email',async()=>{const {DB,call,env,pair,claims,fetcher,teacher}=await setup();try{
+ const missing=await call(req('/api/teacher/auth-diagnostic'));assert.equal(missing.status,200);assert.deepEqual(await missing.json(),{ok:false,stage:'request-or-config',checks:{tokenPresent:false,issuerConfigured:true,audienceConfigured:true,emailConfigured:true,tokenParsed:false,algorithmAccepted:false,issuerMatches:false,audienceMatches:false,emailClaimPresent:false,emailMatches:false,timeValid:false,certificatesFetched:false,signingKeyFound:false,signatureValid:false}});
  assert.equal((await call(req('/api/teacher/students'))).status,403);
  assert.equal((await call(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':'forged'}))).status,403);
  const wrong=await sign(pair.privateKey,{...claims,aud:'other'});assert.equal((await handle(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':wrong}),env,{fetcher})).status,403);
  const expired=await sign(pair.privateKey,{...claims,exp:Math.floor(Date.now()/1000)-1});assert.equal((await handle(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':expired}),env,{fetcher})).status,403);
  const email=await sign(pair.privateKey,{...claims,email:'other@example.test'});assert.equal((await handle(req('/api/teacher/students','GET',null,{'Cf-Access-Jwt-Assertion':email}),env,{fetcher})).status,403);
+ const diagnostic=await call(req('/api/teacher/auth-diagnostic','GET',null,teacher));assert.equal(diagnostic.status,200);const diagnosis=await diagnostic.json();assert.equal(diagnosis.ok,true);assert.equal(diagnosis.stage,'authorized');assert.ok(Object.values(diagnosis.checks).every(Boolean));
  assert.equal((await call(req('/api/teacher/students','GET',null,teacher))).status,200);
 }finally{DB.close()}});
 test('same-origin teacher assets require signed Access while public API and shared stylesheet stay available',async()=>{const {DB,env,fetcher,teacher}=await setup();try{

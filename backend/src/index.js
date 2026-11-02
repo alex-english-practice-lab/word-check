@@ -1,5 +1,5 @@
 import {InputError,selectStudent,createStudent,listStudents,updateStudent} from './identity.js';
-import {issueSession,requireStudent,revokeStudent,requireTeacher} from './auth.js';
+import {issueSession,requireStudent,revokeStudent,requireTeacher,diagnoseTeacher} from './auth.js';
 import {createAssignment,openAssignment,putRecord,listRecords,listTeacherRecords,listTeacherAssignments} from './records.js';
 function json(value,status=200,headers={}){return new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}})}
 async function body(request,max=4096){
@@ -56,6 +56,7 @@ export async function handle(request,env,{fetcher=fetch}={}){
    const s=await requireStudent(request,env.DB);return json(await putRecord(env.DB,s.id,await body(request,200000)),200,cors);
   }
   if(path.startsWith('/api/teacher/')){
+   if(path==='/api/teacher/auth-diagnostic'&&request.method==='GET')return json(await diagnoseTeacher(request,env,fetcher),200,cors);
    await requireTeacher(request,env,fetcher);
    if(path==='/api/teacher/records'&&request.method==='GET'){
     const query=new URL(request.url).searchParams;
