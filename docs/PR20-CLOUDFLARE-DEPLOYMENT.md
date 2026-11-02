@@ -5,7 +5,8 @@ This branch prepares the existing Worker and teacher dashboard for a private cla
 ## Current evidence
 
 - Base: `main` at `2a28c804`, including Single Meaning PR #19.
-- Local Wrangler 4.156.0 is unauthenticated (`wrangler whoami`). The Cloudflare dashboard shows a newly provisioned `word-check-classroom` D1 database with UUID `cecf28ba-6e8b-429a-b4ba-922592fe1b13`, zero tables, and no Worker projects. Account plan, remote migrations, Zero Trust, Access application, teacher email, and Worker URL remain **unverified**.
+- Local Wrangler 4.156.0 is unauthenticated (`wrangler whoami`). The Cloudflare dashboard shows a newly provisioned `word-check-classroom` D1 database with UUID `cecf28ba-6e8b-429a-b4ba-922592fe1b13`, zero tables, plus a connected `word-check-classroom-api` Workers Builds project targeting `feature/cloudflare-production-deployment`. The build root is `backend`, the deploy command is `npm run deploy`, and the build environment now has restricted Wrangler credentials supplied as secrets. Account plan, successful remote migrations, Zero Trust, Access application, teacher email, and Worker URL remain **unverified**.
+- A deployment-trigger commit was pushed after the restricted build credentials were configured; its remote build result must be recorded before this evidence is upgraded.
 - `npm ci`, `npm run setup:browser`, the project test suites, local D1 migrations, foreign key check, and `wrangler deploy --dry-run` are local checks only. A dry run does not prove that the remote D1 binding or deployed Worker is usable.
 - `/api/health` now performs a D1 read (`SELECT 1`) instead of checking only that a binding object exists.
 - Opening an assigned link temporarily selects its student in the current tab. The ordinary saved Student ID and the other student's local namespace are preserved. Navigation into or out of `#assigned=` reloads so the correct profile initializes.
