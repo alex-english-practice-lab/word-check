@@ -20,6 +20,7 @@ async function main(){const {handle}=await import('../backend/src/index.js'),db=
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));origin='http://127.0.0.1:'+server.address().port;
   browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.WORD_CHECK_CHROMIUM?{executablePath:process.env.WORD_CHECK_CHROMIUM}:{})});
   const teacherContext=await browser.newContext({viewport:{width:1280,height:900}});await teacherContext.addCookies([{name:'teacher',value:'1',url:origin}]);const teacher=await teacherContext.newPage();await teacher.goto(origin+'/word-check/teacher/');
+  assert.equal(await teacher.locator('a').filter({hasText:'查看学生记录'}).getAttribute('href'),origin+'/teacher/dashboard.html');
   const unauthorized=await browser.newPage();await unauthorized.goto(origin+'/word-check/teacher/');await unauthorized.locator('#assignmentStudentNotice').filter({hasText:'加载失败'}).waitFor();assert.equal(await unauthorized.locator('#assignmentStudent option').count(),1);await unauthorized.close();
   await teacher.waitForFunction(id=>!!document.querySelector('#assignmentStudent option[value="'+id+'"]'),A);await teacher.locator('#assignmentStudent').selectOption(A);await teacher.waitForFunction(()=>!document.querySelector('#createPreset').disabled);await teacher.locator('[name=mode][value=single]').check();await teacher.locator('#sampling').selectOption('total');await teacher.locator('#count').fill('1');await teacher.locator('#linkType').selectOption('fixed');await teacher.locator('#createPreset').click();
   await teacher.locator('#presetLinkPanel').waitFor({state:'visible'});const url=await teacher.locator('#presetLink').inputValue();assert.match(url,/#assigned=[A-Za-z0-9_-]{40,64}$/);assert.ok(url.length<200);
@@ -32,6 +33,19 @@ async function main(){const {handle}=await import('../backend/src/index.js'),db=
   for(let i=0;i<100&&!(await db.prepare('SELECT record_id FROM student_records WHERE kind=?').bind('check').first());i++)await new Promise(resolve=>setTimeout(resolve,100));
   const saved=await db.prepare('SELECT student_id,kind,assignment_id FROM student_records WHERE kind=?').bind('check').first();if(!saved)console.error('sync diagnostic',await student.evaluate(()=>({status:document.querySelector('#results [data-cloud-status]')?.textContent,identity:WordStudentIdentity.current,token:!!WordStudentIdentity.token,checks:Object.keys(localStorage).filter(k=>k.includes('check.')).map(k=>{let v;try{v=JSON.parse(localStorage.getItem(k));return {k,status:v.attempt?.status,userId:v.attempt?.identity.userId,assignmentId:v.assignmentId,answers:v.answers?.length}}catch{return {k}}}),error:WordCloudSync.lastError})),db.count());assert.ok(saved,'completed check should reach the server');assert.equal(saved.student_id,A);assert.ok(saved.assignment_id);assert.deepEqual(errors,[]);
   const cloudPrompt=JSON.parse((await db.prepare('SELECT payload_json FROM student_records WHERE kind=? AND assignment_id=?').bind('check',saved.assignment_id).first()).payload_json);assert.deepEqual(cloudPrompt.attempt.questions[0].prompt,visible.prompt);assert.equal(cloudPrompt.answers[0].result.outcome,'correct');assert.equal(cloudPrompt.answers[0].response.hintCount,0);assert.equal(cloudPrompt.answers[0].response.spellingChecks,0);
+  for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
+   const device=await browser.newContext({viewport}),visitor=await device.newPage();await visitor.goto(origin+'/word-check/');
+   await visitor.locator('#studentAlias').fill('irving');await visitor.locator('#identitySelect').click();await visitor.waitForFunction(id=>WordStudentIdentity.current?.id===id,B);
+   await visitor.evaluate(()=>WordStudentIdentity.storage.setItem('identity-isolation','Irving local record'));
+   await visitor.goto(url);await visitor.locator('#quiz').waitFor({state:'visible',timeout:15000});
+   assert.equal(await visitor.evaluate(()=>WordStudentIdentity.current.id),A);
+   assert.equal(await visitor.evaluate(()=>WordStudentIdentity.storage.getItem('identity-isolation')),null);
+   assert.equal(await visitor.evaluate(()=>JSON.parse(localStorage.getItem(WordStudentIdentityCore.KEY)).id),B);
+   assert.ok(await visitor.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await visitor.goto(origin+'/word-check/');await visitor.waitForFunction(id=>WordStudentIdentity.current?.id===id,B);
+   assert.equal(await visitor.evaluate(()=>WordStudentIdentity.storage.getItem('identity-isolation')),'Irving local record');
+   await device.close();
+  }
   const beforeRetry=db.count();await student.route('**/api/student/records*',route=>route.request().method()==='POST'?route.abort('failed'):route.continue());
   await student.locator('#restart').click();await student.locator('#answer').fill('wrong');await student.locator('#submit').click();await student.locator('#next').click();
   await student.locator('#results [data-cloud-status]').filter({hasText:'尚未提交'}).waitFor({timeout:15000});assert.equal(db.count(),beforeRetry);assert.ok(await student.evaluate(()=>Object.keys(localStorage).filter(k=>k.includes('.check.')).length>=2));
@@ -62,12 +76,24 @@ async function main(){const {handle}=await import('../backend/src/index.js'),db=
   const blocked=await browser.newPage();await blocked.goto(origin+'/word-check/teacher/dashboard.html');await blocked.locator('#dashError').filter({hasText:'未授权'}).waitFor({timeout:5000}).catch(async e=>{console.error('dashboard blocked diagnostic',await blocked.evaluate(()=>({base:WordCheckStudentConfig.apiBase,error:document.querySelector('#dashError')?.textContent,status:document.querySelector('#dashStatus')?.textContent,ready:document.readyState})));throw e});assert.equal(await blocked.locator('#dashRecords article').count(),0);
   const dashboard=await teacherContext.newPage();await dashboard.goto(origin+'/word-check/teacher/dashboard.html');await dashboard.locator('#dashStudent').selectOption(B);await dashboard.locator('#dashRecords').filter({hasText:'尚无已提交记录'}).waitFor();
   for(let i=0;i<26;i++)await db.prepare('INSERT INTO student_records(student_id,kind,record_id,payload_json,payload_hash,updated_at,assignment_id) VALUES(?,?,?,?,?,?,?)').bind(A,'daily','dashboard-page-'+i,JSON.stringify({id:'dashboard-page-'+i,finished:true,answers:[],completed_at:at}),'test-hash-'+i,at,null).run();
+
+  await dashboard.locator('summary').filter({hasText:'添加学生'}).click();
+  await dashboard.locator('#rosterEntries').fill('Test C | trial-c, trial-c-alt\nTest D | trial-d');
+  await dashboard.locator('#rosterSubmit').click();
+  await dashboard.locator('#rosterStatus').filter({hasText:'已建立：Test C、Test D'}).waitFor();
+  const aliases=await db.prepare('SELECT student_id FROM student_aliases WHERE normalized_alias IN (?,?)').bind('trial-c','trial-c-alt').all();
+  assert.equal(aliases.results.length,2);assert.equal(aliases.results[0].student_id,aliases.results[1].student_id);
+  await dashboard.locator('#rosterEntries').fill('Test E | trial-e\nExisting | trial-c');
+  await dashboard.locator('#rosterSubmit').click();
+  await dashboard.locator('#rosterStatus').filter({hasText:'Student ID 已被使用'}).waitFor();
+  assert.equal(await dashboard.locator('#rosterEntries').inputValue(),'Existing | trial-c');
+  await dashboard.locator('summary').filter({hasText:'添加学生'}).click();
   await dashboard.locator('#dashStudent').selectOption(A);await dashboard.locator('#dashRecords article').first().waitFor();assert.equal(await dashboard.locator('#dashRecords article').count(),25);await dashboard.locator('#dashMore').click();await dashboard.waitForFunction(()=>document.querySelectorAll('#dashRecords article').length>25);assert.equal(await dashboard.locator('#dashMore').isHidden(),true);
   await dashboard.locator('#dashAssignment').selectOption(saved.assignment_id);await dashboard.locator('#dashRecords article').first().waitFor();await dashboard.locator('#dashRecords details').first().evaluate(node=>node.open=true);assert.match((await dashboard.locator('#dashRecords table').allTextContents()).join(' '),new RegExp('首字母：'+visible.prompt.initial));
   await dashboard.locator('#dashAssignment').selectOption(learningId);await dashboard.locator('#dashRecords article').first().waitFor();assert.ok(await dashboard.locator('#dashRecords article').count()>=2);assert.match(await dashboard.locator('#dashRecords').innerText(),/自评不计入正式正确率/);assert.match(await dashboard.locator('#dashRecords').innerText(),/客户端提交/);
   await dashboard.locator('#dashAssignment').selectOption('');await dashboard.locator('#dashRecords article').first().waitFor();await dashboard.locator('#dashRecords details').first().evaluate(node=>node.open=true);assert.ok(await dashboard.locator('#dashRecords table').count()>=1);
   await dashboard.setViewportSize({width:390,height:844});assert.ok(await dashboard.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile dashboard overflow');
   await dashboard.route('**/api/teacher/records?*',route=>route.abort('failed'));await dashboard.locator('#dashRefresh').click();await dashboard.locator('#dashError').filter({hasText:/fetch|Failed|服务/i}).waitFor();await dashboard.unroute('**/api/teacher/records?*');await dashboard.locator('#dashRefresh').click();await dashboard.locator('#dashRecords article').first().waitFor();
-  console.log('PASS assigned fixed and learning links, named spelling/Daily sync, cross-device progress, offline retry, Guest isolation, invalid/expired links, desktop/mobile');
+  console.log('PASS assigned fixed and learning links, temporary assigned identity, named spelling/Daily sync, cross-device progress, offline retry, Guest isolation, invalid/expired links, desktop/mobile');
  }finally{await browser?.close();if(server)await new Promise(resolve=>server.close(resolve));db.close()}}
 main().catch(error=>{console.error(error);process.exitCode=1});

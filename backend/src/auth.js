@@ -15,20 +15,37 @@ export async function requireStudent(request,db){
  return {id:row.id,displayName:row.display_name,tokenHash:hash};
 }
 export async function revokeStudent(request,db){await db.prepare('DELETE FROM student_sessions WHERE token_hash=?').bind(await digest(bearer(request))).run()}
-export async function requireTeacher(request,env,fetcher=fetch){
- const token=request.headers.get('Cf-Access-Jwt-Assertion');
- if(!token||!env.ACCESS_ISSUER?.startsWith('https://')||!env.ACCESS_AUD||!env.TEACHER_EMAIL||env.ACCESS_AUD.startsWith('REPLACE_')||env.ACCESS_ISSUER.includes('REPLACE-'))throw new InputError('教师访问未授权',403);
+async function inspectTeacher(request,env,fetcher=fetch){
+ const checks={
+  tokenPresent:false,issuerConfigured:false,audienceConfigured:false,emailConfigured:false,
+  tokenParsed:false,algorithmAccepted:false,issuerMatches:false,audienceMatches:false,
+  emailClaimPresent:false,emailMatches:false,timeValid:false,certificatesFetched:false,
+  signingKeyFound:false,signatureValid:false
+ };
+ const token=request.headers.get('Cf-Access-Jwt-Assertion');checks.tokenPresent=Boolean(token);
+ checks.issuerConfigured=Boolean(env.ACCESS_ISSUER?.startsWith('https://')&&!env.ACCESS_ISSUER.includes('REPLACE-'));
+ checks.audienceConfigured=Boolean(env.ACCESS_AUD&&!env.ACCESS_AUD.startsWith('REPLACE_'));
+ checks.emailConfigured=Boolean(env.TEACHER_EMAIL);
+ if(!checks.tokenPresent||!checks.issuerConfigured||!checks.audienceConfigured||!checks.emailConfigured)return{ok:false,stage:'request-or-config',checks};
  try{
-  const parts=token.split('.');if(parts.length!==3)throw Error('JWT');
-  const header=JSON.parse(new TextDecoder().decode(decode(parts[0]))),payload=JSON.parse(new TextDecoder().decode(decode(parts[1])));
-  if(header.alg!=='RS256'||typeof header.kid!=='string'||!header.kid)throw Error('alg/kid');
+  const parts=token.split('.');if(parts.length!==3)return{ok:false,stage:'token-format',checks};
+  const header=JSON.parse(new TextDecoder().decode(decode(parts[0]))),payload=JSON.parse(new TextDecoder().decode(decode(parts[1])));checks.tokenParsed=true;
+  checks.algorithmAccepted=header.alg==='RS256'&&typeof header.kid==='string'&&Boolean(header.kid);if(!checks.algorithmAccepted)return{ok:false,stage:'token-header',checks};
   const issuer=env.ACCESS_ISSUER.replace(/\/$/,'');
-  if(payload.iss!==issuer||!(Array.isArray(payload.aud)?payload.aud.includes(env.ACCESS_AUD):payload.aud===env.ACCESS_AUD)||payload.email?.toLowerCase()!==env.TEACHER_EMAIL.toLowerCase())throw Error('claims');
-  const now=Math.floor(Date.now()/1000);if(!Number.isFinite(payload.exp)||payload.exp<=now||payload.nbf>now||payload.iat>now+60)throw Error('expired');
-  const certs=await fetcher(issuer+'/cdn-cgi/access/certs');if(!certs.ok)throw Error('certs');
-  const keys=(await certs.json()).keys;const jwk=keys?.find(k=>k.kid===header.kid&&k.kty==='RSA');if(!jwk)throw Error('key');
+  checks.issuerMatches=payload.iss===issuer;
+  checks.audienceMatches=Array.isArray(payload.aud)?payload.aud.includes(env.ACCESS_AUD):payload.aud===env.ACCESS_AUD;
+  checks.emailClaimPresent=typeof payload.email==='string'&&Boolean(payload.email);
+  checks.emailMatches=checks.emailClaimPresent&&payload.email.toLowerCase()===env.TEACHER_EMAIL.toLowerCase();
+  if(!checks.issuerMatches||!checks.audienceMatches||!checks.emailMatches)return{ok:false,stage:'claims',checks};
+  const now=Math.floor(Date.now()/1000);checks.timeValid=Number.isFinite(payload.exp)&&payload.exp>now&&!(payload.nbf>now)&&!(payload.iat>now+60);if(!checks.timeValid)return{ok:false,stage:'time',checks};
+  const certs=await fetcher(issuer+'/cdn-cgi/access/certs');checks.certificatesFetched=certs.ok;if(!checks.certificatesFetched)return{ok:false,stage:'certificates',checks};
+  const keys=(await certs.json()).keys,jwk=keys?.find(k=>k.kid===header.kid&&k.kty==='RSA');checks.signingKeyFound=Boolean(jwk);if(!checks.signingKeyFound)return{ok:false,stage:'signing-key',checks};
   const key=await crypto.subtle.importKey('jwk',jwk,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['verify']);
-  if(!await crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,decode(parts[2]),new TextEncoder().encode(parts[0]+'.'+parts[1])))throw Error('signature');
-  return {email:payload.email,subject:payload.sub};
- }catch{throw new InputError('教师访问未授权',403)}
+  checks.signatureValid=await crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,decode(parts[2]),new TextEncoder().encode(parts[0]+'.'+parts[1]));if(!checks.signatureValid)return{ok:false,stage:'signature',checks};
+  return{ok:true,stage:'authorized',checks,identity:{email:payload.email,subject:payload.sub}};
+ }catch{return{ok:false,stage:'unexpected',checks}}
+}
+export async function diagnoseTeacher(request,env,fetcher=fetch){const result=await inspectTeacher(request,env,fetcher);return{ok:result.ok,stage:result.stage,checks:result.checks}}
+export async function requireTeacher(request,env,fetcher=fetch){
+ const result=await inspectTeacher(request,env,fetcher);if(!result.ok)throw new InputError('教师访问未授权',403);return result.identity;
 }

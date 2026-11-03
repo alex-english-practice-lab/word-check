@@ -1,3 +1,6 @@
-// Set to the deployed Worker origin after PR15-A is configured and tested.
-// Empty keeps the existing local-only site behavior until cloud identity is ready.
-window.WordCheckStudentConfig={apiBase:''};
+// The public classroom runs on GitHub Pages. Local copies stay offline.
+window.WordCheckStudentConfig = {
+  apiBase: location.origin === 'https://alex-english-practice-lab.github.io'
+    ? 'https://word-check-classroom-api.alexli7official.workers.dev'
+    : ''
+};

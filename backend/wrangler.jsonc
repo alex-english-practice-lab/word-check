@@ -3,13 +3,18 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
   "workers_dev": true,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
   "vars": {
     "FRONTEND_ORIGIN": "https://alex-english-practice-lab.github.io"
   },
   "d1_databases": [{
     "binding": "DB",
     "database_name": "word-check-classroom",
-    "database_id": "00000000-0000-0000-0000-000000000000",
+    "database_id": "cecf28ba-6e8b-429a-b4ba-922592fe1b13",
     "migrations_dir": "migrations"
   }],
   "ratelimits": [{

@@ -2,11 +2,15 @@
 'use strict';if(document.body.dataset.teacher==='true')return;
 const C=root.WordStudentIdentityCore,config=root.WordCheckStudentConfig||{};
 const assignedToken=new URLSearchParams(root.location.hash.replace(/^#/, '')).get('assigned');
+root.addEventListener('hashchange',()=>{
+ const next=new URLSearchParams(root.location.hash.replace(/^#/, '')).get('assigned');
+ if(next!==assignedToken)root.location.reload();
+});
 let local,session;try{local=root.localStorage;session=root.sessionStorage;void local.length;void session.length}catch{
  const note=document.createElement('span');note.className='small';note.textContent='本浏览器无法保存记录 · Guest';document.querySelector('header').append(note);
  root.WordStudentIdentity={enabled:false,mode:'guest',storage:C.scopedStorage(null,null),warning:'本浏览器无法保存学习记录；刷新后进度可能丢失。'};if(assignedToken)root.WordAssignedReady=Promise.resolve();return;
 }
-const ctrl=C.create({apiBase:config.apiBase,local,session,fetcher:(...args)=>root.fetch(...args),refresh:()=>root.location.reload()});
+const ctrl=C.create({apiBase:config.apiBase,local,session,assignedToken,fetcher:(...args)=>root.fetch(...args),refresh:()=>root.location.reload()});
 root.WordStudentIdentity=ctrl;if(!ctrl.enabled){if(assignedToken)root.WordAssignedReady=Promise.resolve();if(ctrl.mode==='guest'){const note=document.createElement('span');note.className='small';note.textContent='云端身份暂不可用 · Guest 不记录';document.querySelector('header').append(note)}return}
 const header=document.querySelector('header'),button=document.createElement('button');button.type='button';button.className='identity-trigger';button.id='identityTrigger';header.append(button);
 header.classList.add('has-student-identity');

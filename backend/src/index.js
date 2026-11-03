@@ -1,5 +1,5 @@
 import {InputError,selectStudent,createStudent,listStudents,updateStudent} from './identity.js';
-import {issueSession,requireStudent,revokeStudent,requireTeacher} from './auth.js';
+import {issueSession,requireStudent,revokeStudent,requireTeacher,diagnoseTeacher} from './auth.js';
 import {createAssignment,openAssignment,putRecord,listRecords,listTeacherRecords,listTeacherAssignments} from './records.js';
 function json(value,status=200,headers={}){return new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}})}
 async function body(request,max=4096){
@@ -9,14 +9,32 @@ async function body(request,max=4096){
  try{return JSON.parse(raw)}catch{throw new InputError('JSON 格式无效')}
 }
 export async function handle(request,env,{fetcher=fetch}={}){
- const origin=request.headers.get('Origin'),allowed=env.FRONTEND_ORIGIN;
- if(origin&&origin!==allowed)return json({error:'Origin 未授权'},403);
- const cors=origin?{'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Allow-Methods':'GET, POST, PATCH, OPTIONS','Vary':'Origin'}:{};
+ const origin=request.headers.get('Origin'),allowed=env.FRONTEND_ORIGIN,self=new URL(request.url).origin;
+ if(origin&&origin!==allowed&&origin!==self)return json({error:'Origin 未授权'},403);
+ const cors=origin===allowed?{'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Allow-Methods':'GET, POST, PATCH, OPTIONS','Vary':'Origin'}:{};
  if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
  try{
   if(!env.DB)throw new InputError('数据库尚未配置',503);
   const path=new URL(request.url).pathname;
-  if(path==='/api/health'&&request.method==='GET')return json({ok:true},200,cors);
+  // A same-origin teacher dashboard avoids third-party Access cookies. The
+  // Worker checks the same signed Access assertion as the teacher API before
+  // serving its HTML, script and stylesheet, even if an Access path is missed.
+  if(['/teacher','/teacher/','/teacher/dashboard','/teacher/dashboard.html','/teacher/dashboard.js','/teacher/dashboard.css'].includes(path)){
+   await requireTeacher(request,env,fetcher);
+   if(!env.ASSETS)throw new InputError('教师页面尚未配置',503);
+   if(['/teacher','/teacher/'].includes(path))return Response.redirect(new URL('/teacher/dashboard',request.url),302);
+   return env.ASSETS.fetch(request);
+  }
+  if(['/style.css','/student-config.js'].includes(path)){
+   if(!env.ASSETS)throw new InputError('教师页面尚未配置',503);
+   return env.ASSETS.fetch(request);
+  }
+  if(path==='/api/health'&&request.method==='GET'){
+   // A bound but unavailable D1 database must not pass the deployment health check.
+   const database=await env.DB.prepare('SELECT 1 AS ok').first();
+   if(database?.ok!==1)throw new InputError('数据库暂不可用',503);
+   return json({ok:true},200,cors);
+  }
   if(path==='/api/student/select'&&request.method==='POST'){
    if(!env.SELECT_LIMITER?.limit)throw new InputError('身份查询暂不可用',503);
    const ip=request.headers.get('CF-Connecting-IP')||'unknown';if(!(await env.SELECT_LIMITER.limit({key:ip})).success)throw new InputError('尝试次数过多，请稍后重试',429);
@@ -39,6 +57,7 @@ export async function handle(request,env,{fetcher=fetch}={}){
    const s=await requireStudent(request,env.DB);return json(await putRecord(env.DB,s.id,await body(request,200000)),200,cors);
   }
   if(path.startsWith('/api/teacher/')){
+   if(path==='/api/teacher/auth-diagnostic'&&request.method==='GET')return json(await diagnoseTeacher(request,env,fetcher),200,cors);
    await requireTeacher(request,env,fetcher);
    if(path==='/api/teacher/records'&&request.method==='GET'){
     const query=new URL(request.url).searchParams;

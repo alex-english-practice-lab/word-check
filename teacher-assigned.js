@@ -3,6 +3,8 @@
 if(document.body.dataset.teacher!=='true')return;
 const select=document.getElementById('assignmentStudent'),note=document.getElementById('assignmentStudentNotice');
 const base=root.WordCheckStudentConfig?.apiBase?.replace(/\/$/,'')||'';
+const dashboard=document.querySelector('a[href="teacher/dashboard.html"]');
+if(base&&dashboard)dashboard.href=base+'/teacher/dashboard.html';
 let loading=null,loaded=false;
 async function roster(){
  if(!base){note.textContent='学生服务尚未配置；可继续生成普通链接。';return}

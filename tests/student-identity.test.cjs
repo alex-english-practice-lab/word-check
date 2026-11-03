@@ -28,3 +28,22 @@ test('without configured backend the established local-only storage is unchanged
  const local=memory(),c=C.create({apiBase:'',local,session:memory()});assert.equal(c.mode,'legacy');assert.equal(c.storage,local);
  local.setItem(C.MARKER,'1');const rollback=C.create({apiBase:'',local,session:memory()});assert.equal(rollback.mode,'guest');assert.notEqual(rollback.storage,local);
 });
+test('assigned student temporarily overrides a different default without changing either profile',async()=>{
+ const local=memory(),session=memory(),defaultStudent={id:A,displayName:'Zining',alias:'isabella'},assignedStudent={id:B,displayName:'Irving',alias:'irving'};
+ local.setItem(C.KEY,JSON.stringify(defaultStudent));C.scopedStorage(local,A).setItem('history','default');C.scopedStorage(local,B).setItem('history','assigned');
+ let reloads=0;const response={student:{id:B,displayName:'Irving'},alias:'irving',assignmentId:'assignment-1',accessToken:'opaque'};
+ const fetcher=async()=>({ok:true,json:async()=>({student:{id:B,displayName:'Irving'},accessToken:'opaque'})});
+ const options={apiBase:'https://api.example.test',local,session,fetcher,refresh:()=>reloads++,assignedToken:'assignment-token'};
+ let ctrl=C.create(options);assert.equal(ctrl.current.id,A);assert.equal(ctrl.acceptAssigned(response),false);assert.equal(reloads,1);
+ assert.deepEqual(JSON.parse(local.getItem(C.KEY)),defaultStudent);
+ ctrl=C.create(options);assert.equal(ctrl.mode,'named');assert.equal(ctrl.current.id,B);assert.equal(ctrl.storage.getItem('history'),'assigned');
+ assert.equal(ctrl.acceptAssigned(response),true);assert.equal(ctrl.token,'opaque');
+ assert.throws(()=>ctrl.noRecording(),/不能以 Guest/);
+ const ordinary=C.create({...options,assignedToken:null});assert.equal(ordinary.current.id,A);assert.equal(ordinary.storage.getItem('history'),'default');
+ await ctrl.logout();assert.deepEqual(JSON.parse(local.getItem(C.KEY)),defaultStudent);assert.equal(session.getItem(C.ASSIGNED),null);
+ const guestSession=memory();guestSession.setItem(C.GUEST,'1');let guest=C.create({...options,session:guestSession});assert.equal(guest.mode,'guest');
+ assert.equal(guest.acceptAssigned(response),false);guest=C.create({...options,session:guestSession});assert.equal(guest.current.id,B);assert.equal(guest.mode,'named');
+ assert.equal(guestSession.getItem(C.GUEST),'1');assert.equal(C.create({...options,session:guestSession,assignedToken:null}).mode,'guest');
+ const selected=C.create({...options,assignedToken:'another-assignment'});await selected.choose('irving',B);assert.deepEqual(JSON.parse(local.getItem(C.KEY)),defaultStudent);
+ assert.equal(C.create({...options,assignedToken:null}).current.id,A);
+});
