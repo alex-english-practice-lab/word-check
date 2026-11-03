@@ -1,6 +1,8 @@
 # PR20 — Cloudflare deployment and acceptance
 
-This branch prepares the existing Worker and teacher dashboard for a private classroom pilot. It does **not** enable the production student API. `student-config.js` remains empty until all live gates below pass. `backend/wrangler.jsonc` now identifies the provisioned `word-check-classroom` D1 database; deployment still requires authenticated migration and Worker steps.
+The release enables named practice on the official GitHub Pages origin. Other origins keep the offline default. Use the Worker dashboard’s 添加学生 form after Cloudflare Access login to provision actual students privately. The deployment command no longer reseeds test accounts.
+
+The pilot exercised real A/B accounts, assigned spelling submissions and isolation against D1, including an independently opened Chromium session. Mobile checks used a phone-sized Chromium viewport. Physical Safari remains unverified. The deployment and verification checklist below records the original rollout procedure.
 
 ## Current evidence
 

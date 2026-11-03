@@ -76,6 +76,18 @@ async function main(){const {handle}=await import('../backend/src/index.js'),db=
   const blocked=await browser.newPage();await blocked.goto(origin+'/word-check/teacher/dashboard.html');await blocked.locator('#dashError').filter({hasText:'未授权'}).waitFor({timeout:5000}).catch(async e=>{console.error('dashboard blocked diagnostic',await blocked.evaluate(()=>({base:WordCheckStudentConfig.apiBase,error:document.querySelector('#dashError')?.textContent,status:document.querySelector('#dashStatus')?.textContent,ready:document.readyState})));throw e});assert.equal(await blocked.locator('#dashRecords article').count(),0);
   const dashboard=await teacherContext.newPage();await dashboard.goto(origin+'/word-check/teacher/dashboard.html');await dashboard.locator('#dashStudent').selectOption(B);await dashboard.locator('#dashRecords').filter({hasText:'尚无已提交记录'}).waitFor();
   for(let i=0;i<26;i++)await db.prepare('INSERT INTO student_records(student_id,kind,record_id,payload_json,payload_hash,updated_at,assignment_id) VALUES(?,?,?,?,?,?,?)').bind(A,'daily','dashboard-page-'+i,JSON.stringify({id:'dashboard-page-'+i,finished:true,answers:[],completed_at:at}),'test-hash-'+i,at,null).run();
+
+  await dashboard.locator('summary').filter({hasText:'添加学生'}).click();
+  await dashboard.locator('#rosterEntries').fill('Test C | trial-c, trial-c-alt\nTest D | trial-d');
+  await dashboard.locator('#rosterSubmit').click();
+  await dashboard.locator('#rosterStatus').filter({hasText:'已建立：Test C、Test D'}).waitFor();
+  const aliases=await db.prepare('SELECT student_id FROM student_aliases WHERE normalized_alias IN (?,?)').bind('trial-c','trial-c-alt').all();
+  assert.equal(aliases.results.length,2);assert.equal(aliases.results[0].student_id,aliases.results[1].student_id);
+  await dashboard.locator('#rosterEntries').fill('Test E | trial-e\nExisting | trial-c');
+  await dashboard.locator('#rosterSubmit').click();
+  await dashboard.locator('#rosterStatus').filter({hasText:'Student ID 已被使用'}).waitFor();
+  assert.equal(await dashboard.locator('#rosterEntries').inputValue(),'Existing | trial-c');
+  await dashboard.locator('summary').filter({hasText:'添加学生'}).click();
   await dashboard.locator('#dashStudent').selectOption(A);await dashboard.locator('#dashRecords article').first().waitFor();assert.equal(await dashboard.locator('#dashRecords article').count(),25);await dashboard.locator('#dashMore').click();await dashboard.waitForFunction(()=>document.querySelectorAll('#dashRecords article').length>25);assert.equal(await dashboard.locator('#dashMore').isHidden(),true);
   await dashboard.locator('#dashAssignment').selectOption(saved.assignment_id);await dashboard.locator('#dashRecords article').first().waitFor();await dashboard.locator('#dashRecords details').first().evaluate(node=>node.open=true);assert.match((await dashboard.locator('#dashRecords table').allTextContents()).join(' '),new RegExp('首字母：'+visible.prompt.initial));
   await dashboard.locator('#dashAssignment').selectOption(learningId);await dashboard.locator('#dashRecords article').first().waitFor();assert.ok(await dashboard.locator('#dashRecords article').count()>=2);assert.match(await dashboard.locator('#dashRecords').innerText(),/自评不计入正式正确率/);assert.match(await dashboard.locator('#dashRecords').innerText(),/客户端提交/);

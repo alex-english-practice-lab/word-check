@@ -24,6 +24,35 @@ async function load(reset=false){if(!base||!student.value)return;if(busy&&!reset
   data.records.forEach(r=>records.append(render(r)));cursor=data.nextCursor;results.hidden=false;$('dashTitle').textContent=data.student.displayName+' · 已提交记录';$('dashCounts').textContent=records.querySelectorAll('article').length+' 条已加载记录（含学习进度；重复提交按记录 ID 合并）';if(!records.children.length)records.append(el('p','尚无已提交记录。'));more.hidden=cursor===null;status.textContent=cursor===null?'已加载当前范围的全部记录。':'还有更早记录可加载。';
  }catch(e){if(run===epoch){error.textContent=e.message;status.textContent='读取失败，可点击刷新重试。'}}finally{if(run===epoch){busy=false;more.disabled=false}}}
 async function choose(){const run=++epoch;assignment.disabled=true;assignment.replaceChildren(new Option('全部记录',''));results.hidden=true;records.replaceChildren();error.textContent='';if(!student.value){status.textContent='请选择学生。';return}status.textContent='正在加载作业…';try{const data=await get('/api/teacher/assignments?'+new URLSearchParams({studentId:student.value}));if(run!==epoch)return;data.assignments.forEach(a=>assignment.add(new Option(date(a.createdAt)+' · '+a.id.slice(0,8),a.id)));assignment.disabled=false;await load(true)}catch(e){if(run===epoch){error.textContent=e.message;status.textContent='读取失败，可点击刷新重试。'}}}
-async function init(){if(!base){status.textContent='学生服务尚未配置，暂时无法查看云端记录。';student.replaceChildren(new Option('服务尚未配置',''));return}try{const data=await get('/api/teacher/students');student.replaceChildren(new Option('请选择学生',''),...(data.students||[]).map(s=>new Option(s.displayName+(s.status==='disabled'?' · 已停用':''),s.id)));student.disabled=false;status.textContent='请选择学生查看记录。'}catch(e){student.replaceChildren(new Option('无法加载学生',''));error.textContent=e.message;status.textContent='请检查教师身份与服务连接。'}}
+async function init(){if(!base){status.textContent='学生服务尚未配置，暂时无法查看云端记录。';student.replaceChildren(new Option('服务尚未配置',''));return}try{const data=await get('/api/teacher/students');student.replaceChildren(new Option('请选择学生',''),...(data.students||[]).map(s=>new Option(s.displayName+(s.status==='disabled'?' · 已停用':''),s.id)));student.disabled=false;$('rosterSubmit').disabled=false;status.textContent='请选择学生查看记录。'}catch(e){student.replaceChildren(new Option('无法加载学生',''));error.textContent=e.message;status.textContent='请检查教师身份与服务连接。'}}
+const rosterForm=$('rosterForm'), entries=$('rosterEntries'), rosterStatus=$('rosterStatus');
+rosterForm.addEventListener('submit', async event=>{
+ event.preventDefault();
+ const submit=$('rosterSubmit');
+ if(submit.disabled)return;
+ submit.disabled=true;
+ const completed=[];
+ try{
+  const rows=entries.value.trim().split(/\r?\n/).filter(line=>line.trim()).map((line,index)=>{
+   const parts=line.split('|').map(s=>s.trim());
+   const aliases=(parts[1]||'').split(',').map(s=>s.trim()).filter(Boolean);
+   if(parts.length!==2||!parts[0]||!aliases.length)throw Error('请检查第 '+(index+1)+' 行的姓名和登录 ID。');
+   return {displayName:parts[0],aliases};
+  });
+  for(const person of rows){
+   const res=await root.fetch(base+'/api/teacher/students',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(person)});
+   const body=await res.json().catch(()=>null);
+   if(!res.ok)throw Error(person.displayName+'：'+(body?.error||'请刷新页面并重新验证教师登录。'));
+   completed.push(body.student.displayName);
+   entries.value=rows.slice(completed.length).map(row=>row.displayName+' | '+row.aliases.join(', ')).join('\n');
+  }
+  rosterStatus.textContent='已建立：'+completed.join('、');
+ }catch(err){
+  rosterStatus.textContent=(completed.length?'已建立：'+completed.join('、')+'\n':'')+err.message;
+ }finally{
+  if(completed.length){await init();await choose();}
+  submit.disabled=false;
+ }
+});
 student.addEventListener('change',choose);assignment.addEventListener('change',()=>load(true));more.addEventListener('click',()=>load());$('dashRefresh').addEventListener('click',()=>student.value?choose():init());init();
 })(window);
