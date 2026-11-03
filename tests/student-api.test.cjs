@@ -51,6 +51,7 @@ test('same-origin teacher assets require signed Access while public API and shar
  assert.equal((await handle(req('/teacher/dashboard.html'),env,{fetcher})).status,403);
  assert.equal((await handle(req('/teacher/dashboard.js','GET',null,{Authorization:'Bearer '+'a'.repeat(43)}),env,{fetcher})).status,403);
  assert.equal(await (await handle(req('/teacher/dashboard.html','GET',null,teacher),env,{fetcher})).text(),'asset:/teacher/dashboard.html');
+ for(const alias of ['/teacher','/teacher/','/teacher/dashboard'])assert.equal(await (await handle(req(alias,'GET',null,teacher),env,{fetcher})).text(),'asset:/teacher/dashboard.html');
  assert.equal(await (await handle(req('/style.css'),env,{fetcher})).text(),'asset:/style.css');
  assert.equal((await handle(req('/api/health'),env,{fetcher})).status,200);
  assert.equal((await handle(req('/api/teacher/students','POST',{displayName:'Same-origin teacher',aliases:['teacher-test']},{...teacher,Origin:base}),env,{fetcher})).status,201);
