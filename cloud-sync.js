@@ -51,7 +51,14 @@ async function perform(){const ctrl=identity();if(ctrl?.mode!=='named')return {s
  if(ctrl.ready)await ctrl.ready;if(root.WordAssignedReady)await root.WordAssignedReady;
  if(!ctrl.token)throw Error('学生身份尚未验证；学习记录只保存在本机');
  const rows=await remoteRecords();hydrate(rows);
- for(const record of readLocal())await request('POST','/api/student/records',record);
+ const remoteById=new Map(rows.map(row=>[row.kind+':'+row.id,row]));
+ for(const record of readLocal()){
+  const remote=remoteById.get(record.kind+':'+record.id);
+  // Older assigned records can carry the assignment only in the server envelope.
+  if(remote&&JSON.stringify(canonical(record.payload))===JSON.stringify(canonical(remote.payload))&&
+     (record.assignmentId===remote.assignmentId||(record.assignmentId===null&&record.payload.assignmentId===undefined)))continue;
+  await request('POST','/api/student/records',record);
+ }
  lastError='';synced=true;paint('已同步到学生云端记录。');return {status:'synced'};
 }
 function queue(){if(scheduled)return scheduled;if(identity()?.mode==='named')paint('正在提交云端记录…');
