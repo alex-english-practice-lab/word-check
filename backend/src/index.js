@@ -19,7 +19,7 @@ export async function handle(request,env,{fetcher=fetch}={}){
   // A same-origin teacher dashboard avoids third-party Access cookies. The
   // Worker checks the same signed Access assertion as the teacher API before
   // serving its HTML, script and stylesheet, even if an Access path is missed.
-  if(['/teacher','/teacher/','/teacher/dashboard','/teacher/dashboard.html','/teacher/dashboard.js','/teacher/dashboard.css'].includes(path)){
+  if(['/teacher','/teacher/','/teacher/dashboard','/teacher/dashboard.html','/teacher/dashboard.js','/teacher/dashboard.css','/teacher/setup','/teacher/setup.html'].includes(path)||path.startsWith('/teacher/setup-assets/')){
    await requireTeacher(request,env,fetcher);
    if(!env.ASSETS)throw new InputError('教师页面尚未配置',503);
    if(['/teacher','/teacher/'].includes(path))return Response.redirect(new URL('/teacher/dashboard',request.url),302);
