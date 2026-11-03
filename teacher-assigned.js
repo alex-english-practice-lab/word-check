@@ -5,6 +5,15 @@ const select=document.getElementById('assignmentStudent'),note=document.getEleme
 const base=root.WordCheckStudentConfig?.apiBase?.replace(/\/$/,'')||'';
 const dashboard=document.querySelector('a[href="teacher/dashboard.html"]');
 if(base&&dashboard)dashboard.href=base+'/teacher/dashboard.html';
+if(base&&new URL(base).origin!==location.origin){
+ // Public Pages still supports ordinary links. Teacher operations require first-party Access.
+ const option=new Option('指定学生 · 前往教师后台','teacher-setup');
+ select.replaceChildren(new Option('普通链接 · 不指定学生',''),option);
+ const link=document.createElement('a');link.href=base+'/teacher/setup';link.textContent='打开教师作业设置';
+ note.replaceChildren('要保存到学生名下，请在教师后台设置作业。',link);
+ select.addEventListener('change',()=>{if(select.value==='teacher-setup'){select.value='';location.assign(link.href)}});
+ return;
+}
 let loading=null,loaded=false;
 async function roster(){
  if(!base){note.textContent='学生服务尚未配置；可继续生成普通链接。';return}

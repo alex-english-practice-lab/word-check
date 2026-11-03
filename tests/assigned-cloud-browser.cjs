@@ -6,12 +6,17 @@ function database(){const db=new DatabaseSync(':memory:');for(const file of ['00
  return {prepare:sql=>prep(sql),async batch(statements){db.exec('BEGIN');try{const result=[];for(const s of statements)result.push(await s.run());db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}},count:()=>db.prepare('SELECT COUNT(*) AS n FROM student_records').get().n,close:()=>db.close()};
 }
 const enc=value=>Buffer.from(JSON.stringify(value)).toString('base64url');
-async function main(){const {handle}=await import('../backend/src/index.js'),db=database();let browser,server;
+async function main(){await import('../scripts/build-teacher-assets.mjs');const {handle}=await import('../backend/src/index.js'),db=database();let browser,server;
  try{
   const at=new Date().toISOString();for(const [id,name,alias] of [[A,'Zining','isabella'],[B,'Irving','irving']]){await db.prepare('INSERT INTO students(id,display_name,status,created_at,updated_at) VALUES(?,?,?,?,?)').bind(id,name,'active',at,at).run();await db.prepare('INSERT INTO student_aliases(normalized_alias,student_id,active,created_at) VALUES(?,?,1,?)').bind(alias,id,at).run()}
   const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']),jwk=await crypto.subtle.exportKey('jwk',pair.publicKey);jwk.kid='browser-test';
   const issuer='https://teacher.cloudflareaccess.com',claims={iss:issuer,aud:'word-check-test',email:'teacher@example.test',sub:'teacher',exp:Math.floor(Date.now()/1000)+3600},head=enc({alg:'RS256',kid:jwk.kid}),body=enc(claims),signature=Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(head+'.'+body))).toString('base64url'),jwt=head+'.'+body+'.'+signature;
   let origin;server=http.createServer(async(req,res)=>{try{const pathname=new URL(req.url,'http://localhost').pathname;
+    if(pathname==='/teacher/setup'||pathname.startsWith('/teacher/setup-assets/')){
+     if(!req.headers.cookie?.includes('teacher=1')){res.writeHead(403);res.end();return}
+     const file=path.join(root,'backend/public',pathname==='/teacher/setup'?'teacher/setup.html':pathname);
+     res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.json':'application/json','.html':'text/html'})[path.extname(file)]);res.end(fs.readFileSync(file));return
+    }
     if(pathname==='/word-check/student-config.js'){res.setHeader('Content-Type','text/javascript');res.end(`window.WordCheckStudentConfig={apiBase:${JSON.stringify(origin)}};`);return}
     if(pathname.startsWith('/api/')){const chunks=[];for await(const chunk of req)chunks.push(chunk);const headers=new Headers(req.headers);if(pathname.startsWith('/api/teacher/')&&req.headers.cookie?.includes('teacher=1'))headers.set('Cf-Access-Jwt-Assertion',jwt);
      const request=new Request(origin+req.url,{method:req.method,headers,...(chunks.length?{body:Buffer.concat(chunks)}:{})});const response=await handle(request,{DB:db,SELECT_LIMITER:{limit:async()=>({success:true})},FRONTEND_ORIGIN:origin,ACCESS_ISSUER:issuer,ACCESS_AUD:'word-check-test',TEACHER_EMAIL:'teacher@example.test'},{fetcher:async()=>new Response(JSON.stringify({keys:[jwk]}))});res.writeHead(response.status,Object.fromEntries(response.headers));res.end(await response.text());return}
@@ -21,6 +26,19 @@ async function main(){const {handle}=await import('../backend/src/index.js'),db=
   browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.WORD_CHECK_CHROMIUM?{executablePath:process.env.WORD_CHECK_CHROMIUM}:{})});
   const teacherContext=await browser.newContext({viewport:{width:1280,height:900}});await teacherContext.addCookies([{name:'teacher',value:'1',url:origin}]);const teacher=await teacherContext.newPage();await teacher.goto(origin+'/word-check/teacher/');
   assert.equal(await teacher.locator('a').filter({hasText:'查看学生记录'}).getAttribute('href'),origin+'/teacher/dashboard.html');
+  const setup=await teacherContext.newPage();await setup.goto(origin+'/teacher/setup');
+  await setup.locator('#assignmentStudent').selectOption(A);
+  await setup.locator('#librarySelect').selectOption('practice:daily-v3');
+  await setup.locator('#v3QuestionCount').fill('20');
+  await setup.locator('#createPreset').click();await setup.locator('#presetLinkPanel').waitFor({state:'visible'});
+  const dailyLink=new URL(await setup.locator('#presetLink').inputValue());
+  assert.equal(dailyLink.origin+dailyLink.pathname,'https://alex-english-practice-lab.github.io/word-check/');
+  assert.match(dailyLink.hash,/^#assigned=/);
+  const trial=await browser.newPage();await trial.goto(origin+'/word-check/'+dailyLink.hash);
+  await trial.locator('#v3Quiz').waitFor({state:'visible'});
+  assert.equal(await trial.evaluate(()=>WordStudentIdentity.current.id),A);
+  assert.match(await trial.locator('#v3Quiz').innerText(),/1\s*\/\s*20/);
+  await trial.close();await setup.close();
   const unauthorized=await browser.newPage();await unauthorized.goto(origin+'/word-check/teacher/');await unauthorized.locator('#assignmentStudentNotice').filter({hasText:'加载失败'}).waitFor();assert.equal(await unauthorized.locator('#assignmentStudent option').count(),1);await unauthorized.close();
   await teacher.waitForFunction(id=>!!document.querySelector('#assignmentStudent option[value="'+id+'"]'),A);await teacher.locator('#assignmentStudent').selectOption(A);await teacher.waitForFunction(()=>!document.querySelector('#createPreset').disabled);await teacher.locator('[name=mode][value=single]').check();await teacher.locator('#sampling').selectOption('total');await teacher.locator('#count').fill('1');await teacher.locator('#linkType').selectOption('fixed');await teacher.locator('#createPreset').click();
   await teacher.locator('#presetLinkPanel').waitFor({state:'visible'});const url=await teacher.locator('#presetLink').inputValue();assert.match(url,/#assigned=[A-Za-z0-9_-]{40,64}$/);assert.ok(url.length<200);

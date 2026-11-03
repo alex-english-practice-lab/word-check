@@ -162,7 +162,7 @@ $('createPreset').onclick=async()=>{
    questions=quiz.pool.length;
    summary=(random?'每次按设置重新抽取':'已固定')+' '+questions+' 个单词 · '+quiz.label+' · '+(quiz.options.timeLimit?'每题 '+quiz.options.timeLimit+' 秒':'不限时')+' · '+(quiz.options.hintsAllowed?'允许提示':'不提供提示')+(random?' · 刷新或再练会重新抽词，可能与上一轮重合':' · 学生每次打开时随机排列');
   }
-  let url=await P.createUrl(payload,new URL('./',document.baseURI).href);
+  let url=await P.createUrl(payload,window.WordCheckStudentConfig?.studentHome||new URL('./',document.baseURI).href);
   if(url.length>2000)throw Error('链接过长，请减少题量或选择范围。');
   if(window.WordAssignedTeacher?.assigned){url=await window.WordAssignedTeacher.wrap(url);summary+=' · 已指定学生，成绩需提交到服务端'}
   $('presetLink').value=url;$('presetSummary').textContent=summary;$('presetLinkPanel').hidden=false;$('presetLink').focus();$('presetLink').select();
