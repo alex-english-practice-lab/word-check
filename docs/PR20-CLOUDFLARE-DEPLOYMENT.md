@@ -9,6 +9,7 @@ This branch prepares the existing Worker and teacher dashboard for a private cla
 - Live `GET /api/health` returned `200 {"ok":true}` from the production `workers.dev` hostname, confirming that the deployed Worker can perform a real D1 read. This does not by itself prove the schema, writes, Access protection, or student isolation.
 - `npm ci`, `npm run setup:browser`, the project test suites, local D1 migrations, foreign key check, and `wrangler deploy --dry-run` are local checks only. A dry run does not prove that the remote D1 binding or deployed Worker is usable.
 - `/api/health` now performs a D1 read (`SELECT 1`) instead of checking only that a binding object exists.
+- Production deploys read `ACCESS_ISSUER`, `ACCESS_AUD`, and `TEACHER_EMAIL` from encrypted Workers Builds secrets, validate their formats, and pass them to Wrangler through an ephemeral `--secrets-file`. The file is deleted after the deploy and secret values are never printed. This keeps the required values in the Worker runtime across automated builds.
 - Opening an assigned link temporarily selects its student in the current tab. The ordinary saved Student ID and the other student's local namespace are preserved. Navigation into or out of `#assigned=` reloads so the correct profile initializes.
 
 ## Account access required
