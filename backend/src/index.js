@@ -22,10 +22,7 @@ export async function handle(request,env,{fetcher=fetch}={}){
   if(['/teacher','/teacher/','/teacher/dashboard','/teacher/dashboard.html','/teacher/dashboard.js','/teacher/dashboard.css'].includes(path)){
    await requireTeacher(request,env,fetcher);
    if(!env.ASSETS)throw new InputError('教师页面尚未配置',503);
-   if(['/teacher','/teacher/','/teacher/dashboard'].includes(path)){
-    const assetUrl=new URL(request.url);assetUrl.pathname='/teacher/dashboard.html';
-    return env.ASSETS.fetch(new Request(assetUrl,request));
-   }
+   if(['/teacher','/teacher/'].includes(path))return Response.redirect(new URL('/teacher/dashboard',request.url),302);
    return env.ASSETS.fetch(request);
   }
   if(['/style.css','/student-config.js'].includes(path)){
