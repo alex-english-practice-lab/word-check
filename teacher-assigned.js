@@ -27,7 +27,7 @@ async function roster(){
   try{const response=await root.fetch(base+'/api/teacher/students',{credentials:'include',headers:{Accept:'application/json'}});
    if(!response.ok)throw Error('HTTP '+response.status+'；请确认已通过教师 Access 验证');
    const data=await response.json(),previous=select.value;select.replaceChildren(new Option('普通链接 · 不指定学生',''),...(data.students||[]).filter(s=>s.status==='active').map(s=>new Option(`${s.displayName} · ${(s.aliases||[]).join(' / ')}`,s.id)));if([...select.options].some(o=>o.value===previous))select.value=previous;loaded=true;
-   note.textContent='指定学生的链接会保存答题记录；链接持有人可使用该学生身份。';
+   note.textContent='指定学生后，固定测试和每日练习均会保存成绩。每日练习可重复使用同一链接，每次重新抽题；链接持有人可使用该学生身份。';
   }catch(error){note.textContent='学生名单加载失败：'+error.message+'。普通链接仍可生成。'}
  })();try{await loading}finally{loading=null}
 }
