@@ -36,6 +36,20 @@ test('health check requires a functioning D1 binding',async()=>{await ready;
  const noDb=await handle(req('/api/health'),{FRONTEND_ORIGIN:origin});assert.equal(noDb.status,503);
  const unavailable=await handle(req('/api/health'),{FRONTEND_ORIGIN:origin,DB:{prepare:()=>({first:async()=>({ok:0})})}});assert.equal(unavailable.status,503);
 });
+test('disable invalidates existing sessions permanently; re-enable requires a new login and conflicts roll back',async()=>{const {DB,call,teacher}=await setup();try{
+ const person=(await (await call(req('/api/teacher/students','POST',{displayName:'Ruoya',aliases:['ruoya','r']},teacher))).json()).student;
+ await call(req('/api/teacher/students','POST',{displayName:'Zining',aliases:['zining']},teacher));
+ const login=await (await call(req('/api/student/select','POST',{alias:'ruoya'}))).json(),headers={Authorization:'Bearer '+login.accessToken};
+ assert.equal((await call(req('/api/teacher/students/'+person.id,'PATCH',{displayName:'Wrong',aliases:['zining']},teacher))).status,409);
+ assert.equal((await (await call(req('/api/student/profile','GET',null,headers))).json()).student.displayName,'Ruoya');
+ await call(req('/api/teacher/students/'+person.id,'PATCH',{status:'disabled'},teacher));
+ assert.equal((await call(req('/api/student/profile','GET',null,headers))).status,401);
+ await call(req('/api/teacher/students/'+person.id,'PATCH',{status:'active',displayName:'Ruoya Updated',aliases:['ruoya']},teacher));
+ assert.equal((await call(req('/api/student/profile','GET',null,headers))).status,401);
+ assert.equal((await call(req('/api/student/select','POST',{alias:'r'}))).status,404);
+ const fresh=await (await call(req('/api/student/select','POST',{alias:'ruoya'}))).json();assert.equal(fresh.student.id,person.id);assert.equal(fresh.student.displayName,'Ruoya Updated');
+ assert.equal((await call(req('/api/teacher/assignments/'+person.id,'PATCH',{revoke:true}))).status,403);
+}finally{DB.close()}});
 test('teacher APIs require signed Access JWT, matching audience, issuer and teacher email',async()=>{const {DB,call,env,pair,claims,fetcher,teacher}=await setup();try{
  const missing=await call(req('/api/teacher/auth-diagnostic'));assert.equal(missing.status,200);assert.deepEqual(await missing.json(),{ok:false,stage:'request-or-config',checks:{tokenPresent:false,issuerConfigured:true,audienceConfigured:true,emailConfigured:true,tokenParsed:false,algorithmAccepted:false,issuerMatches:false,audienceMatches:false,emailClaimPresent:false,emailMatches:false,timeValid:false,certificatesFetched:false,signingKeyFound:false,signatureValid:false}});
  assert.equal((await call(req('/api/teacher/students'))).status,403);
@@ -68,3 +82,4 @@ test('alias edits preserve historical ownership; disabled student and rate limit
  env.SELECT_LIMITER={limit:async()=>({success:false})};assert.equal((await handle(req('/api/student/select','POST',{alias:'isabella'}),env,{fetcher})).status,429);
  assert.equal((await call(req('/api/student/select','POST',{alias:'isabella'},{Origin:'https://wrong.example'}))).status,403);
 }finally{DB.close()}});
+

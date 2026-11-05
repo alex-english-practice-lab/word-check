@@ -15,6 +15,9 @@ if(base&&new URL(base).origin!==location.origin){
  return;
 }
 let loading=null,loaded=false;
+const expiryLabel=document.createElement('label');expiryLabel.textContent='指定学生链接有效天数（1–90 天）';
+const expiry=document.createElement('input');expiry.type='number';expiry.min='1';expiry.max='90';expiry.step='1';expiry.value='30';expiry.id='assignmentExpiryDays';expiryLabel.append(expiry);note.after(expiryLabel);
+function showExpiry(){expiryLabel.hidden=!select.value}select.addEventListener('change',showExpiry);showExpiry();
 async function roster(){
  if(!base){note.textContent='学生服务尚未配置；可继续生成普通链接。';return}
  if(loaded)return;
@@ -32,10 +35,12 @@ select.addEventListener('focus',roster);roster();
 async function wrap(url){
  if(!select.value)return url;
  if(!base)throw Error('学生服务尚未配置，无法生成指定学生链接。');
- const response=await root.fetch(base+'/api/teacher/assignments',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentId:select.value,presetHash:new URL(url).hash})});
+ const days=Number(expiry.value);if(!Number.isInteger(days)||days<1||days>90)throw Error('链接有效期需在 1–90 天之间');
+ const response=await root.fetch(base+'/api/teacher/assignments',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentId:select.value,presetHash:new URL(url).hash,expiresInDays:days})});
  let data;try{data=await response.json()}catch{throw Error('教师服务没有返回有效结果；请检查 Access 登录与服务地址。')}
  if(!response.ok)throw Error(data.error||'指定学生链接生成失败');
  const result=new URL(url);result.hash='assigned='+data.token;return result.href;
 }
 root.WordAssignedTeacher={wrap,get assigned(){return !!select.value},roster};
 })(window);
+

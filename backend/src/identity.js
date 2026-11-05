@@ -48,7 +48,9 @@ export async function updateStudent(db,id,input){
  try{await db.batch([
   db.prepare('UPDATE students SET display_name=?,status=?,updated_at=? WHERE id=?').bind(displayName,status,at,id),
   db.prepare('UPDATE student_aliases SET active=0 WHERE student_id=?').bind(id),
+  ...(status==='disabled'?[db.prepare('DELETE FROM student_sessions WHERE student_id=?').bind(id)]:[]),
   ...aliases.map(alias=>owned.some(row=>row.normalized_alias===alias)?db.prepare('UPDATE student_aliases SET active=1 WHERE normalized_alias=? AND student_id=?').bind(alias,id):db.prepare('INSERT INTO student_aliases(normalized_alias,student_id,active,created_at) VALUES(?,?,1,?)').bind(alias,id,at))
  ])}catch{throw new InputError('Student ID 冲突，资料未修改',409)}
  return {id,displayName,aliases,status};
 }
+
