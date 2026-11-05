@@ -142,7 +142,6 @@ $('createPreset').onclick=async()=>{
   if(sourceKind==='spelling'&&libraryLoadFailed)throw Error('词库加载失败，请重试或重新选择词库后再生成链接。');
   button.disabled=true;button.textContent='正在生成…';
   const random=$('linkType').value==='random';
-  if(random&&window.WordAssignedTeacher?.assigned)throw Error('指定学生作业请选固定测试，以便每次使用相同题目。');
   let payload,questions,summary;
   if(sourceKind==='v3'){
    const built=H.buildPreset(random?'random':'fixed');payload=built.payload;questions=built.questions;
@@ -213,3 +212,4 @@ async function initialize(){
 }
 initialize();
 if(document.modelContext?.registerTool){const lifecycle=new AbortController();for(const tool of [{name:'read_vocabulary_summary',description:'Read the loaded vocabulary lists and the current quiz status without revealing answers.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute(){return{lists:[...new Set(words.map(w=>w.list))],words:words.length,isDemo,active,completed:answers.length}}},{name:'start_vocabulary_check',description:'Start a new vocabulary check from the loaded lists. Fails while a quiz is active.',inputSchema:{type:'object',properties:{lists:{type:'string'},mode:{type:'string',enum:['full','single']},count:{type:'integer',minimum:0,maximum:10000}},required:['lists','mode','count'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute(input){if(presetSession||/^(#preset=|#assigned=)/.test(location.hash))throw Error('学生练习链接不允许更改设置。');if(active)throw Error('请先结束当前检查。');if(!input||typeof input.lists!=='string'||!['full','single'].includes(input.mode)||!Number.isInteger(input.count)||input.count<0||input.count>10000)throw Error('Invalid quiz settings');const r=C.range(input.lists,words.map(w=>w.list));if(r.some(n=>!words.some(w=>w.list===n)))throw Error('所选 List 不在词表中。');let pool=C.sampleMixed(words.filter(w=>r.includes(w.list)),input.count);return begin(pool,input.mode,'List '+input.lists)}}]){try{Promise.resolve(document.modelContext.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{})}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true})}
+
