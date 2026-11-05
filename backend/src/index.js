@@ -1,6 +1,7 @@
 import {InputError,selectStudent,createStudent,listStudents,updateStudent} from './identity.js';
 import {issueSession,requireStudent,revokeStudent,requireTeacher,diagnoseTeacher} from './auth.js';
 import {createAssignment,openAssignment,putRecord,listRecords,listTeacherRecords,listTeacherAssignments,updateAssignment} from './records.js';
+import {emailReportConfiguration,queueEmailReport,deliverEmailReport,processPendingEmailReports} from './email-report.js';
 function json(value,status=200,headers={}){return new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}})}
 async function body(request,max=4096){
  if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json'))throw new InputError('请提交 JSON');
@@ -8,7 +9,7 @@ async function body(request,max=4096){
  const raw=await request.text();if(raw.length>max)throw new InputError('请求过大',413);
  try{return JSON.parse(raw)}catch{throw new InputError('JSON 格式无效')}
 }
-export async function handle(request,env,{fetcher=fetch}={}){
+export async function handle(request,env,{fetcher=fetch,waitUntil=null}={}){
  const origin=request.headers.get('Origin'),allowed=env.FRONTEND_ORIGIN,self=new URL(request.url).origin;
  if(origin&&origin!==allowed&&origin!==self)return json({error:'Origin 未授权'},403);
  const cors=origin===allowed?{'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Allow-Methods':'GET, POST, PATCH, OPTIONS','Vary':'Origin'}:{};
@@ -54,11 +55,18 @@ export async function handle(request,env,{fetcher=fetch}={}){
    return json(await listRecords(env.DB,s.id,Number(raw)),200,cors);
   }
   if(path==='/api/student/records'&&request.method==='POST'){
-   const s=await requireStudent(request,env.DB);return json(await putRecord(env.DB,s.id,await body(request,200000)),200,cors);
+   const s=await requireStudent(request,env.DB),input=await body(request,200000),saved=await putRecord(env.DB,s.id,input);
+   const emailReport=saved.saved?await queueEmailReport(env.DB,s.id,input,env):{status:'duplicate'};
+   if(emailReport.status==='queued'){
+    const task=deliverEmailReport(env,{studentId:s.id,kind:input.kind,recordId:input.id},{fetcher});
+    if(waitUntil)waitUntil(task);else await task;
+   }
+   return json({...saved,emailReport},200,cors);
   }
   if(path.startsWith('/api/teacher/')){
    if(path==='/api/teacher/auth-diagnostic'&&request.method==='GET')return json(await diagnoseTeacher(request,env,fetcher),200,cors);
    await requireTeacher(request,env,fetcher);
+   if(path==='/api/teacher/email-report-status'&&request.method==='GET')return json(emailReportConfiguration(env),200,cors);
    if(path==='/api/teacher/records'&&request.method==='GET'){
     const query=new URL(request.url).searchParams;
     const raw=query.get('before');if(raw!==null&&!/^[1-9]\d*$/.test(raw))throw new InputError('分页位置无效');
@@ -76,5 +84,8 @@ export async function handle(request,env,{fetcher=fetch}={}){
   return json({error:'Not found'},404,cors);
  }catch(error){return json({error:error instanceof InputError?error.message:'服务暂不可用'},error instanceof InputError?error.status:500,cors)}
 }
-export default {fetch:handle};
+export default {
+ fetch(request,env,ctx){return handle(request,env,{waitUntil:promise=>ctx.waitUntil(promise)})},
+ scheduled(controller,env,ctx){ctx.waitUntil(processPendingEmailReports(env))}
+};
 
