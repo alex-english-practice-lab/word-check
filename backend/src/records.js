@@ -19,7 +19,7 @@ export async function createAssignment(db,body){
 }
 export async function openAssignment(db,value){
  if(typeof value!=='string'||! /^[A-Za-z0-9_-]{40,64}$/.test(value))throw new InputError('作业链接无效',404);
- const row=await db.prepare('SELECT a.id,a.student_id,a.preset_hash,a.expires_at,s.display_name FROM assignments a JOIN students s ON s.id=a.student_id WHERE a.token_hash=? AND a.expires_at>? AND s.status=?').bind(await digest(value),new Date().toISOString(),'active').first();
+ const row=await db.prepare('SELECT a.id,a.student_id,a.preset_hash,a.expires_at,s.display_name FROM assignments a JOIN students s ON s.id=a.student_id WHERE a.token_hash=? AND a.expires_at>? AND a.revoked_at IS NULL AND s.status=?').bind(await digest(value),new Date().toISOString(),'active').first();
  if(!row)throw new InputError('作业链接已过期或不可用',404);
  const alias=await db.prepare('SELECT normalized_alias FROM student_aliases WHERE student_id=? AND active=1 ORDER BY normalized_alias LIMIT 1').bind(row.student_id).first();
  if(!alias)throw new InputError('该学生没有有效的 Student ID',404);
@@ -32,8 +32,9 @@ export async function putRecord(db,studentId,input){
  if(!['session','check','daily'].includes(kind)||!id(recordId)||!payload||typeof payload!=='object'||Array.isArray(payload))throw new InputError('学习记录格式无效');
  if(assignmentId!==null){
   if(!id(assignmentId))throw new InputError('作业编号无效');
-  const assigned=await db.prepare('SELECT id FROM assignments WHERE id=? AND student_id=?').bind(assignmentId,studentId).first();
+  const assigned=await db.prepare('SELECT id,expires_at,revoked_at FROM assignments WHERE id=? AND student_id=?').bind(assignmentId,studentId).first();
   if(!assigned)throw new InputError('作业与当前学生不匹配',403);
+  if(assigned.revoked_at||assigned.expires_at<=new Date().toISOString())throw new InputError('作业已撤销或到期，未接收本次提交；请联系老师',410);
  }
  const expected=kind==='session'?payload.session?.id:kind==='check'?payload.attempt?.id:payload.id;
  const timestamp=kind==='session'?payload.session?.updatedAt:kind==='check'?payload.attempt?.completedAt:payload.completed_at;
@@ -78,6 +79,25 @@ export async function listTeacherRecords(db,{studentId,assignmentId=null,before=
 export async function listTeacherAssignments(db,studentId){
  if(typeof studentId!=='string'||!/^[0-9a-f-]{36}$/i.test(studentId))throw new InputError('请选择有效的学生');
  const student=await db.prepare('SELECT id FROM students WHERE id=?').bind(studentId).first();if(!student)throw new InputError('找不到该学生',404);
- const rows=(await db.prepare('SELECT id,created_at,expires_at FROM assignments WHERE student_id=? ORDER BY created_at DESC,id DESC LIMIT 200').bind(studentId).all()).results;
- return rows.map(row=>({id:row.id,createdAt:row.created_at,expiresAt:row.expires_at}));
+ const rows=(await db.prepare('SELECT id,created_at,expires_at,revoked_at FROM assignments WHERE student_id=? ORDER BY created_at DESC,id DESC LIMIT 200').bind(studentId).all()).results;
+ return rows.map(row=>({id:row.id,createdAt:row.created_at,expiresAt:row.expires_at,revokedAt:row.revoked_at,status:row.revoked_at?'revoked':row.expires_at<=new Date().toISOString()?'expired':'active'}));
 }
+
+export async function updateAssignment(db,assignmentId,input){
+ if(typeof assignmentId!=='string'||!/^[0-9a-f-]{36}$/i.test(assignmentId))throw new InputError('作业编号无效');
+ if(!input||typeof input!=='object'||Array.isArray(input))throw new InputError('作业设置无效');
+ const row=await db.prepare('SELECT id,revoked_at FROM assignments WHERE id=?').bind(assignmentId).first();
+ if(!row)throw new InputError('找不到该作业',404);
+ const now=new Date();
+ if(input.revoke===true&&Object.keys(input).length===1){
+  await db.prepare('UPDATE assignments SET revoked_at=COALESCE(revoked_at,?) WHERE id=?').bind(now.toISOString(),assignmentId).run();
+ }else if(Object.keys(input).length===1&&iso(input.expiresAt)){
+  if(row.revoked_at)throw new InputError('已撤销的作业不能恢复，请生成新链接',409);
+  const end=Date.parse(input.expiresAt);
+  if(end<=now.getTime()||end>now.getTime()+90*86400000)throw new InputError('到期时间须晚于现在且不超过 90 天');
+  await db.prepare('UPDATE assignments SET expires_at=? WHERE id=? AND revoked_at IS NULL').bind(input.expiresAt,assignmentId).run();
+ }else throw new InputError('请选择撤销或有效的到期时间');
+ const updated=await db.prepare('SELECT expires_at,revoked_at FROM assignments WHERE id=?').bind(assignmentId).first();
+ return {id:assignmentId,expiresAt:updated.expires_at,revokedAt:updated.revoked_at};
+}
+

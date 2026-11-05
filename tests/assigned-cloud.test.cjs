@@ -2,11 +2,35 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {DatabaseSync}=require('node:sqlite');
 const LearnStore=require('../learn-store.js');
 let api,records,identity;const ready=Promise.all([import('../backend/src/index.js'),import('../backend/src/records.js'),import('../backend/src/identity.js')]).then(([a,r,i])=>{api=a;records=r;identity=i});
-function database(){const db=new DatabaseSync(':memory:');for(const name of ['0001_students.sql','0002_assignments_records.sql'])db.exec(fs.readFileSync(path.join(__dirname,'../backend/migrations',name),'utf8'));
+function database(){const db=new DatabaseSync(':memory:');for(const name of ['0001_students.sql','0002_assignments_records.sql','0003_assignment_revocation.sql'])db.exec(fs.readFileSync(path.join(__dirname,'../backend/migrations',name),'utf8'));
  const prep=(sql,args=[])=>({bind:(...values)=>prep(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)});
  return {prepare:sql=>prep(sql),async batch(statements){db.exec('BEGIN');try{const result=[];for(const s of statements)result.push(await s.run());db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}},close:()=>db.close()};
 }
 const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222',now=()=>new Date().toISOString();
+test('revocation blocks opening and new submissions, keeps results, and cannot be undone by extending expiry',async()=>{const db=await setup();try{
+ const a=await records.createAssignment(db,{studentId:A,presetHash:'#preset=abc'});
+ const input={kind:'daily',id:'saved',assignmentId:a.id,payload:{id:'saved',completed_at:now(),answers:[]}};
+ await records.putRecord(db,A,input);
+ await records.updateAssignment(db,a.id,{revoke:true});
+ const revoked=(await records.listTeacherAssignments(db,A))[0];assert.equal(revoked.status,'revoked');
+ await records.updateAssignment(db,a.id,{revoke:true});assert.equal((await records.listTeacherAssignments(db,A))[0].revokedAt,revoked.revokedAt);
+ await assert.rejects(()=>records.openAssignment(db,a.token),/过期或不可用/);
+ await assert.rejects(()=>records.putRecord(db,A,{...input,id:'new',payload:{...input.payload,id:'new'}}),e=>e.status===410);
+ await assert.rejects(()=>records.updateAssignment(db,a.id,{expiresAt:new Date(Date.now()+86400000).toISOString()}),e=>e.status===409);
+ assert.equal((await records.listTeacherRecords(db,{studentId:A,assignmentId:a.id})).records.length,1);
+ assert.equal((await records.listTeacherRecords(db,{studentId:B})).records.length,0);
+}finally{db.close()}});
+test('expiry blocks submissions from an already opened link, supports extension, and validates dates',async()=>{const db=await setup();try{
+ const a=await records.createAssignment(db,{studentId:A,presetHash:'#preset=abc'});await records.openAssignment(db,a.token);
+ await db.prepare('UPDATE assignments SET expires_at=? WHERE id=?').bind('2020-01-01T00:00:00.000Z',a.id).run();
+ const input={kind:'daily',id:'late',assignmentId:a.id,payload:{id:'late',completed_at:now(),answers:[]}};
+ await assert.rejects(()=>records.putRecord(db,A,input),e=>e.status===410);
+ assert.equal((await records.listTeacherAssignments(db,A))[0].status,'expired');
+ for(const expiresAt of ['bad','2020-01-01T00:00:00.000Z',new Date(Date.now()+91*86400000).toISOString()])await assert.rejects(()=>records.updateAssignment(db,a.id,{expiresAt}),e=>e.status===400);
+ await records.updateAssignment(db,a.id,{expiresAt:new Date(Date.now()+86400000).toISOString()});
+ assert.equal((await records.listTeacherAssignments(db,A))[0].status,'active');await records.openAssignment(db,a.token);assert.equal((await records.putRecord(db,A,input)).saved,true);
+ await assert.rejects(()=>records.updateAssignment(db,a.id,{revoke:false}),e=>e.status===400);
+}finally{db.close()}});
 async function setup(){await ready;const db=database(),at=now();for(const [id,name,alias] of [[A,'Zining','isabella'],[B,'Irving','irving']]){await db.prepare('INSERT INTO students(id,display_name,status,created_at,updated_at) VALUES(?,?,?,?,?)').bind(id,name,'active',at,at).run();await db.prepare('INSERT INTO student_aliases(normalized_alias,student_id,active,created_at) VALUES(?,?,1,?)').bind(alias,id,at).run()}return db}
 test('assigned token opens only the named student, expires, and never exposes the teacher preset to a guessed token',async()=>{const db=await setup();try{
  const created=await records.createAssignment(db,{studentId:A,presetHash:'#preset=Abc_def.0123',expiresInDays:1});assert.match(created.token,/^[A-Za-z0-9_-]{40,64}$/);assert.equal(created.expiresAt.length,24);
@@ -59,3 +83,4 @@ test('cloud history pages beyond 100 records without dropping a student fact',as
  assert.equal(new Set([...first.records,...second.records].map(r=>r.id)).size,102);
  assert.deepEqual((await records.listRecords(db,B)).records,[]);
 }finally{db.close()}});
+

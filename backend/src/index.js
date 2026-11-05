@@ -1,6 +1,6 @@
 import {InputError,selectStudent,createStudent,listStudents,updateStudent} from './identity.js';
 import {issueSession,requireStudent,revokeStudent,requireTeacher,diagnoseTeacher} from './auth.js';
-import {createAssignment,openAssignment,putRecord,listRecords,listTeacherRecords,listTeacherAssignments} from './records.js';
+import {createAssignment,openAssignment,putRecord,listRecords,listTeacherRecords,listTeacherAssignments,updateAssignment} from './records.js';
 function json(value,status=200,headers={}){return new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}})}
 async function body(request,max=4096){
  if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json'))throw new InputError('请提交 JSON');
@@ -66,6 +66,8 @@ export async function handle(request,env,{fetcher=fetch}={}){
    }
    if(path==='/api/teacher/assignments'&&request.method==='GET')return json({assignments:await listTeacherAssignments(env.DB,new URL(request.url).searchParams.get('studentId'))},200,cors);
    if(path==='/api/teacher/assignments'&&request.method==='POST')return json(await createAssignment(env.DB,await body(request)),201,cors);
+   const assignmentMatch=/^\/api\/teacher\/assignments\/([0-9a-f-]{36})$/i.exec(path);
+   if(assignmentMatch&&request.method==='PATCH')return json({assignment:await updateAssignment(env.DB,assignmentMatch[1],await body(request))},200,cors);
    if(path==='/api/teacher/students'&&request.method==='GET')return json({students:await listStudents(env.DB)},200,cors);
    if(path==='/api/teacher/students'&&request.method==='POST')return json({student:await createStudent(env.DB,await body(request))},201,cors);
    const match=/^\/api\/teacher\/students\/([0-9a-f-]{36})$/i.exec(path);
@@ -75,3 +77,4 @@ export async function handle(request,env,{fetcher=fetch}={}){
  }catch(error){return json({error:error instanceof InputError?error.message:'服务暂不可用'},error instanceof InputError?error.status:500,cors)}
 }
 export default {fetch:handle};
+

@@ -11,7 +11,7 @@ function paint(message='',failed=false){for(const panel of panels){const note=pa
 async function request(method,path,payload){const ctrl=identity();if(ctrl?.mode!=='named'||!ctrl.token)throw Error('学生身份尚未验证，记录仍在本机。');
  const response=await root.fetch(ctrl.apiBase+path,{method,headers:{Authorization:'Bearer '+ctrl.token,...(payload?{'Content-Type':'application/json'}:{})},...(payload?{body:JSON.stringify(payload)}:{})});
  let data;try{data=await response.json()}catch{throw Error('服务端响应无效')}
- if(!response.ok)throw Error(data.error||'提交失败 (HTTP '+response.status+')');return data;
+ if(!response.ok){const error=Error(data.error||'提交失败 (HTTP '+response.status+')');error.status=response.status;throw error}return data;
 }
 function readLocal(){
  const s=storage(),records=[];
@@ -52,13 +52,15 @@ async function perform(){const ctrl=identity();if(ctrl?.mode!=='named')return {s
  if(!ctrl.token)throw Error('学生身份尚未验证；学习记录只保存在本机');
  const rows=await remoteRecords();hydrate(rows);
  const remoteById=new Map(rows.map(row=>[row.kind+':'+row.id,row]));
+ let closed=0;
  for(const record of readLocal()){
   const remote=remoteById.get(record.kind+':'+record.id);
   // Older assigned records can carry the assignment only in the server envelope.
   if(remote&&JSON.stringify(canonical(record.payload))===JSON.stringify(canonical(remote.payload))&&
      (record.assignmentId===remote.assignmentId||(record.assignmentId===null&&record.payload.assignmentId===undefined)))continue;
-  await request('POST','/api/student/records',record);
+  try{await request('POST','/api/student/records',record)}catch(error){if(error.status===410&&record.assignmentId){closed++;continue}throw error}
  }
+ if(closed){lastError=closed+' 条已撤销或到期作业的记录仅保存在本机，请联系老师。其他记录已同步。';synced=false;paint(lastError,true);return {status:'blocked',error:lastError}}
  lastError='';synced=true;paint('已同步到学生云端记录。');return {status:'synced'};
 }
 function queue(){if(scheduled)return scheduled;if(identity()?.mode==='named')paint('正在提交云端记录…');
@@ -67,3 +69,4 @@ const ready=new Promise(resolve=>root.setTimeout(resolve,0)).then(()=>queue());
 root.addEventListener('online',()=>queue());
 root.WordCloudSync={ready,queue,get lastError(){return lastError},get synced(){return synced}};
 })(window);
+

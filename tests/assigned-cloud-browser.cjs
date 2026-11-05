@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 const {DatabaseSync}=require('node:sqlite'),{chromium}=require('playwright');
 const root=path.resolve(__dirname,'..'),A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222';
-function database(){const db=new DatabaseSync(':memory:');for(const file of ['0001_students.sql','0002_assignments_records.sql'])db.exec(fs.readFileSync(path.join(root,'backend/migrations',file),'utf8'));
+function database(){const db=new DatabaseSync(':memory:');for(const file of ['0001_students.sql','0002_assignments_records.sql','0003_assignment_revocation.sql'])db.exec(fs.readFileSync(path.join(root,'backend/migrations',file),'utf8'));
  const prep=(sql,args=[])=>({bind:(...values)=>prep(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)});
  return {prepare:sql=>prep(sql),async batch(statements){db.exec('BEGIN');try{const result=[];for(const s of statements)result.push(await s.run());db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}},count:()=>db.prepare('SELECT COUNT(*) AS n FROM student_records').get().n,close:()=>db.close()};
 }
@@ -115,3 +115,4 @@ async function main(){await import('../scripts/build-teacher-assets.mjs');const 
   console.log('PASS assigned fixed and learning links, temporary assigned identity, named spelling/Daily sync, cross-device progress, offline retry, Guest isolation, invalid/expired links, desktop/mobile');
  }finally{await browser?.close();if(server)await new Promise(resolve=>server.close(resolve));db.close()}}
 main().catch(error=>{console.error(error);process.exitCode=1});
+

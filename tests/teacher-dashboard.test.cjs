@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {DatabaseSync}=require('node:sqlite');
 const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222';
-function database(){const db=new DatabaseSync(':memory:');for(const file of ['0001_students.sql','0002_assignments_records.sql'])db.exec(fs.readFileSync(path.join(__dirname,'../backend/migrations',file),'utf8'));const prep=(sql,args=[])=>({bind:(...values)=>prep(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)});return {prepare:sql=>prep(sql),close:()=>db.close()}}
+function database(){const db=new DatabaseSync(':memory:');for(const file of ['0001_students.sql','0002_assignments_records.sql','0003_assignment_revocation.sql'])db.exec(fs.readFileSync(path.join(__dirname,'../backend/migrations',file),'utf8'));const prep=(sql,args=[])=>({bind:(...values)=>prep(sql,values),first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)});return {prepare:sql=>prep(sql),close:()=>db.close()}}
 async function setup(){const db=database(),now=new Date().toISOString();for(const id of [A,B])await db.prepare('INSERT INTO students(id,display_name,status,created_at,updated_at) VALUES(?,?,?,?,?)').bind(id,id===A?'Alice':'Bob','active',now,now).run();return db}
 test('teacher record query scopes by student and assignment; retries dedupe, checkpoint shows latest and pages backwards',async()=>{const {listTeacherRecords,listTeacherAssignments,createAssignment,putRecord}=await import('../backend/src/records.js'),db=await setup();try{
  const first=await createAssignment(db,{studentId:A,presetHash:'#preset=abc.def'}),second=await createAssignment(db,{studentId:B,presetHash:'#preset=xyz.def'}),time='2026-10-24T00:00:00.000Z';
@@ -19,3 +19,4 @@ test('teacher record routes deny unauthenticated requests and reject malformed f
  for(const url of ['/api/teacher/records?studentId='+A,'/api/teacher/assignments?studentId='+A])assert.equal((await handle(new Request('https://api.example'+url),env)).status,403);
  assert.equal((await handle(new Request('https://api.example/api/student/records?studentId='+A),env)).status,401);
 }finally{db.close()}});
+
